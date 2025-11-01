@@ -1,0 +1,3728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Langfuse Trace Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #0056b3;
+            background-color: #e3f2fd;
+        }
+
+        .upload-area.dragover {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .upload-btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        .upload-btn:hover {
+            background: #0056b3;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .stat-card h3 {
+            margin: 0 0 8px 0;
+            color: #495057;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 16px;
+        }
+
+        canvas {
+            max-height: 400px;
+        }
+
+        .data-table {
+            margin: 30px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 11px;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+            font-weight: 600;
+            font-size: 10px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #007bff;
+        }
+
+        .results {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Langfuse Trace Analyzer</h1>
+        <p>Upload Langfuse trace JSON to analyze observations, spans, generations, token usage, costs, and performance metrics.</p>
+        <div style="margin-bottom: 15px;">
+            <button onclick="enableTokenDebug()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                🐛 Debug Token Fields
+            </button>
+            <button onclick="showRawDataSample()" style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                📄 Show Raw Data Sample
+            </button>
+            <button onclick="openFeedbackModal()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                💬 Send Feedback
+            </button>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div>
+                <p style="font-size: 18px; margin-bottom: 15px;">📁 Drop your JSON file here or click to browse</p>
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                <input type="file" id="fileInput" accept=".json" />
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <p>🔄 Processing JSON file...</p>
+        </div>
+
+        <div id="error"></div>
+
+        <div class="results" id="results">
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <div class="chart-container">
+                <h3>Observation Types Distribution</h3>
+                <canvas id="nameChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Average Latency by Type</h3>
+                <canvas id="latencyChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Token Usage by Model</h3>
+                <canvas id="tokenChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Cost Analysis</h3>
+                <canvas id="costChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Timeline Analysis</h3>
+                <canvas id="timelineChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Performance Scatter Plot - Latency vs Token Usage</h3>
+                <canvas id="scatterChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Laggard Analysis - Slowest Operations</h3>
+                <canvas id="laggardChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Trace Hierarchy - Flame Graph</h3>
+                <div id="flameGraph" style="height: 400px; overflow: auto; border: 1px solid #ddd; border-radius: 8px;"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Call Timeline - Gantt Chart</h3>
+                <canvas id="ganttChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>🤖 OpenAI Calls Analysis - Why 122+ Calls?</h3>
+                <div id="openaiCallsAnalysis"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>📝 Individual Prompt Analysis - Detailed Breakdown</h3>
+                <div style="margin-bottom: 15px;">
+                    <button onclick="togglePromptView('category')" id="categoryViewBtn" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                        📊 Category View
+                    </button>
+                    <button onclick="togglePromptView('individual')" id="individualViewBtn" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                        📄 Individual Prompts
+                    </button>
+                    <button onclick="togglePromptView('timeline')" id="timelineViewBtn" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                        ⏰ Timeline View
+                    </button>
+                    <button onclick="togglePromptView('hierarchy')" id="hierarchyViewBtn" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                        🌳 Agent Hierarchy
+                    </button>
+                </div>
+                <div id="promptAnalysis"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Generation Analysis - Individual Breakdown</h3>
+                <div id="generationAnalysis"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Generation Deep Dive</h3>
+                <div style="margin-bottom: 20px;">
+                    <label for="typeFilter" style="margin-right: 10px;">Filter by Type:</label>
+                    <select id="typeFilter" style="padding: 5px; margin-right: 20px;">
+                        <option value="all">All Types</option>
+                    </select>
+                    <label for="modelFilter" style="margin-right: 10px;">Filter by Model:</label>
+                    <select id="modelFilter" style="padding: 5px; margin-right: 15px;">
+                        <option value="all">All Models</option>
+                    </select>
+                    <label for="nameFilter" style="margin-right: 10px;">Filter by Name:</label>
+                    <select id="nameFilter" style="padding: 5px;">
+                        <option value="all">All Names</option>
+                    </select>
+                </div>
+                <canvas id="deepDiveChart"></canvas>
+            </div>
+
+            <div class="data-table">
+                <h3>Detailed Observations</h3>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Model</th>
+                            <th>Latency (ms)</th>
+                            <th>Input Tokens</th>
+                            <th>Output Tokens</th>
+                            <th>Total Cost</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for detailed observation view -->
+    <div id="observationModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div style="background-color: #fefefe; margin: 5% auto; padding: 20px; border: none; border-radius: 10px; width: 80%; max-width: 800px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #007bff; padding-bottom: 15px;">
+                <h2 id="modalTitle" style="margin: 0; color: #007bff;">Observation Details</h2>
+                <span onclick="closeModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            <div id="modalContent" style="max-height: 600px; overflow-y: auto;">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Hover tooltip for OpenAI call/response -->
+    <div id="hoverTooltip" style="display: none; position: fixed; z-index: 2000; background: white; border: 2px solid #007bff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); max-width: 600px; max-height: 500px;">
+        <div style="background: #007bff; color: white; padding: 6px 10px; border-radius: 6px 6px 0 0; font-weight: bold; font-size: 10px;">
+            🤖 OpenAI Call Details
+        </div>
+        <div id="tooltipContent" style="max-height: 350px; overflow-y: auto; padding: 0;">
+            <!-- Content will be populated dynamically -->
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" style="display: none; position: fixed; z-index: 1500; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div style="background-color: #fefefe; margin: 10% auto; padding: 25px; border: none; border-radius: 10px; width: 70%; max-width: 600px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #28a745; padding-bottom: 15px;">
+                <h2 style="margin: 0; color: #28a745;">💬 Send Feedback</h2>
+                <span onclick="closeFeedbackModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <p style="color: #6c757d; margin-bottom: 15px;">Help us improve the Langfuse Trace Analyzer! Your feedback will be submitted as an issue to our diagnostics repository.</p>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #495057;">Feedback Type:</label>
+                    <select id="feedbackType" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                        <option value="bug">🐛 Bug Report</option>
+                        <option value="feature">✨ Feature Request</option>
+                        <option value="improvement">🔧 Improvement Suggestion</option>
+                        <option value="question">❓ Question</option>
+                        <option value="other">💭 Other</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #495057;">Title:</label>
+                    <input type="text" id="feedbackTitle" placeholder="Brief description of your feedback..." style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #495057;">Description:</label>
+                    <textarea id="feedbackDescription" rows="6" placeholder="Please provide detailed feedback. Include steps to reproduce for bugs, or describe the feature/improvement you'd like to see..." style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; resize: vertical;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #495057;">Your Email (optional):</label>
+                    <input type="email" id="feedbackEmail" placeholder="your.email@example.com" style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                    <small style="color: #6c757d;">We'll only use this to follow up on your feedback if needed</small>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #17a2b8;">
+                    <h6 style="margin: 0 0 10px 0; color: #0c5460;">📊 Analysis Context (automatically included):</h6>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 12px; color: #6c757d;">
+                        <li>Total observations analyzed: <span id="contextObservations">-</span></li>
+                        <li>OpenAI calls detected: <span id="contextOpenAICalls">-</span></li>
+                        <li>Duplicate calls found: <span id="contextDuplicates">-</span></li>
+                        <li>Rate limit retries: <span id="contextRetries">-</span></li>
+                        <li>Browser: <span id="contextBrowser">-</span></li>
+                        <li>Timestamp: <span id="contextTimestamp">-</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="text-align: right;">
+                <button onclick="closeFeedbackModal()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                    Cancel
+                </button>
+                <button onclick="submitFeedback()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                    📤 Submit Feedback
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let jsonData = null;
+        let allObservations = [];
+        let nameChart = null;
+        let latencyChart = null;
+        let tokenChart = null;
+        let costChart = null;
+        let timelineChart = null;
+        let scatterChart = null;
+        let laggardChart = null;
+        let deepDiveChart = null;
+        let ganttChart = null;
+        let hoverTimeout = null;
+
+        // File upload handlers
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const errorDiv = document.getElementById('error');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('click', (e) => {
+            // Only trigger file input if not clicking on the button itself
+            if (e.target.tagName !== 'BUTTON') {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+                // Clear the file input to allow re-uploading the same file
+                e.target.value = '';
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.json')) {
+                showError('Please select a JSON file.');
+                return;
+            }
+
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            errorDiv.innerHTML = '';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    jsonData = JSON.parse(e.target.result);
+                    analyzeData();
+                } catch (error) {
+                    showError('Invalid JSON file: ' + error.message);
+                    loading.style.display = 'none';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function showError(message) {
+            errorDiv.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        function analyzeData() {
+            try {
+                // Extract observations from the JSON
+                const observations = extractObservations(jsonData);
+
+                if (!observations || observations.length === 0) {
+                    showError('No trace observations found in the JSON file. Expected structure: $.trace.observations[]');
+                    loading.style.display = 'none';
+                    return;
+                }
+
+                // Store observations globally for interactions
+                allObservations = observations;
+
+                // Calculate statistics
+                const stats = calculateStats(observations);
+
+                // Display results
+                displayStats(stats);
+                displayCharts(stats);
+                displayOpenAICallsAnalysis(stats);
+                displayPromptAnalysis(stats);
+                displayGenerationAnalysis(stats);
+                displayTable(observations);
+                setupFilters(stats);
+
+                // Update feedback context with analysis results
+                updateAnalysisContext(stats);
+
+                loading.style.display = 'none';
+                results.style.display = 'block';
+
+            } catch (error) {
+                showError('Error analyzing data: ' + error.message);
+                loading.style.display = 'none';
+            }
+        }
+
+        // Modal functions
+        function openModal(observationIndex) {
+            const observation = allObservations[observationIndex];
+            const modal = document.getElementById('observationModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+
+            modalTitle.textContent = `${observation.type || 'Unknown'} - ${observation.name || 'Unnamed'}`;
+
+            modalContent.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 style="color: #007bff; margin-bottom: 15px;">📊 Performance Metrics</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <p><strong>Latency:</strong> ${calculateLatency(observation)}ms</p>
+                            <p><strong>Start Time:</strong> ${observation.startTime ? new Date(observation.startTime).toLocaleString() : 'N/A'}</p>
+                            <p><strong>End Time:</strong> ${observation.endTime ? new Date(observation.endTime).toLocaleString() : 'N/A'}</p>
+                            <p><strong>Model:</strong> ${observation.model || observation.modelId || 'N/A'}</p>
+                        </div>
+
+                        <h4 style="color: #007bff; margin-bottom: 15px;">💰 Cost Analysis</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <p><strong>Total Cost:</strong> $${(observation.calculatedTotalCost || observation.totalCost || 0).toFixed(6)}</p>
+                            <p><strong>Input Cost:</strong> $${(observation.calculatedInputCost || 0).toFixed(6)}</p>
+                            <p><strong>Output Cost:</strong> $${(observation.calculatedOutputCost || 0).toFixed(6)}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="color: #007bff; margin-bottom: 15px;">🔢 Token Usage</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            ${observation.usage ? `
+                                <p><strong>Input Tokens:</strong> ${observation.usage.promptTokens || observation.usage.input || 0}</p>
+                                <p><strong>Output Tokens:</strong> ${observation.usage.completionTokens || observation.usage.output || 0}</p>
+                                <p><strong>Total Tokens:</strong> ${observation.usage.totalTokens || observation.usage.total || 0}</p>
+                            ` : '<p>No token usage data available</p>'}
+                        </div>
+
+                        <h4 style="color: #007bff; margin-bottom: 15px;">🏷️ Metadata</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <p><strong>ID:</strong> ${observation.id || 'N/A'}</p>
+                            <p><strong>Trace ID:</strong> ${observation.traceId || 'N/A'}</p>
+                            <p><strong>Parent ID:</strong> ${observation.parentObservationId || 'N/A'}</p>
+                            <p><strong>Type:</strong> ${observation.type || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                ${observation.input || observation.output ? `
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: #007bff; margin-bottom: 15px;">💬 Input/Output</h4>
+                        ${observation.input ? `
+                            <div style="margin-bottom: 15px;">
+                                <h5>Input:</h5>
+                                <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 200px;">${JSON.stringify(observation.input, null, 2)}</pre>
+                            </div>
+                        ` : ''}
+                        ${observation.output ? `
+                            <div>
+                                <h5>Output:</h5>
+                                <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 200px;">${JSON.stringify(observation.output, null, 2)}</pre>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #007bff; margin-bottom: 15px;">🔍 Raw Data</h4>
+                    <pre style="background: #f8f9fa; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 300px; font-size: 12px;">${JSON.stringify(observation, null, 2)}</pre>
+                </div>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('observationModal').style.display = 'none';
+        }
+
+        function calculateLatency(obs) {
+            if (obs.startTime && obs.endTime) {
+                return new Date(obs.endTime) - new Date(obs.startTime);
+            }
+            return parseFloat(obs.latency) || 0;
+        }
+
+        // Setup filter dropdowns
+        function setupFilters(stats) {
+            const typeFilter = document.getElementById('typeFilter');
+            const modelFilter = document.getElementById('modelFilter');
+            const nameFilter = document.getElementById('nameFilter');
+
+            // Clear existing options (except "All")
+            typeFilter.innerHTML = '<option value="all">All Types</option>';
+            modelFilter.innerHTML = '<option value="all">All Models</option>';
+            nameFilter.innerHTML = '<option value="all">All Names</option>';
+
+            // Add type options
+            Object.keys(stats.typeMap).forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = `${type} (${stats.typeMap[type]})`;
+                typeFilter.appendChild(option);
+            });
+
+            // Add model options
+            Object.keys(stats.modelMap).forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = `${model} (${stats.modelMap[model]})`;
+                modelFilter.appendChild(option);
+            });
+
+            // Add name options (from regular calls only, excluding orchestrators)
+            const nameCount = {};
+            stats.regularCalls.forEach(obs => {
+                const name = obs.name || 'Unknown';
+                nameCount[name] = (nameCount[name] || 0) + 1;
+            });
+
+            Object.keys(nameCount).forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = `${name} (${nameCount[name]})`;
+                nameFilter.appendChild(option);
+            });
+
+            // Add event listeners
+            typeFilter.addEventListener('change', updateDeepDiveChart);
+            modelFilter.addEventListener('change', updateDeepDiveChart);
+            nameFilter.addEventListener('change', updateDeepDiveChart);
+        }
+
+        function updateDeepDiveChart() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const modelFilter = document.getElementById('modelFilter').value;
+            const nameFilter = document.getElementById('nameFilter').value;
+
+            // Start with regular calls only (exclude orchestrators)
+            const stats = calculateStats(allObservations);
+            let filteredObs = stats.regularCalls;
+
+            if (typeFilter !== 'all') {
+                filteredObs = filteredObs.filter(obs => obs.type === typeFilter);
+            }
+
+            if (modelFilter !== 'all') {
+                filteredObs = filteredObs.filter(obs => (obs.model || obs.modelId) === modelFilter);
+            }
+
+            if (nameFilter !== 'all') {
+                filteredObs = filteredObs.filter(obs => obs.name === nameFilter);
+            }
+
+            displayDeepDiveChart(filteredObs);
+        }
+
+        function extractObservations(data) {
+            let observations = [];
+
+            // Handle array of traces
+            if (Array.isArray(data)) {
+                data.forEach(trace => {
+                    if (trace.observations) {
+                        observations = observations.concat(trace.observations);
+                    }
+                });
+                return observations;
+            }
+
+            // Handle single trace with observations
+            if (data.observations && Array.isArray(data.observations)) {
+                return data.observations;
+            }
+
+            // Handle nested structure
+            if (data.data && Array.isArray(data.data)) {
+                data.data.forEach(trace => {
+                    if (trace.observations) {
+                        observations = observations.concat(trace.observations);
+                    }
+                });
+                return observations;
+            }
+
+            // Search for observations in nested objects
+            const findObservations = (obj) => {
+                if (obj && typeof obj === 'object') {
+                    if (obj.observations && Array.isArray(obj.observations)) {
+                        return obj.observations;
+                    }
+                    for (const key in obj) {
+                        const result = findObservations(obj[key]);
+                        if (result) return result;
+                    }
+                }
+                return null;
+            };
+
+            const found = findObservations(data);
+            return found || [];
+        }
+
+        function calculateStats(observations) {
+            const typeMap = {};
+            const nameMap = {};
+            const modelMap = {};
+            const latencyMap = {};
+            const tokenMap = {};
+            const costMap = {};
+            const timeData = [];
+            const hierarchyMap = {};
+
+            let totalLatency = 0;
+            let totalCost = 0;
+            let totalInputTokens = 0;
+            let totalOutputTokens = 0;
+            let totalCount = 0;
+
+            // Separate orchestrators from other calls
+            const orchestrators = [];
+            const regularCalls = [];
+
+            // First pass: identify orchestrators and build hierarchy
+            observations.forEach((obs, index) => {
+                const name = obs.name || 'Unknown';
+                const isOrchestrator = name.toLowerCase().includes('orchestrator') ||
+                                     name.toLowerCase().includes('workflow') ||
+                                     (!obs.parentObservationId && obs.type === 'SPAN');
+
+                if (isOrchestrator) {
+                    orchestrators.push({...obs, originalIndex: index});
+                } else {
+                    regularCalls.push({...obs, originalIndex: index});
+                }
+
+                // Build hierarchy map
+                const parentId = obs.parentObservationId;
+                if (parentId) {
+                    if (!hierarchyMap[parentId]) {
+                        hierarchyMap[parentId] = [];
+                    }
+                    hierarchyMap[parentId].push({...obs, originalIndex: index});
+                }
+            });
+
+            // Process regular calls (non-orchestrators) for main stats
+            regularCalls.forEach((obs, index) => {
+                const type = obs.type || 'Unknown';
+                const name = obs.name || 'Unknown';
+                const model = obs.model || obs.modelId || 'Unknown';
+
+                // Calculate latency from timestamps or use provided latency
+                let latency = 0;
+                if (obs.startTime && obs.endTime) {
+                    const start = new Date(obs.startTime);
+                    const end = new Date(obs.endTime);
+                    latency = end - start;
+                } else if (obs.latency) {
+                    latency = parseFloat(obs.latency);
+                }
+
+                // Extract token usage - check multiple possible field structures
+                const usage = obs.usage || {};
+                const usageDetails = obs.usageDetails || {}; // This is where Langfuse stores token data!
+
+                // Check usageDetails first (primary source for Langfuse)
+                let inputTokens = usageDetails.input || usageDetails.prompt_tokens || usageDetails.promptTokens || 0;
+                let outputTokens = usageDetails.output || usageDetails.completion_tokens || usageDetails.completionTokens || 0;
+                let totalTokens = usageDetails.total || 0;
+
+                // Fallback to usage object if not found in usageDetails
+                if (!inputTokens) {
+                    inputTokens = usage.promptTokens || usage.input || usage.inputTokens || 0;
+                }
+                if (!outputTokens) {
+                    outputTokens = usage.completionTokens || usage.output || usage.outputTokens || 0;
+                }
+                if (!totalTokens) {
+                    totalTokens = usage.totalTokens || usage.total || 0;
+                }
+
+                // Fallback to top-level observation fields
+                if (!inputTokens) {
+                    inputTokens = obs.promptTokens || obs.inputTokens || obs.input || 0;
+                }
+                if (!outputTokens) {
+                    outputTokens = obs.completionTokens || obs.outputTokens || obs.output || 0;
+                }
+                if (!totalTokens) {
+                    totalTokens = obs.totalTokens || obs.total || (inputTokens + outputTokens) || 0;
+                }
+
+                // Debug logging for token fields (will show in browser console)
+                if ((inputTokens > 0 || outputTokens > 0 || totalTokens > 0) && window.DEBUG_TOKENS) {
+                    console.log('Token data found:', {
+                        name: obs.name,
+                        type: obs.type,
+                        inputTokens,
+                        outputTokens,
+                        totalTokens,
+                        rawUsage: usage,
+                        rawObs: obs
+                    });
+                }
+
+                // Extract cost information
+                const cost = parseFloat(obs.calculatedTotalCost || obs.totalCost || 0);
+
+                // Count by type
+                typeMap[type] = (typeMap[type] || 0) + 1;
+
+                // Count by name
+                nameMap[name] = (nameMap[name] || 0) + 1;
+
+                // Count by model
+                if (model !== 'Unknown') {
+                    modelMap[model] = (modelMap[model] || 0) + 1;
+                }
+
+                // Accumulate latency for averages
+                if (!latencyMap[type]) {
+                    latencyMap[type] = { total: 0, count: 0 };
+                }
+                latencyMap[type].total += latency;
+                latencyMap[type].count += 1;
+
+                // Accumulate token usage by model
+                if (model !== 'Unknown' && (inputTokens > 0 || outputTokens > 0)) {
+                    if (!tokenMap[model]) {
+                        tokenMap[model] = { input: 0, output: 0, total: 0 };
+                    }
+                    tokenMap[model].input += inputTokens;
+                    tokenMap[model].output += outputTokens;
+                    tokenMap[model].total += totalTokens;
+                }
+
+                // Accumulate cost by model
+                if (model !== 'Unknown' && cost > 0) {
+                    if (!costMap[model]) {
+                        costMap[model] = 0;
+                    }
+                    costMap[model] += cost;
+                }
+
+                // Time series data
+                if (obs.startTime) {
+                    timeData.push({
+                        time: new Date(obs.startTime),
+                        type: type,
+                        latency: latency,
+                        cost: cost
+                    });
+                }
+
+                totalLatency += latency;
+                totalCost += cost;
+                totalInputTokens += inputTokens;
+                totalOutputTokens += outputTokens;
+                totalCount += 1;
+            });
+
+            // Calculate averages
+            const avgLatencyByType = {};
+            Object.keys(latencyMap).forEach(type => {
+                avgLatencyByType[type] = latencyMap[type].total / latencyMap[type].count;
+            });
+
+            // Sort time data
+            timeData.sort((a, b) => a.time - b.time);
+
+            return {
+                typeMap,
+                nameMap,
+                modelMap,
+                avgLatencyByType,
+                tokenMap,
+                costMap,
+                timeData,
+                hierarchyMap,
+                orchestrators,
+                regularCalls,
+                totalCount,
+                totalLatency,
+                totalCost,
+                totalInputTokens,
+                totalOutputTokens,
+                avgLatency: totalLatency / totalCount || 0,
+                avgCost: totalCost / totalCount || 0,
+                uniqueTypes: Object.keys(typeMap).length,
+                uniqueModels: Object.keys(modelMap).length,
+                generations: typeMap['GENERATION'] || 0,
+                spans: typeMap['SPAN'] || 0,
+                events: typeMap['EVENT'] || 0
+            };
+        }
+
+        function displayStats(stats) {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <h3>Total Observations</h3>
+                    <div class="value">${stats.totalCount}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Generations</h3>
+                    <div class="value">${stats.generations}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Spans</h3>
+                    <div class="value">${stats.spans}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Events</h3>
+                    <div class="value">${stats.events}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Unique Models</h3>
+                    <div class="value">${stats.uniqueModels}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Latency</h3>
+                    <div class="value">${stats.avgLatency.toFixed(0)}ms</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Input Tokens</h3>
+                    <div class="value">${stats.totalInputTokens.toLocaleString()}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Output Tokens</h3>
+                    <div class="value">${stats.totalOutputTokens.toLocaleString()}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Cost</h3>
+                    <div class="value">$${stats.totalCost.toFixed(4)}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Cost</h3>
+                    <div class="value">$${stats.avgCost.toFixed(6)}</div>
+                </div>
+            `;
+        }
+
+        function displayCharts(stats) {
+            // Observation types distribution chart
+            const nameCtx = document.getElementById('nameChart').getContext('2d');
+            if (nameChart) nameChart.destroy();
+
+            nameChart = new Chart(nameCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(stats.typeMap),
+                    datasets: [{
+                        label: 'Count',
+                        data: Object.values(stats.typeMap),
+                        backgroundColor: ['rgba(0, 123, 255, 0.7)', 'rgba(40, 167, 69, 0.7)', 'rgba(255, 193, 7, 0.7)', 'rgba(220, 53, 69, 0.7)'],
+                        borderColor: ['rgba(0, 123, 255, 1)', 'rgba(40, 167, 69, 1)', 'rgba(255, 193, 7, 1)', 'rgba(220, 53, 69, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Average latency by type chart
+            const latencyCtx = document.getElementById('latencyChart').getContext('2d');
+            if (latencyChart) latencyChart.destroy();
+
+            latencyChart = new Chart(latencyCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(stats.avgLatencyByType),
+                    datasets: [{
+                        label: 'Average Latency (ms)',
+                        data: Object.values(stats.avgLatencyByType),
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Token usage by model chart
+            const tokenCtx = document.getElementById('tokenChart').getContext('2d');
+            if (tokenChart) tokenChart.destroy();
+
+            if (Object.keys(stats.tokenMap).length > 0) {
+                const models = Object.keys(stats.tokenMap);
+                tokenChart = new Chart(tokenCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: models,
+                        datasets: [{
+                            label: 'Input Tokens',
+                            data: models.map(model => stats.tokenMap[model].input),
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Output Tokens',
+                            data: models.map(model => stats.tokenMap[model].output),
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: true
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Cost analysis chart
+            const costCtx = document.getElementById('costChart').getContext('2d');
+            if (costChart) costChart.destroy();
+
+            if (Object.keys(stats.costMap).length > 0) {
+                costChart = new Chart(costCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(stats.costMap),
+                        datasets: [{
+                            data: Object.values(stats.costMap),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 205, 86, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(153, 102, 255, 0.7)',
+                                'rgba(255, 159, 64, 0.7)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Timeline analysis chart
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            if (timelineChart) timelineChart.destroy();
+
+            if (stats.timeData.length > 0) {
+                // Group by hour for timeline
+                const hourlyData = {};
+                stats.timeData.forEach(item => {
+                    const hour = new Date(item.time).toISOString().substring(0, 13) + ':00:00.000Z';
+                    if (!hourlyData[hour]) {
+                        hourlyData[hour] = { count: 0, totalLatency: 0, totalCost: 0 };
+                    }
+                    hourlyData[hour].count += 1;
+                    hourlyData[hour].totalLatency += item.latency;
+                    hourlyData[hour].totalCost += item.cost;
+                });
+
+                const sortedHours = Object.keys(hourlyData).sort();
+
+                timelineChart = new Chart(timelineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: sortedHours.map(h => new Date(h).toLocaleString()),
+                        datasets: [{
+                            label: 'Observations per Hour',
+                            data: sortedHours.map(h => hourlyData[h].count),
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y'
+                        }, {
+                            label: 'Avg Latency per Hour (ms)',
+                            data: sortedHours.map(h => hourlyData[h].totalLatency / hourlyData[h].count),
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Count'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Latency (ms)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Interactive scatter plot - Latency vs Token Usage
+            const scatterCtx = document.getElementById('scatterChart').getContext('2d');
+            if (scatterChart) scatterChart.destroy();
+
+            const scatterData = [];
+            allObservations.forEach((obs, index) => {
+                const latency = calculateLatency(obs);
+
+                // Extract tokens using same logic as calculateStats
+                const usage = obs.usage || {};
+                const usageDetails = obs.usageDetails || {};
+
+                let totalTokens = usageDetails.total || 0;
+                if (!totalTokens) {
+                    totalTokens = usage.totalTokens || usage.total || 0;
+                }
+                if (!totalTokens) {
+                    totalTokens = obs.totalTokens || obs.total || 0;
+                }
+                if (!totalTokens) {
+                    const inputTokens = usageDetails.input || usage.promptTokens || usage.input || obs.promptTokens || obs.input || 0;
+                    const outputTokens = usageDetails.output || usage.completionTokens || usage.output || obs.completionTokens || obs.output || 0;
+                    totalTokens = inputTokens + outputTokens;
+                }
+
+                const cost = parseFloat(obs.calculatedTotalCost || obs.totalCost || 0);
+
+                if (latency > 0 || totalTokens > 0) {
+                    scatterData.push({
+                        x: totalTokens,
+                        y: latency,
+                        cost: cost,
+                        type: obs.type,
+                        model: obs.model || obs.modelId,
+                        index: index,
+                        name: obs.name
+                    });
+                }
+            });
+
+            scatterChart = new Chart(scatterCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Observations',
+                        data: scatterData,
+                        backgroundColor: scatterData.map(point => {
+                            // Color by type
+                            const colors = {
+                                'GENERATION': 'rgba(255, 99, 132, 0.6)',
+                                'SPAN': 'rgba(54, 162, 235, 0.6)',
+                                'EVENT': 'rgba(255, 205, 86, 0.6)',
+                                'TRACE': 'rgba(75, 192, 192, 0.6)'
+                            };
+                            return colors[point.type] || 'rgba(153, 102, 255, 0.6)';
+                        }),
+                        borderColor: scatterData.map(point => {
+                            const colors = {
+                                'GENERATION': 'rgba(255, 99, 132, 1)',
+                                'SPAN': 'rgba(54, 162, 235, 1)',
+                                'EVENT': 'rgba(255, 205, 86, 1)',
+                                'TRACE': 'rgba(75, 192, 192, 1)'
+                            };
+                            return colors[point.type] || 'rgba(153, 102, 255, 1)';
+                        }),
+                        pointRadius: scatterData.map(point => Math.max(3, Math.min(15, point.cost * 1000 + 5))),
+                        pointHoverRadius: scatterData.map(point => Math.max(5, Math.min(20, point.cost * 1000 + 8)))
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Total Tokens'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Latency (ms)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const point = context[0].raw;
+                                    return `${point.type} - ${point.name || 'Unnamed'}`;
+                                },
+                                label: function(context) {
+                                    const point = context.raw;
+                                    return [
+                                        `Tokens: ${point.x}`,
+                                        `Latency: ${point.y}ms`,
+                                        `Cost: $${point.cost.toFixed(6)}`,
+                                        `Model: ${point.model || 'Unknown'}`
+                                    ];
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const observationIndex = scatterData[index].index;
+                            openModal(observationIndex);
+                        }
+                    }
+                }
+            });
+
+            // Laggard analysis - identify slowest operations
+            const laggardCtx = document.getElementById('laggardChart').getContext('2d');
+            if (laggardChart) laggardChart.destroy();
+
+            // Get slowest 10 operations
+            const sortedByLatency = [...allObservations]
+                .map((obs, index) => ({
+                    ...obs,
+                    latency: calculateLatency(obs),
+                    originalIndex: index
+                }))
+                .filter(obs => obs.latency > 0)
+                .sort((a, b) => b.latency - a.latency)
+                .slice(0, 10);
+
+            if (sortedByLatency.length > 0) {
+                laggardChart = new Chart(laggardCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedByLatency.map(obs => `${obs.type} - ${obs.name || 'Unnamed'}`),
+                        datasets: [{
+                            label: 'Latency (ms)',
+                            data: sortedByLatency.map(obs => obs.latency),
+                            backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                            borderColor: 'rgba(220, 53, 69, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Latency (ms)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const obs = sortedByLatency[context[0].dataIndex];
+                                        return `${obs.type} - ${obs.name || 'Unnamed'}`;
+                                    },
+                                    label: function(context) {
+                                        const obs = sortedByLatency[context.dataIndex];
+                                        return [
+                                            `Latency: ${obs.latency}ms`,
+                                            `Model: ${obs.model || obs.modelId || 'Unknown'}`,
+                                            `Cost: $${(obs.calculatedTotalCost || obs.totalCost || 0).toFixed(6)}`
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const observationIndex = sortedByLatency[index].originalIndex;
+                                openModal(observationIndex);
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Display flame graph and Gantt chart
+            displayFlameGraph(stats);
+            displayGanttChart(stats);
+
+            // Initial deep dive chart (with regular calls only)
+            displayDeepDiveChart(stats.regularCalls);
+        }
+
+        function displayFlameGraph(stats) {
+            const flameGraphContainer = document.getElementById('flameGraph');
+            flameGraphContainer.innerHTML = '';
+
+            // Build hierarchical structure for flame graph
+            const buildFlameStack = (observations, hierarchyMap) => {
+                // Find root observations (no parent)
+                const roots = observations.filter(obs => !obs.parentObservationId);
+
+                const buildStack = (obs, level = 0) => {
+                    const latency = calculateLatency(obs);
+                    const startTime = obs.startTime ? new Date(obs.startTime) : null;
+
+                    const element = document.createElement('div');
+                    element.style.cssText = `
+                        margin-left: ${level * 20}px;
+                        padding: 8px 12px;
+                        margin: 2px 0;
+                        background: ${getColorForType(obs.type)};
+                        border-radius: 4px;
+                        border-left: 4px solid ${getBorderColorForType(obs.type)};
+                        cursor: pointer;
+                        position: relative;
+                        font-size: 12px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    `;
+
+                    element.innerHTML = `
+                        <div style="font-weight: bold; color: #333;">
+                            ${obs.name || 'Unknown'} (${obs.type || 'Unknown'})
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-top: 2px;">
+                            Latency: ${latency}ms | Model: ${obs.model || obs.modelId || 'N/A'}
+                            ${obs.usage ? ` | Tokens: ${obs.usage.totalTokens || obs.usage.total || 0}` : ''}
+                        </div>
+                    `;
+
+                    element.addEventListener('click', () => openModal(obs.originalIndex));
+                    element.addEventListener('mouseenter', (e) => showHoverTooltip(e, obs.originalIndex || allObservations.indexOf(obs)));
+                    element.addEventListener('mouseleave', hideHoverTooltip);
+                    flameGraphContainer.appendChild(element);
+
+                    // Add children
+                    const children = hierarchyMap[obs.id] || [];
+                    children.forEach(child => buildStack(child, level + 1));
+                };
+
+                roots.forEach(root => buildStack(root));
+            };
+
+            buildFlameStack(allObservations, stats.hierarchyMap);
+        }
+
+        function displayGanttChart(stats) {
+            const ganttCtx = document.getElementById('ganttChart').getContext('2d');
+            if (ganttChart) ganttChart.destroy();
+
+            // Create timeline data for Gantt chart
+            const timelineItems = allObservations
+                .filter(obs => obs.startTime && obs.endTime)
+                .map((obs, index) => {
+                    const start = new Date(obs.startTime);
+                    const end = new Date(obs.endTime);
+                    const duration = end - start;
+
+                    return {
+                        name: `${obs.type}: ${obs.name || 'Unknown'}`,
+                        start: start,
+                        end: end,
+                        duration: duration,
+                        type: obs.type,
+                        originalIndex: obs.originalIndex || index,
+                        level: getHierarchyLevel(obs, stats.hierarchyMap)
+                    };
+                })
+                .sort((a, b) => a.start - b.start);
+
+            if (timelineItems.length === 0) return;
+
+            const earliestStart = Math.min(...timelineItems.map(item => item.start));
+            const latestEnd = Math.max(...timelineItems.map(item => item.end));
+            const totalDuration = latestEnd - earliestStart;
+
+            // Create horizontal bar chart data
+            const labels = timelineItems.map(item => item.name);
+            const data = timelineItems.map(item => {
+                const relativeStart = (item.start - earliestStart) / totalDuration * 100;
+                const relativeDuration = item.duration / totalDuration * 100;
+                return {
+                    x: relativeStart,
+                    y: item.name,
+                    width: relativeDuration,
+                    originalIndex: item.originalIndex,
+                    type: item.type,
+                    start: item.start,
+                    end: item.end,
+                    duration: item.duration
+                };
+            });
+
+            ganttChart = new Chart(ganttCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Execution Timeline',
+                        data: data.map(item => item.width),
+                        backgroundColor: data.map(item => getColorForType(item.type)),
+                        borderColor: data.map(item => getBorderColorForType(item.type)),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Timeline (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const item = data[context[0].dataIndex];
+                                    return `${item.type}: ${labels[context[0].dataIndex]}`;
+                                },
+                                label: function(context) {
+                                    const item = data[context.dataIndex];
+                                    return [
+                                        `Start: ${item.start.toLocaleTimeString()}`,
+                                        `End: ${item.end.toLocaleTimeString()}`,
+                                        `Duration: ${item.duration}ms`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const item = data[index];
+                            openModal(item.originalIndex);
+                        }
+                    }
+                }
+            });
+        }
+
+        function getColorForType(type) {
+            const colors = {
+                'GENERATION': 'rgba(255, 99, 132, 0.6)',
+                'SPAN': 'rgba(54, 162, 235, 0.6)',
+                'EVENT': 'rgba(255, 205, 86, 0.6)',
+                'TRACE': 'rgba(75, 192, 192, 0.6)'
+            };
+            return colors[type] || 'rgba(153, 102, 255, 0.6)';
+        }
+
+        function getBorderColorForType(type) {
+            const colors = {
+                'GENERATION': 'rgba(255, 99, 132, 1)',
+                'SPAN': 'rgba(54, 162, 235, 1)',
+                'EVENT': 'rgba(255, 205, 86, 1)',
+                'TRACE': 'rgba(75, 192, 192, 1)'
+            };
+            return colors[type] || 'rgba(153, 102, 255, 1)';
+        }
+
+        function getHierarchyLevel(obs, hierarchyMap) {
+            let level = 0;
+            let current = obs;
+
+            while (current.parentObservationId) {
+                level++;
+                // Find parent in all observations
+                current = allObservations.find(o => o.id === current.parentObservationId);
+                if (!current) break;
+            }
+
+            return level;
+        }
+
+        function displayDeepDiveChart(observations) {
+            const deepDiveCtx = document.getElementById('deepDiveChart').getContext('2d');
+            if (deepDiveChart) deepDiveChart.destroy();
+
+            if (observations.length === 0) {
+                return;
+            }
+
+            // Group by name for the filtered observations
+            const nameLatencyMap = {};
+            observations.forEach((obs, index) => {
+                const name = obs.name || 'Unknown';
+                const latency = calculateLatency(obs);
+
+                if (!nameLatencyMap[name]) {
+                    nameLatencyMap[name] = {
+                        latencies: [],
+                        indices: [],
+                        totalCost: 0,
+                        count: 0
+                    };
+                }
+
+                nameLatencyMap[name].latencies.push(latency);
+                nameLatencyMap[name].indices.push(allObservations.indexOf(obs));
+                nameLatencyMap[name].totalCost += parseFloat(obs.calculatedTotalCost || obs.totalCost || 0);
+                nameLatencyMap[name].count += 1;
+            });
+
+            // Calculate averages
+            const chartData = Object.keys(nameLatencyMap).map(name => ({
+                name,
+                avgLatency: nameLatencyMap[name].latencies.reduce((a, b) => a + b, 0) / nameLatencyMap[name].latencies.length,
+                maxLatency: Math.max(...nameLatencyMap[name].latencies),
+                minLatency: Math.min(...nameLatencyMap[name].latencies),
+                count: nameLatencyMap[name].count,
+                totalCost: nameLatencyMap[name].totalCost,
+                indices: nameLatencyMap[name].indices
+            }));
+
+            deepDiveChart = new Chart(deepDiveCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(item => `${item.name} (${item.count})`),
+                    datasets: [{
+                        label: 'Average Latency (ms)',
+                        data: chartData.map(item => item.avgLatency),
+                        backgroundColor: 'rgba(0, 123, 255, 0.7)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Max Latency (ms)',
+                        data: chartData.map(item => item.maxLatency),
+                        backgroundColor: 'rgba(255, 193, 7, 0.7)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Latency (ms)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const item = chartData[context[0].dataIndex];
+                                    return item.name;
+                                },
+                                label: function(context) {
+                                    const item = chartData[context.dataIndex];
+                                    const dataset = context.dataset.label;
+                                    return [
+                                        `${dataset}: ${context.parsed.y.toFixed(2)}ms`,
+                                        `Count: ${item.count}`,
+                                        `Min Latency: ${item.minLatency}ms`,
+                                        `Total Cost: $${item.totalCost.toFixed(6)}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const item = chartData[index];
+                            // Open modal for the first observation of this name
+                            if (item.indices.length > 0) {
+                                openModal(item.indices[0]);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayTable(observations) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            observations.forEach((obs, index) => {
+                // Calculate latency from timestamps or use provided latency
+                let latency = 'N/A';
+                if (obs.startTime && obs.endTime) {
+                    const start = new Date(obs.startTime);
+                    const end = new Date(obs.endTime);
+                    latency = (end - start) + 'ms';
+                } else if (obs.latency) {
+                    latency = parseFloat(obs.latency) + 'ms';
+                }
+
+                // Extract token usage using same logic as calculateStats
+                const usage = obs.usage || {};
+                const usageDetails = obs.usageDetails || {};
+
+                let inputTokens = usageDetails.input || usageDetails.prompt_tokens || usageDetails.promptTokens || 0;
+                let outputTokens = usageDetails.output || usageDetails.completion_tokens || usageDetails.completionTokens || 0;
+
+                // Fallback to usage object if not found in usageDetails
+                if (!inputTokens) {
+                    inputTokens = usage.promptTokens || usage.input || usage.inputTokens || 0;
+                }
+                if (!outputTokens) {
+                    outputTokens = usage.completionTokens || usage.output || usage.outputTokens || 0;
+                }
+
+                // Fallback to top-level observation fields
+                if (!inputTokens) {
+                    inputTokens = obs.promptTokens || obs.inputTokens || obs.input || 0;
+                }
+                if (!outputTokens) {
+                    outputTokens = obs.completionTokens || obs.outputTokens || obs.output || 0;
+                }
+
+                // Display with fallback to dash if still 0
+                const inputTokensDisplay = inputTokens || '-';
+                const outputTokensDisplay = outputTokens || '-';
+
+                // Extract cost
+                const cost = obs.calculatedTotalCost || obs.totalCost;
+                const costDisplay = cost ? `$${parseFloat(cost).toFixed(6)}` : '-';
+
+                // Format timestamps
+                const startTime = obs.startTime ? new Date(obs.startTime).toLocaleString() : 'N/A';
+                const endTime = obs.endTime ? new Date(obs.endTime).toLocaleString() : 'N/A';
+
+                const row = document.createElement('tr');
+                row.style.cursor = 'pointer';
+                row.addEventListener('click', () => openModal(index));
+                row.addEventListener('mouseenter', (e) => {
+                    row.style.backgroundColor = '#e3f2fd';
+                    showHoverTooltip(e, index);
+                });
+                row.addEventListener('mouseleave', () => {
+                    row.style.backgroundColor = '';
+                    hideHoverTooltip();
+                });
+
+                row.innerHTML = `
+                    <td>${index}</td>
+                    <td>${obs.type || 'Unknown'}</td>
+                    <td>${obs.name || 'Unknown'}</td>
+                    <td>${obs.model || obs.modelId || '-'}</td>
+                    <td>${latency}</td>
+                    <td>${inputTokensDisplay}</td>
+                    <td>${outputTokensDisplay}</td>
+                    <td>${costDisplay}</td>
+                    <td>${startTime}</td>
+                    <td>${endTime}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Debug functions
+        function enableTokenDebug() {
+            window.DEBUG_TOKENS = true;
+            console.log('Token debugging enabled. Re-upload your file to see token field analysis in the console.');
+            alert('Token debugging enabled! Check the browser console (F12) after re-uploading your file.');
+        }
+
+        function showRawDataSample() {
+            if (allObservations.length > 0) {
+                console.log('Sample raw observation data:');
+                console.log('First observation:', allObservations[0]);
+                console.log('All observation keys:', Object.keys(allObservations[0]));
+
+                // Show a generation if available
+                const generation = allObservations.find(obs => obs.type === 'GENERATION');
+                if (generation) {
+                    console.log('Sample GENERATION observation:', generation);
+                }
+
+                alert('Raw data samples logged to console (F12). Look for token fields like usage, promptTokens, completionTokens, etc.');
+            } else {
+                alert('No data loaded yet. Please upload a JSON file first.');
+            }
+        }
+
+        function displayOpenAICallsAnalysis(stats) {
+            const container = document.getElementById('openaiCallsAnalysis');
+            container.innerHTML = '';
+
+            // Get all generations (which are typically the OpenAI calls)
+            const openaiCalls = allObservations.filter(obs =>
+                obs.type === 'GENERATION' ||
+                (obs.input && obs.output) ||
+                obs.model || obs.modelId ||
+                (obs.usage && (obs.usage.promptTokens || obs.usage.completionTokens))
+            );
+
+            if (openaiCalls.length === 0) {
+                container.innerHTML = '<p>No OpenAI calls detected in the data.</p>';
+                return;
+            }
+
+            // Analyze and categorize calls
+            const analysis = analyzeOpenAICalls(openaiCalls);
+
+            container.innerHTML = `
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+                    <h4 style="margin: 0 0 15px 0; color: #856404;">🔍 Call Volume Analysis</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <div style="font-size: 28px; font-weight: bold; color: #dc3545;">${openaiCalls.length}</div>
+                            <div style="font-size: 14px; color: #6c757d;">Total OpenAI Calls</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: bold; color: #28a745;">$${analysis.totalCost.toFixed(4)}</div>
+                            <div style="font-size: 14px; color: #6c757d;">Total Cost</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: bold; color: #007bff;">${analysis.totalTokens.toLocaleString()}</div>
+                            <div style="font-size: 14px; color: #6c757d;">Total Tokens</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: bold; color: #6f42c1;">${analysis.avgLatency.toFixed(0)}ms</div>
+                            <div style="font-size: 14px; color: #6c757d;">Avg Latency</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
+                        <h5 style="margin: 0 0 15px 0; color: #495057;">📊 Call Categories</h5>
+                        ${Object.entries(analysis.categories).map(([category, data]) => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding: 8px; background: white; border-radius: 4px;">
+                                <span style="font-weight: 500;">${category}</span>
+                                <span style="color: #007bff; font-weight: bold;">${data.count} calls</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">
+                        <h5 style="margin: 0 0 15px 0; color: #495057;">💰 Cost Breakdown</h5>
+                        ${Object.entries(analysis.categories).map(([category, data]) => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding: 8px; background: white; border-radius: 4px;">
+                                <span style="font-weight: 500;">${category}</span>
+                                <span style="color: #28a745; font-weight: bold;">$${data.cost.toFixed(4)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h5 style="margin: 0 0 15px 0; color: #495057;">🔄 Duplicate & Retry Analysis</h5>
+                    <div id="duplicateAnalysis">
+                        ${generateDuplicateAnalysis(analysis)}
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h5 style="margin: 0 0 15px 0; color: #495057;">⚡ Optimization Opportunities</h5>
+                    <div id="optimizationSuggestions">
+                        ${generateOptimizationSuggestions(analysis)}
+                    </div>
+                </div>
+
+                <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
+                    <h5 style="margin: 0 0 15px 0; color: #0056b3;">📋 Detailed Call Breakdown</h5>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        ${Object.entries(analysis.callDetails).map(([prompt, data]) => `
+                            <div style="margin-bottom: 12px; padding: 12px; background: white; border-radius: 4px; border-left: 3px solid ${data.count > 5 ? '#dc3545' : data.count > 2 ? '#ffc107' : '#28a745'};">
+                                <div style="font-weight: bold; margin-bottom: 5px; cursor: pointer;" onclick="toggleCallDetails('${btoa(prompt)}')">
+                                    ${data.count}x - ${prompt.substring(0, 80)}${prompt.length > 80 ? '...' : ''}
+                                </div>
+                                <div style="font-size: 12px; color: #6c757d; margin-bottom: 5px;">
+                                    Cost: $${data.cost.toFixed(6)} | Avg Latency: ${data.avgLatency.toFixed(0)}ms | Tokens: ${data.tokens}
+                                </div>
+                                <div id="details-${btoa(prompt)}" style="display: none; font-size: 11px; color: #495057; background: #f8f9fa; padding: 8px; border-radius: 3px; margin-top: 5px;">
+                                    <strong>Models:</strong> ${[...data.models].join(', ')}<br>
+                                    <strong>Calls:</strong> ${data.observations.map(obs => obs.name || 'Unnamed').join(', ')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function analyzeOpenAICalls(calls) {
+            const categories = {};
+            const callDetails = {};
+            const duplicateAnalysis = {
+                exactDuplicates: [],
+                rateLimitRetries: [],
+                legitimateRepeats: [],
+                totalDuplicateCalls: 0,
+                totalRetryCallsFromRateLimit: 0
+            };
+
+            let totalCost = 0;
+            let totalTokens = 0;
+            let totalLatency = 0;
+
+            // First pass: extract full prompt content and identify patterns
+            const promptGroups = {};
+
+            calls.forEach((call, index) => {
+                const fullPrompt = extractFullPrompt(call);
+                const promptHash = generatePromptHash(fullPrompt);
+
+                if (!promptGroups[promptHash]) {
+                    promptGroups[promptHash] = {
+                        fullPrompt: fullPrompt,
+                        calls: [],
+                        timestamps: [],
+                        costs: [],
+                        latencies: [],
+                        errors: []
+                    };
+                }
+
+                // Check for rate limit indicators
+                const isRateLimitRetry = checkRateLimitRetry(call, index, calls);
+
+                promptGroups[promptHash].calls.push(call);
+                promptGroups[promptHash].timestamps.push(new Date(call.startTime || call.createdAt || Date.now()));
+                promptGroups[promptHash].costs.push(parseFloat(call.calculatedTotalCost || call.totalCost || 0));
+                promptGroups[promptHash].latencies.push(calculateLatency(call));
+
+                // Check for error indicators
+                const errorInfo = extractErrorInfo(call);
+                if (errorInfo) {
+                    promptGroups[promptHash].errors.push({
+                        call: call,
+                        error: errorInfo,
+                        isRateLimit: isRateLimitRetry
+                    });
+                }
+            });
+
+            // Analyze each prompt group for duplicates and retries
+            Object.entries(promptGroups).forEach(([hash, group]) => {
+                if (group.calls.length > 1) {
+                    const analysisResult = analyzePromptGroup(group);
+
+                    if (analysisResult.type === 'exact_duplicate') {
+                        duplicateAnalysis.exactDuplicates.push(analysisResult);
+                        duplicateAnalysis.totalDuplicateCalls += group.calls.length - 1; // Don't count the first as duplicate
+                    } else if (analysisResult.type === 'rate_limit_retry') {
+                        duplicateAnalysis.rateLimitRetries.push(analysisResult);
+                        duplicateAnalysis.totalRetryCallsFromRateLimit += analysisResult.retryCount;
+                    } else if (analysisResult.type === 'legitimate_repeat') {
+                        duplicateAnalysis.legitimateRepeats.push(analysisResult);
+                    }
+                }
+            });
+
+            // Standard analysis
+            calls.forEach(call => {
+                // Categorize calls
+                const category = categorizeCall(call);
+                if (!categories[category]) {
+                    categories[category] = { count: 0, cost: 0, tokens: 0, latency: 0 };
+                }
+                categories[category].count++;
+
+                // Calculate metrics
+                const cost = parseFloat(call.calculatedTotalCost || call.totalCost || 0);
+                const latency = calculateLatency(call);
+                const usage = call.usage || {};
+                const tokens = (usage.promptTokens || usage.input || 0) + (usage.completionTokens || usage.output || 0);
+
+                categories[category].cost += cost;
+                categories[category].tokens += tokens;
+                categories[category].latency += latency;
+
+                totalCost += cost;
+                totalTokens += tokens;
+                totalLatency += latency;
+
+                // Group by similar prompts for display
+                const promptKey = extractPromptKey(call);
+                if (!callDetails[promptKey]) {
+                    callDetails[promptKey] = {
+                        count: 0,
+                        cost: 0,
+                        tokens: 0,
+                        latency: 0,
+                        models: new Set(),
+                        observations: [],
+                        fullPrompt: extractFullPrompt(call)
+                    };
+                }
+
+                callDetails[promptKey].count++;
+                callDetails[promptKey].cost += cost;
+                callDetails[promptKey].tokens += tokens;
+                callDetails[promptKey].latency += latency;
+                callDetails[promptKey].models.add(call.model || call.modelId || 'Unknown');
+                callDetails[promptKey].observations.push(call);
+            });
+
+            // Calculate averages
+            Object.values(categories).forEach(cat => {
+                cat.avgLatency = cat.latency / cat.count;
+            });
+
+            Object.values(callDetails).forEach(detail => {
+                detail.avgLatency = detail.latency / detail.count;
+            });
+
+            return {
+                categories,
+                callDetails,
+                duplicateAnalysis,
+                totalCost,
+                totalTokens,
+                avgLatency: totalLatency / calls.length,
+                totalCalls: calls.length
+            };
+        }
+
+        function categorizeCall(call) {
+            const name = (call.name || '').toLowerCase();
+            const input = call.input || {};
+            const inputStr = JSON.stringify(input).toLowerCase();
+
+            // Try to categorize based on name patterns
+            if (name.includes('system') || name.includes('init')) return '🔧 System/Initialization';
+            if (name.includes('planning') || name.includes('plan')) return '📋 Planning';
+            if (name.includes('execution') || name.includes('execute')) return '⚡ Execution';
+            if (name.includes('validation') || name.includes('validate')) return '✅ Validation';
+            if (name.includes('analysis') || name.includes('analyze')) return '🔍 Analysis';
+            if (name.includes('summary') || name.includes('summarize')) return '📝 Summarization';
+            if (name.includes('classification') || name.includes('classify')) return '🏷️ Classification';
+            if (name.includes('generation') || name.includes('generate')) return '🎯 Content Generation';
+            if (name.includes('retrieval') || name.includes('search')) return '🔎 Information Retrieval';
+            if (name.includes('reasoning') || name.includes('reason')) return '🧠 Reasoning';
+
+            // Try to categorize based on input content
+            if (inputStr.includes('plan') || inputStr.includes('strategy')) return '📋 Planning';
+            if (inputStr.includes('execute') || inputStr.includes('run')) return '⚡ Execution';
+            if (inputStr.includes('analyze') || inputStr.includes('analysis')) return '🔍 Analysis';
+            if (inputStr.includes('summarize') || inputStr.includes('summary')) return '📝 Summarization';
+            if (inputStr.includes('classify') || inputStr.includes('category')) return '🏷️ Classification';
+            if (inputStr.includes('generate') || inputStr.includes('create')) return '🎯 Content Generation';
+            if (inputStr.includes('search') || inputStr.includes('find')) return '🔎 Information Retrieval';
+
+            return '❓ Other/Uncategorized';
+        }
+
+        function extractPromptKey(call) {
+            const input = call.input || {};
+
+            // Try different input structures
+            if (input.messages && Array.isArray(input.messages)) {
+                const userMessage = input.messages.find(m => m.role === 'user');
+                if (userMessage && userMessage.content) {
+                    return userMessage.content.substring(0, 200);
+                }
+                return input.messages.map(m => m.content || '').join(' ').substring(0, 200);
+            }
+
+            if (input.prompt) {
+                return input.prompt.substring(0, 200);
+            }
+
+            if (typeof input === 'string') {
+                return input.substring(0, 200);
+            }
+
+            if (input.text || input.content) {
+                return (input.text || input.content).substring(0, 200);
+            }
+
+            return call.name || 'Unknown prompt';
+        }
+
+        function extractFullPrompt(call) {
+            const input = call.input || {};
+
+            // Try different input structures to get the FULL prompt
+            if (input.messages && Array.isArray(input.messages)) {
+                return JSON.stringify(input.messages);
+            }
+
+            if (input.prompt) {
+                return input.prompt;
+            }
+
+            if (typeof input === 'string') {
+                return input;
+            }
+
+            if (input.text || input.content) {
+                return input.text || input.content;
+            }
+
+            // Return stringified input if nothing else matches
+            return JSON.stringify(input);
+        }
+
+        function generatePromptHash(promptContent) {
+            // Simple hash function for prompt content
+            let hash = 0;
+            if (promptContent.length === 0) return hash.toString();
+            for (let i = 0; i < promptContent.length; i++) {
+                const char = promptContent.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString();
+        }
+
+        function checkRateLimitRetry(call, index, allCalls) {
+            // Check for 429 error in the call
+            const output = call.output || {};
+            const statusCode = call.statusCode || output.statusCode || output.status_code;
+
+            if (statusCode === 429) return true;
+
+            // Check error messages
+            const errorMessage = call.error || output.error || call.statusMessage || output.message || '';
+            if (typeof errorMessage === 'string' && errorMessage.toLowerCase().includes('rate limit')) return true;
+
+            // Check if this call happened shortly after a failed call with same prompt
+            if (index > 0) {
+                const prevCall = allCalls[index - 1];
+                const currentTime = new Date(call.startTime || call.createdAt || 0);
+                const prevTime = new Date(prevCall.startTime || prevCall.createdAt || 0);
+                const timeDiff = currentTime - prevTime;
+
+                // If within 30 seconds and same prompt, likely a retry
+                if (timeDiff < 30000 && extractFullPrompt(call) === extractFullPrompt(prevCall)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function extractErrorInfo(call) {
+            const output = call.output || {};
+            const statusCode = call.statusCode || output.statusCode || output.status_code;
+
+            if (statusCode && statusCode >= 400) {
+                return {
+                    statusCode: statusCode,
+                    error: call.error || output.error || call.statusMessage || output.message || 'Unknown error'
+                };
+            }
+
+            if (call.error || output.error) {
+                return {
+                    error: call.error || output.error
+                };
+            }
+
+            return null;
+        }
+
+        function analyzePromptGroup(group) {
+            const { calls, timestamps, errors } = group;
+
+            // Sort by timestamp
+            const sortedIndices = timestamps.map((time, index) => ({ time, index }))
+                .sort((a, b) => a.time - b.time);
+
+            // Check for rate limit retries
+            const rateLimitErrors = errors.filter(e => e.isRateLimit);
+            if (rateLimitErrors.length > 0) {
+                return {
+                    type: 'rate_limit_retry',
+                    prompt: group.fullPrompt.substring(0, 200),
+                    fullPrompt: group.fullPrompt,
+                    totalCalls: calls.length,
+                    retryCount: rateLimitErrors.length,
+                    calls: calls,
+                    reason: '429 Rate Limit encountered, causing retries',
+                    timestamps: timestamps,
+                    wastedCost: group.costs.slice(1).reduce((sum, cost) => sum + cost, 0) // Cost of retry calls
+                };
+            }
+
+            // Check timing patterns - if calls are very close together, likely retries
+            let quickRetries = 0;
+            for (let i = 1; i < sortedIndices.length; i++) {
+                const timeDiff = sortedIndices[i].time - sortedIndices[i-1].time;
+                if (timeDiff < 5000) { // Less than 5 seconds apart
+                    quickRetries++;
+                }
+            }
+
+            if (quickRetries > 0) {
+                return {
+                    type: 'rate_limit_retry',
+                    prompt: group.fullPrompt.substring(0, 200),
+                    fullPrompt: group.fullPrompt,
+                    totalCalls: calls.length,
+                    retryCount: quickRetries,
+                    calls: calls,
+                    reason: 'Multiple calls within seconds - likely retries',
+                    timestamps: timestamps,
+                    wastedCost: group.costs.slice(1).reduce((sum, cost) => sum + cost, 0)
+                };
+            }
+
+            // Check if calls are spread over time (legitimate repeats)
+            const timeSpan = Math.max(...timestamps) - Math.min(...timestamps);
+            if (timeSpan > 300000) { // More than 5 minutes apart
+                return {
+                    type: 'legitimate_repeat',
+                    prompt: group.fullPrompt.substring(0, 200),
+                    fullPrompt: group.fullPrompt,
+                    totalCalls: calls.length,
+                    calls: calls,
+                    reason: 'Calls spread over time - likely legitimate repeated operations',
+                    timestamps: timestamps,
+                    timeSpan: Math.round(timeSpan / 1000) // in seconds
+                };
+            }
+
+            // Default to exact duplicate
+            return {
+                type: 'exact_duplicate',
+                prompt: group.fullPrompt.substring(0, 200),
+                fullPrompt: group.fullPrompt,
+                totalCalls: calls.length,
+                calls: calls,
+                reason: 'Identical prompts called multiple times without clear reason',
+                timestamps: timestamps,
+                wastedCost: group.costs.slice(1).reduce((sum, cost) => sum + cost, 0)
+            };
+        }
+
+        function generateDuplicateAnalysis(analysis) {
+            const { duplicateAnalysis } = analysis;
+            let html = '';
+
+            // Summary stats
+            html += `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #dc3545;">
+                        <div style="font-size: 24px; font-weight: bold; color: #dc3545;">${duplicateAnalysis.totalDuplicateCalls}</div>
+                        <div style="font-size: 12px; color: #6c757d;">True Duplicate Calls</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #ffc107;">
+                        <div style="font-size: 24px; font-weight: bold; color: #ffc107;">${duplicateAnalysis.totalRetryCallsFromRateLimit}</div>
+                        <div style="font-size: 12px; color: #6c757d;">429 Rate Limit Retries</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #28a745;">
+                        <div style="font-size: 24px; font-weight: bold; color: #28a745;">${duplicateAnalysis.legitimateRepeats.length}</div>
+                        <div style="font-size: 12px; color: #6c757d;">Legitimate Repeats</div>
+                    </div>
+                </div>
+            `;
+
+            // Rate limit retries
+            if (duplicateAnalysis.rateLimitRetries.length > 0) {
+                html += `
+                    <div style="margin-bottom: 20px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                        <h6 style="margin: 0 0 10px 0; color: #856404;">🚨 Rate Limit Retries (${duplicateAnalysis.rateLimitRetries.length} groups)</h6>
+                        ${duplicateAnalysis.rateLimitRetries.map(retry => `
+                            <div style="margin: 8px 0; padding: 8px; background: white; border-radius: 3px; font-size: 12px;">
+                                <div style="font-weight: bold;">${retry.totalCalls}x calls - Wasted $${retry.wastedCost.toFixed(4)}</div>
+                                <div style="color: #6c757d; margin: 2px 0;">${retry.reason}</div>
+                                <div style="font-family: monospace; background: #f8f9fa; padding: 4px; border-radius: 2px; max-height: 60px; overflow-y: auto;">
+                                    ${retry.prompt}${retry.fullPrompt.length > 200 ? '...' : ''}
+                                </div>
+                                <button onclick="showFullPrompt('${btoa(retry.fullPrompt)}')" style="margin-top: 5px; font-size: 10px; padding: 2px 6px; background: #007bff; color: white; border: none; border-radius: 2px; cursor: pointer;">
+                                    Show Full Prompt
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Exact duplicates
+            if (duplicateAnalysis.exactDuplicates.length > 0) {
+                html += `
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f8d7da; border-left: 4px solid #dc3545; border-radius: 4px;">
+                        <h6 style="margin: 0 0 10px 0; color: #721c24;">🔄 Exact Duplicates (${duplicateAnalysis.exactDuplicates.length} groups)</h6>
+                        ${duplicateAnalysis.exactDuplicates.map(dup => `
+                            <div style="margin: 8px 0; padding: 8px; background: white; border-radius: 3px; font-size: 12px;">
+                                <div style="font-weight: bold;">${dup.totalCalls}x identical calls - Wasted $${dup.wastedCost.toFixed(4)}</div>
+                                <div style="color: #6c757d; margin: 2px 0;">${dup.reason}</div>
+                                <div style="font-family: monospace; background: #f8f9fa; padding: 4px; border-radius: 2px; max-height: 60px; overflow-y: auto;">
+                                    ${dup.prompt}${dup.fullPrompt.length > 200 ? '...' : ''}
+                                </div>
+                                <button onclick="showFullPrompt('${btoa(dup.fullPrompt)}')" style="margin-top: 5px; font-size: 10px; padding: 2px 6px; background: #007bff; color: white; border: none; border-radius: 2px; cursor: pointer;">
+                                    Show Full Prompt
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Legitimate repeats
+            if (duplicateAnalysis.legitimateRepeats.length > 0) {
+                html += `
+                    <div style="margin-bottom: 20px; padding: 15px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 4px;">
+                        <h6 style="margin: 0 0 10px 0; color: #155724;">✅ Legitimate Repeats (${duplicateAnalysis.legitimateRepeats.length} groups)</h6>
+                        ${duplicateAnalysis.legitimateRepeats.map(repeat => `
+                            <div style="margin: 8px 0; padding: 8px; background: white; border-radius: 3px; font-size: 12px;">
+                                <div style="font-weight: bold;">${repeat.totalCalls}x calls over ${repeat.timeSpan}s</div>
+                                <div style="color: #6c757d; margin: 2px 0;">${repeat.reason}</div>
+                                <div style="font-family: monospace; background: #f8f9fa; padding: 4px; border-radius: 2px; max-height: 60px; overflow-y: auto;">
+                                    ${repeat.prompt}${repeat.fullPrompt.length > 200 ? '...' : ''}
+                                </div>
+                                <button onclick="showFullPrompt('${btoa(repeat.fullPrompt)}')" style="margin-top: 5px; font-size: 10px; padding: 2px 6px; background: #007bff; color: white; border: none; border-radius: 2px; cursor: pointer;">
+                                    Show Full Prompt
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (html === '') {
+                html = `
+                    <div style="padding: 15px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 4px;">
+                        <strong>✅ No Duplicates Detected:</strong> All calls appear to be unique or legitimate repeats.
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
+        function showFullPrompt(encodedPrompt) {
+            const prompt = atob(encodedPrompt);
+            const modal = document.getElementById('observationModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+
+            modalTitle.textContent = '📄 Full Prompt Content';
+            modalContent.innerHTML = `
+                <div style="font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; max-height: 500px; overflow-y: auto; border: 1px solid #dee2e6;">
+                    ${prompt}
+                </div>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        function generateOptimizationSuggestions(analysis) {
+            const suggestions = [];
+
+            // Check for duplicate calls
+            const duplicates = Object.entries(analysis.callDetails).filter(([_, data]) => data.count > 3);
+            if (duplicates.length > 0) {
+                suggestions.push(`
+                    <div style="padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; margin-bottom: 10px; border-radius: 4px;">
+                        <strong>🔄 Duplicate Calls Detected:</strong> ${duplicates.length} prompts are being called ${duplicates.reduce((sum, [_, data]) => sum + data.count, 0)} times total.
+                        Consider caching responses or batching similar requests.
+                    </div>
+                `);
+            }
+
+            // Check for expensive calls
+            const expensiveCalls = Object.entries(analysis.callDetails).filter(([_, data]) => data.cost > 0.01);
+            if (expensiveCalls.length > 0) {
+                suggestions.push(`
+                    <div style="padding: 10px; background: #f8d7da; border-left: 4px solid #dc3545; margin-bottom: 10px; border-radius: 4px;">
+                        <strong>💰 High Cost Calls:</strong> ${expensiveCalls.length} call types cost >$0.01 each.
+                        Review if smaller models or prompt optimization could reduce costs.
+                    </div>
+                `);
+            }
+
+            // Check for slow calls
+            const slowCalls = Object.entries(analysis.callDetails).filter(([_, data]) => data.avgLatency > 5000);
+            if (slowCalls.length > 0) {
+                suggestions.push(`
+                    <div style="padding: 10px; background: #d1ecf1; border-left: 4px solid #17a2b8; margin-bottom: 10px; border-radius: 4px;">
+                        <strong>⏱️ Slow Calls:</strong> ${slowCalls.length} call types average >5s latency.
+                        Consider parallel execution or streaming responses.
+                    </div>
+                `);
+            }
+
+            if (suggestions.length === 0) {
+                suggestions.push(`
+                    <div style="padding: 10px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 4px;">
+                        <strong>✅ Good Performance:</strong> No obvious optimization opportunities detected.
+                        Your OpenAI usage appears well-optimized!
+                    </div>
+                `);
+            }
+
+            return suggestions.join('');
+        }
+
+        function toggleCallDetails(encodedPrompt) {
+            const element = document.getElementById(`details-${encodedPrompt}`);
+            if (element) {
+                element.style.display = element.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function displayGenerationAnalysis(stats) {
+            const container = document.getElementById('generationAnalysis');
+            container.innerHTML = '';
+
+            // Get all generations
+            const generations = allObservations.filter(obs => obs.type === 'GENERATION');
+
+            if (generations.length === 0) {
+                container.innerHTML = '<p>No GENERATION observations found in the data.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0;">📊 Generation Summary</h4>
+                    <p style="margin: 5px 0;"><strong>Total Generations:</strong> ${generations.length}</p>
+                    <p style="margin: 5px 0;"><strong>Average Latency:</strong> ${(generations.reduce((sum, gen) => sum + calculateLatency(gen), 0) / generations.length).toFixed(0)}ms</p>
+                    <p style="margin: 5px 0;"><strong>Total Cost:</strong> $${generations.reduce((sum, gen) => sum + parseFloat(gen.calculatedTotalCost || gen.totalCost || 0), 0).toFixed(4)}</p>
+                </div>
+            `;
+
+            // Create individual generation cards
+            generations.forEach((gen, index) => {
+                const latency = calculateLatency(gen);
+                const cost = parseFloat(gen.calculatedTotalCost || gen.totalCost || 0);
+
+                // Get children of this generation
+                const children = allObservations.filter(obs => obs.parentObservationId === gen.id);
+
+                // Calculate token usage using same logic as calculateStats
+                const usage = gen.usage || {};
+                const usageDetails = gen.usageDetails || {};
+
+                let inputTokens = usageDetails.input || usageDetails.prompt_tokens || usageDetails.promptTokens || 0;
+                let outputTokens = usageDetails.output || usageDetails.completion_tokens || usageDetails.completionTokens || 0;
+                let totalTokens = usageDetails.total || 0;
+
+                // Fallback to usage object if not found in usageDetails
+                if (!inputTokens) {
+                    inputTokens = usage.promptTokens || usage.input || usage.inputTokens || 0;
+                }
+                if (!outputTokens) {
+                    outputTokens = usage.completionTokens || usage.output || usage.outputTokens || 0;
+                }
+                if (!totalTokens) {
+                    totalTokens = usage.totalTokens || usage.total || 0;
+                }
+
+                // Fallback to top-level generation fields
+                if (!inputTokens) {
+                    inputTokens = gen.promptTokens || gen.inputTokens || gen.input || 0;
+                }
+                if (!outputTokens) {
+                    outputTokens = gen.completionTokens || gen.outputTokens || gen.output || 0;
+                }
+                if (!totalTokens) {
+                    totalTokens = gen.totalTokens || gen.total || (inputTokens + outputTokens) || 0;
+                }
+
+                const generationCard = document.createElement('div');
+                generationCard.style.cssText = `
+                    margin: 15px 0;
+                    padding: 20px;
+                    border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                    background: #f8f9fa;
+                `;
+
+                generationCard.innerHTML = `
+                    <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <h5 style="margin: 0 0 8px 0; color: #007bff; cursor: pointer; font-size: 14px;"
+                               onclick="openModal(${allObservations.indexOf(gen)})"
+                               onmouseenter="showHoverTooltip(event, ${allObservations.indexOf(gen)})"
+                               onmouseleave="hideHoverTooltip()">
+                                🤖 ${gen.name || 'Unnamed Generation'}
+                            </h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; font-size: 11px;">
+                                <div>
+                                    <strong>Latency:</strong> ${latency}ms<br>
+                                    <strong>Model:</strong> ${gen.model || gen.modelId || 'Unknown'}
+                                </div>
+                                <div>
+                                    <strong>Input Tokens:</strong> ${inputTokens}<br>
+                                    <strong>Output Tokens:</strong> ${outputTokens}<br>
+                                    <strong>Total Tokens:</strong> ${totalTokens}
+                                </div>
+                                <div>
+                                    <strong>Cost:</strong> $${cost.toFixed(6)}<br>
+                                    <strong>Children:</strong> ${children.length}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${children.length > 0 ? `
+                        <div style="margin-top: 15px;">
+                            <h5 style="margin-bottom: 10px; color: #495057;">🔗 Child Operations (${children.length})</h5>
+                            <div id="gen-flame-${index}" style="margin-left: 10px; border-left: 2px solid #007bff; padding-left: 15px;">
+                                ${createMiniFlameGraph(gen, stats.hierarchyMap, index)}
+                            </div>
+                        </div>
+                    ` : '<p style="color: #6c757d; font-style: italic;">No child operations</p>'}
+
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                        <button onclick="showGenerationDetails(${allObservations.indexOf(gen)})"
+                                style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                            📋 Full Details
+                        </button>
+                        <button onclick="showGenerationFlameGraph(${allObservations.indexOf(gen)})"
+                                style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                            🔥 Flame Graph
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(generationCard);
+            });
+        }
+
+        function createMiniFlameGraph(rootGen, hierarchyMap, genIndex) {
+            let html = '';
+
+            const buildFlameHTML = (obs, level = 0) => {
+                const latency = calculateLatency(obs);
+                const color = getColorForType(obs.type);
+                const borderColor = getBorderColorForType(obs.type);
+
+                html += `
+                    <div style="margin: 1px 0; margin-left: ${level * 12}px; padding: 4px 8px;
+                                background: ${color}; border-left: 2px solid ${borderColor};
+                                border-radius: 2px; font-size: 9px; cursor: pointer;"
+                         onclick="openModal(${allObservations.indexOf(obs)})"
+                         onmouseenter="showHoverTooltip(event, ${allObservations.indexOf(obs)})"
+                         onmouseleave="hideHoverTooltip()">
+                        <strong>${obs.name || 'Unknown'}</strong> (${obs.type}) - ${latency}ms
+                        ${obs.model || obs.modelId ? `<br><em style="font-size: 8px;">Model: ${obs.model || obs.modelId}</em>` : ''}
+                    </div>
+                `;
+
+                // Add children
+                const children = hierarchyMap[obs.id] || [];
+                children.forEach(child => buildFlameHTML(child, level + 1));
+            };
+
+            // Start with the root generation
+            buildFlameHTML(rootGen);
+
+            return html;
+        }
+
+        function showGenerationDetails(observationIndex) {
+            openModal(observationIndex);
+        }
+
+        function showGenerationFlameGraph(observationIndex) {
+            const generation = allObservations[observationIndex];
+            const modal = document.getElementById('observationModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+
+            modalTitle.textContent = `🔥 Flame Graph: ${generation.name || 'Unnamed Generation'}`;
+
+            // Build a detailed flame graph for this generation and its children
+            const buildDetailedFlame = (obs, level = 0) => {
+                const latency = calculateLatency(obs);
+                const color = getColorForType(obs.type);
+                const borderColor = getBorderColorForType(obs.type);
+
+                const usage = obs.usage || {};
+                const inputTokens = usage.promptTokens || usage.input || obs.promptTokens || obs.input || 0;
+                const outputTokens = usage.completionTokens || usage.output || obs.completionTokens || obs.output || 0;
+                const cost = parseFloat(obs.calculatedTotalCost || obs.totalCost || 0);
+
+                let html = `
+                    <div style="margin: 3px 0; margin-left: ${level * 25}px; padding: 10px 15px;
+                                background: ${color}; border-left: 4px solid ${borderColor};
+                                border-radius: 5px; font-size: 12px; cursor: pointer;
+                                box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
+                         onclick="openModal(${allObservations.indexOf(obs)})"
+                         onmouseenter="showHoverTooltip(event, ${allObservations.indexOf(obs)})"
+                         onmouseleave="hideHoverTooltip()">
+                        <div style="font-weight: bold; margin-bottom: 5px;">
+                            ${obs.name || 'Unknown'} (${obs.type})
+                        </div>
+                        <div style="font-size: 11px; color: #666;">
+                            ⏱️ ${latency}ms | 💰 $${cost.toFixed(6)}
+                            ${obs.model || obs.modelId ? ` | 🤖 ${obs.model || obs.modelId}` : ''}
+                            ${inputTokens || outputTokens ? ` | 🔢 ${inputTokens}→${outputTokens} tokens` : ''}
+                        </div>
+                        ${obs.startTime ? `<div style="font-size: 10px; color: #888; margin-top: 3px;">
+                            🕐 ${new Date(obs.startTime).toLocaleTimeString()}
+                        </div>` : ''}
+                    </div>
+                `;
+
+                // Add children recursively
+                const children = allObservations.filter(child => child.parentObservationId === obs.id);
+                children.forEach(child => {
+                    html += buildDetailedFlame(child, level + 1);
+                });
+
+                return html;
+            };
+
+            modalContent.innerHTML = `
+                <div style="font-size: 14px; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                    <strong>Generation:</strong> ${generation.name || 'Unnamed'}<br>
+                    <strong>Total Latency:</strong> ${calculateLatency(generation)}ms<br>
+                    <strong>Model:</strong> ${generation.model || generation.modelId || 'Unknown'}<br>
+                    <strong>Children:</strong> ${allObservations.filter(obs => obs.parentObservationId === generation.id).length}
+                </div>
+                <div style="max-height: 500px; overflow-y: auto;">
+                    ${buildDetailedFlame(generation)}
+                </div>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        // Hover tooltip functions
+        function showHoverTooltip(event, observationIndex) {
+            const observation = allObservations[observationIndex];
+            const tooltip = document.getElementById('hoverTooltip');
+            const tooltipContent = document.getElementById('tooltipContent');
+
+            // Clear any existing timeout
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+            }
+
+            // Extract OpenAI call data
+            const callData = extractOpenAICallData(observation);
+
+            if (!callData.hasData) {
+                return; // Don't show tooltip if no OpenAI data
+            }
+
+            // Build tooltip content
+            tooltipContent.innerHTML = `
+                <div style="padding: 8px;">
+                    <div style="margin-bottom: 8px; padding: 6px; background: #f8f9fa; border-radius: 3px; border-left: 3px solid #28a745;">
+                        <div style="font-weight: bold; font-size: 9px; color: #495057; margin-bottom: 3px;">📤 REQUEST</div>
+                        <div style="font-size: 8px; color: #6c757d; margin-bottom: 3px;">
+                            <strong>Model:</strong> ${callData.model} |
+                            <strong>Tokens:</strong> ${callData.inputTokens} |
+                            <strong>Time:</strong> ${callData.startTime}
+                        </div>
+                        <div style="max-height: 80px; overflow-y: auto; background: white; padding: 6px; border-radius: 2px; font-family: monospace; font-size: 7px; border: 1px solid #dee2e6;">
+                            ${formatCallContent(callData.request)}
+                        </div>
+                    </div>
+
+                    <div style="padding: 6px; background: #f8f9fa; border-radius: 3px; border-left: 3px solid #007bff;">
+                        <div style="font-weight: bold; font-size: 9px; color: #495057; margin-bottom: 3px;">📥 RESPONSE</div>
+                        <div style="font-size: 8px; color: #6c757d; margin-bottom: 3px;">
+                            <strong>Latency:</strong> ${callData.latency}ms |
+                            <strong>Output Tokens:</strong> ${callData.outputTokens} |
+                            <strong>Cost:</strong> $${callData.cost}
+                        </div>
+                        <div style="max-height: 80px; overflow-y: auto; background: white; padding: 6px; border-radius: 2px; font-family: monospace; font-size: 7px; border: 1px solid #dee2e6;">
+                            ${formatCallContent(callData.response)}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Position tooltip
+            positionTooltip(tooltip, event);
+
+            // Show tooltip
+            tooltip.style.display = 'block';
+        }
+
+        function hideHoverTooltip() {
+            const tooltip = document.getElementById('hoverTooltip');
+
+            // Delay hiding to allow moving to tooltip
+            hoverTimeout = setTimeout(() => {
+                tooltip.style.display = 'none';
+            }, 100); // Reduced delay for faster hiding
+        }
+
+        function keepTooltipVisible() {
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+                hoverTimeout = null;
+            }
+        }
+
+        function extractOpenAICallData(obs) {
+            // Extract various possible data sources
+            const input = obs.input || {};
+            const output = obs.output || {};
+            const usage = obs.usage || {};
+            const usageDetails = obs.usageDetails || {}; // This is the missing field!
+
+            // Try to extract request data
+            let request = null;
+            let response = null;
+
+            // Common Langfuse structures for LLM calls
+            if (input.messages || input.prompt) {
+                request = input.messages || input.prompt || input;
+            } else if (typeof input === 'string') {
+                request = input;
+            } else if (input.text || input.content) {
+                request = input.text || input.content;
+            } else if (Object.keys(input).length > 0) {
+                request = input; // Use entire input object if nothing else matches
+            }
+
+            // Try to extract response data
+            if (output.choices && output.choices[0]) {
+                response = output.choices[0].message || output.choices[0].text || output.choices;
+            } else if (output.content || output.text) {
+                response = output.content || output.text;
+            } else if (output.message) {
+                response = output.message;
+            } else if (typeof output === 'string') {
+                response = output;
+            } else if (output && Object.keys(output).length > 0) {
+                response = output; // Use entire output object if nothing else matches
+            }
+
+            // Enhanced token extraction - check multiple possible locations
+            let inputTokens = 0;
+            let outputTokens = 0;
+
+            // Check usageDetails first (this is where Langfuse stores tokens!)
+            if (usageDetails.input || usageDetails.prompt_tokens || usageDetails.promptTokens) {
+                inputTokens = usageDetails.input || usageDetails.prompt_tokens || usageDetails.promptTokens;
+            }
+            if (usageDetails.output || usageDetails.completion_tokens || usageDetails.completionTokens) {
+                outputTokens = usageDetails.output || usageDetails.completion_tokens || usageDetails.completionTokens;
+            }
+
+            // Check usage object if not found in usageDetails
+            if (!inputTokens && (usage.promptTokens || usage.input || usage.inputTokens)) {
+                inputTokens = usage.promptTokens || usage.input || usage.inputTokens;
+            }
+            if (!outputTokens && (usage.completionTokens || usage.output || usage.outputTokens)) {
+                outputTokens = usage.completionTokens || usage.output || usage.outputTokens;
+            }
+
+            // Check top-level observation fields
+            if (!inputTokens && (obs.promptTokens || obs.inputTokens || obs.input_tokens)) {
+                inputTokens = obs.promptTokens || obs.inputTokens || obs.input_tokens;
+            }
+            if (!outputTokens && (obs.completionTokens || obs.outputTokens || obs.output_tokens)) {
+                outputTokens = obs.completionTokens || obs.outputTokens || obs.output_tokens;
+            }
+
+            // Check if tokens are in the output/response
+            if (output.usage) {
+                if (!inputTokens) inputTokens = output.usage.prompt_tokens || output.usage.promptTokens || 0;
+                if (!outputTokens) outputTokens = output.usage.completion_tokens || output.usage.completionTokens || 0;
+            }
+
+            // Debug logging if tokens are found
+            if ((inputTokens > 0 || outputTokens > 0) && window.DEBUG_TOKENS) {
+                console.log('Token extraction for hover:', {
+                    name: obs.name,
+                    inputTokens,
+                    outputTokens,
+                    fromUsage: usage,
+                    fromObs: { promptTokens: obs.promptTokens, completionTokens: obs.completionTokens },
+                    fromOutput: output.usage
+                });
+            }
+
+            const cost = parseFloat(obs.calculatedTotalCost || obs.totalCost || 0);
+            const latency = calculateLatency(obs);
+            const model = obs.model || obs.modelId || 'Unknown';
+            const startTime = obs.startTime ? new Date(obs.startTime).toLocaleTimeString() : 'N/A';
+
+            return {
+                hasData: !!(request || response || inputTokens > 0 || outputTokens > 0),
+                request,
+                response,
+                model,
+                inputTokens,
+                outputTokens,
+                cost: cost.toFixed(6),
+                latency,
+                startTime
+            };
+        }
+
+        function formatCallContent(content) {
+            if (!content) return '<em style="color: #6c757d;">No data available</em>';
+
+            try {
+                if (typeof content === 'object') {
+                    // Special handling for messages array (chat completions)
+                    if (Array.isArray(content)) {
+                        let formatted = '';
+                        content.forEach((msg, index) => {
+                            if (msg.role && msg.content) {
+                                formatted += `<div style="margin-bottom: 8px; padding: 4px; border-left: 2px solid ${msg.role === 'user' ? '#007bff' : msg.role === 'assistant' ? '#28a745' : '#6c757d'}; background: ${msg.role === 'user' ? '#e3f2fd' : msg.role === 'assistant' ? '#d4edda' : '#f8f9fa'};">`;
+                                formatted += `<strong style="font-size: 8px; text-transform: uppercase;">${msg.role}:</strong><br>`;
+                                formatted += `<div style="font-size: 8px;">${msg.content}</div></div>`;
+                            } else {
+                                formatted += `<div style="margin-bottom: 4px; font-size: 8px;">${JSON.stringify(msg)}</div>`;
+                            }
+                        });
+                        return formatted;
+                    }
+
+                    // Format JSON nicely but more compact
+                    const jsonStr = JSON.stringify(content, null, 1);
+                    if (jsonStr.length > 800) {
+                        return `<pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 7px;">${jsonStr.substring(0, 800)}...</pre>`;
+                    }
+                    return `<pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 7px;">${jsonStr}</pre>`;
+                } else if (typeof content === 'string') {
+                    // Handle string content
+                    if (content.length > 600) {
+                        return `<div style="white-space: pre-wrap; word-wrap: break-word; font-size: 8px;">${content.substring(0, 600)}...</div>`;
+                    }
+                    return `<div style="white-space: pre-wrap; word-wrap: break-word; font-size: 8px;">${content}</div>`;
+                } else {
+                    return `<pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 7px;">${String(content)}</pre>`;
+                }
+            } catch (e) {
+                return `<div style="white-space: pre-wrap; word-wrap: break-word; font-size: 8px;">${String(content)}</div>`;
+            }
+        }
+
+        function positionTooltip(tooltip, event) {
+            const tooltipRect = { width: 600, height: 500 }; // Approximate size
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+            let left = event.clientX + scrollLeft + 15;
+            let top = event.clientY + scrollTop + 15;
+
+            // Adjust if tooltip would go off-screen
+            if (left + tooltipRect.width > viewportWidth + scrollLeft) {
+                left = event.clientX + scrollLeft - tooltipRect.width - 15;
+            }
+
+            if (top + tooltipRect.height > viewportHeight + scrollTop) {
+                top = event.clientY + scrollTop - tooltipRect.height - 15;
+            }
+
+            // Ensure tooltip doesn't go off the left or top edges
+            left = Math.max(scrollLeft + 10, left);
+            top = Math.max(scrollTop + 10, top);
+
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+
+        // Add hover events to tooltip itself to prevent hiding when hovering over it
+        document.getElementById('hoverTooltip').addEventListener('mouseenter', keepTooltipVisible);
+        document.getElementById('hoverTooltip').addEventListener('mouseleave', hideHoverTooltip);
+
+        // Add global click listener to hide tooltip when clicking elsewhere
+        document.addEventListener('click', function(event) {
+            const tooltip = document.getElementById('hoverTooltip');
+            if (tooltip.style.display === 'block' && !tooltip.contains(event.target)) {
+                // Clear any pending timeout
+                if (hoverTimeout) {
+                    clearTimeout(hoverTimeout);
+                    hoverTimeout = null;
+                }
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Also hide on scroll
+        document.addEventListener('scroll', function() {
+            const tooltip = document.getElementById('hoverTooltip');
+            if (tooltip.style.display === 'block') {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Add escape key listener to hide tooltip
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const tooltip = document.getElementById('hoverTooltip');
+                if (tooltip.style.display === 'block') {
+                    tooltip.style.display = 'none';
+                }
+            }
+        });
+
+        // Feedback functions
+        function openFeedbackModal() {
+            const modal = document.getElementById('feedbackModal');
+
+            // Update context information
+            updateFeedbackContext();
+
+            modal.style.display = 'block';
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').style.display = 'none';
+            // Clear form
+            document.getElementById('feedbackTitle').value = '';
+            document.getElementById('feedbackDescription').value = '';
+            document.getElementById('feedbackEmail').value = '';
+            document.getElementById('feedbackType').value = 'bug';
+        }
+
+        function updateFeedbackContext() {
+            // Get current analysis context
+            const totalObs = allObservations ? allObservations.length : 0;
+            const openaiCalls = allObservations ? allObservations.filter(obs =>
+                obs.type === 'GENERATION' ||
+                (obs.input && obs.output) ||
+                obs.model || obs.modelId ||
+                (obs.usage && (obs.usage.promptTokens || obs.usage.completionTokens))
+            ).length : 0;
+
+            // Update context display
+            document.getElementById('contextObservations').textContent = totalObs;
+            document.getElementById('contextOpenAICalls').textContent = openaiCalls;
+            document.getElementById('contextDuplicates').textContent = 'TBD'; // Will be filled when analysis is done
+            document.getElementById('contextRetries').textContent = 'TBD'; // Will be filled when analysis is done
+            document.getElementById('contextBrowser').textContent = navigator.userAgent.split(' ').pop();
+            document.getElementById('contextTimestamp').textContent = new Date().toISOString();
+        }
+
+        function submitFeedback() {
+            const type = document.getElementById('feedbackType').value;
+            const title = document.getElementById('feedbackTitle').value.trim();
+            const description = document.getElementById('feedbackDescription').value.trim();
+            const email = document.getElementById('feedbackEmail').value.trim();
+
+            // Basic validation
+            if (!title) {
+                alert('Please provide a title for your feedback.');
+                return;
+            }
+
+            if (!description) {
+                alert('Please provide a description for your feedback.');
+                return;
+            }
+
+            // For now, just show a placeholder message since this is non-functional
+            const feedbackData = {
+                type: type,
+                title: title,
+                description: description,
+                email: email,
+                context: {
+                    totalObservations: document.getElementById('contextObservations').textContent,
+                    openaiCalls: document.getElementById('contextOpenAICalls').textContent,
+                    duplicates: document.getElementById('contextDuplicates').textContent,
+                    retries: document.getElementById('contextRetries').textContent,
+                    browser: document.getElementById('contextBrowser').textContent,
+                    timestamp: document.getElementById('contextTimestamp').textContent,
+                    url: window.location.href
+                }
+            };
+
+            // Placeholder functionality - will eventually create GitHub issue
+            console.log('Feedback data that would be submitted:', feedbackData);
+
+            // Show success message
+            alert('🚧 Feedback system is coming soon!\n\nFor now, your feedback has been logged to the console (F12 to view). In the future, this will automatically create an issue in the Langfuse diagnostics repository.\n\nThank you for your feedback!');
+
+            // TODO: Implement actual GitHub issue creation
+            // This would involve:
+            // 1. API call to GitHub Issues API
+            // 2. Authentication handling
+            // 3. Template formatting for the issue
+            // 4. Error handling and retry logic
+
+            closeFeedbackModal();
+        }
+
+        // Update context when analysis is complete
+        function updateAnalysisContext(stats) {
+            if (stats && stats.duplicateAnalysis) {
+                const duplicates = stats.duplicateAnalysis.totalDuplicateCalls || 0;
+                const retries = stats.duplicateAnalysis.totalRetryCallsFromRateLimit || 0;
+
+                document.getElementById('contextDuplicates').textContent = duplicates;
+                document.getElementById('contextRetries').textContent = retries;
+            }
+        }
+
+        // Global variable to store current prompt view
+        let currentPromptView = 'category';
+        let promptAnalysisData = null;
+
+        function displayPromptAnalysis(stats) {
+            promptAnalysisData = analyzeIndividualPrompts();
+            currentPromptView = 'category';
+            renderPromptView();
+        }
+
+        function analyzeIndividualPrompts() {
+            const openaiCalls = allObservations.filter(obs =>
+                obs.type === 'GENERATION' ||
+                (obs.input && obs.output) ||
+                obs.model || obs.modelId ||
+                (obs.usage && (obs.usage.promptTokens || obs.usage.completionTokens))
+            );
+
+            const promptData = {
+                categories: {},
+                individuals: [],
+                timeline: [],
+                hierarchy: {
+                    agents: {},
+                    roots: [],
+                    orphans: []
+                }
+            };
+
+            openaiCalls.forEach((call, index) => {
+                const promptInfo = extractDetailedPromptInfo(call, index);
+
+                // Categorize prompts
+                const category = categorizePromptByContent(promptInfo);
+                if (!promptData.categories[category]) {
+                    promptData.categories[category] = {
+                        name: category,
+                        prompts: [],
+                        totalCost: 0,
+                        totalTokens: 0,
+                        totalLatency: 0,
+                        count: 0
+                    };
+                }
+
+                promptData.categories[category].prompts.push(promptInfo);
+                promptData.categories[category].totalCost += promptInfo.cost;
+                promptData.categories[category].totalTokens += promptInfo.totalTokens;
+                promptData.categories[category].totalLatency += promptInfo.latency;
+                promptData.categories[category].count++;
+
+                // Add to individuals
+                promptData.individuals.push(promptInfo);
+
+                // Add to timeline
+                if (promptInfo.timestamp) {
+                    promptData.timeline.push({
+                        ...promptInfo,
+                        category: category
+                    });
+                }
+
+                // Build hierarchy data
+                buildHierarchyData(promptInfo, promptData.hierarchy);
+            });
+
+            // Sort timeline by timestamp
+            promptData.timeline.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+            // Calculate averages
+            Object.values(promptData.categories).forEach(cat => {
+                cat.avgCost = cat.totalCost / cat.count;
+                cat.avgTokens = cat.totalTokens / cat.count;
+                cat.avgLatency = cat.totalLatency / cat.count;
+            });
+
+            return promptData;
+        }
+
+        function extractDetailedPromptInfo(call, index) {
+            const input = call.input || {};
+            const output = call.output || {};
+            const usage = call.usage || {};
+            const usageDetails = call.usageDetails || {};
+
+            // Extract full prompt content
+            let promptContent = '';
+            let promptPreview = '';
+            let promptType = 'unknown';
+
+            if (input.messages && Array.isArray(input.messages)) {
+                promptType = 'chat_completion';
+                promptContent = JSON.stringify(input.messages, null, 2);
+
+                // Create a readable preview
+                const userMessages = input.messages.filter(m => m.role === 'user');
+                const systemMessages = input.messages.filter(m => m.role === 'system');
+
+                if (systemMessages.length > 0) {
+                    promptPreview = `SYSTEM: ${systemMessages[0].content?.substring(0, 200) || 'No content'}`;
+                }
+                if (userMessages.length > 0) {
+                    promptPreview += (promptPreview ? '\n\n' : '') + `USER: ${userMessages[userMessages.length - 1].content?.substring(0, 200) || 'No content'}`;
+                }
+            } else if (input.prompt) {
+                promptType = 'completion';
+                promptContent = input.prompt;
+                promptPreview = input.prompt.substring(0, 300);
+            } else if (typeof input === 'string') {
+                promptType = 'simple';
+                promptContent = input;
+                promptPreview = input.substring(0, 300);
+            } else if (input.text || input.content) {
+                promptType = 'text_content';
+                promptContent = input.text || input.content;
+                promptPreview = (input.text || input.content).substring(0, 300);
+            } else {
+                promptType = 'complex';
+                promptContent = JSON.stringify(input, null, 2);
+                promptPreview = JSON.stringify(input).substring(0, 300);
+            }
+
+            // Extract response
+            let responseContent = '';
+            let responsePreview = '';
+
+            if (output.choices && output.choices[0]) {
+                const choice = output.choices[0];
+                responseContent = JSON.stringify(choice, null, 2);
+                responsePreview = (choice.message?.content || choice.text || JSON.stringify(choice)).substring(0, 200);
+            } else if (typeof output === 'string') {
+                responseContent = output;
+                responsePreview = output.substring(0, 200);
+            } else if (output.content || output.text) {
+                responseContent = output.content || output.text;
+                responsePreview = (output.content || output.text).substring(0, 200);
+            } else if (output && Object.keys(output).length > 0) {
+                responseContent = JSON.stringify(output, null, 2);
+                responsePreview = JSON.stringify(output).substring(0, 200);
+            }
+
+            // Extract tokens with comprehensive checking
+            let inputTokens = usageDetails.input || usageDetails.prompt_tokens || usageDetails.promptTokens || 0;
+            let outputTokens = usageDetails.output || usageDetails.completion_tokens || usageDetails.completionTokens || 0;
+            let totalTokens = usageDetails.total || 0;
+
+            if (!inputTokens) inputTokens = usage.promptTokens || usage.input || usage.inputTokens || call.promptTokens || call.inputTokens || 0;
+            if (!outputTokens) outputTokens = usage.completionTokens || usage.output || usage.outputTokens || call.completionTokens || call.outputTokens || 0;
+            if (!totalTokens) totalTokens = usage.totalTokens || usage.total || call.totalTokens || call.total || (inputTokens + outputTokens) || 0;
+
+            // Extract agent information
+            const agentInfo = extractAgentInfo(call);
+
+            return {
+                index: allObservations.indexOf(call),
+                name: call.name || 'Unnamed',
+                model: call.model || call.modelId || 'Unknown',
+                promptType: promptType,
+                promptContent: promptContent,
+                promptPreview: promptPreview,
+                responseContent: responseContent,
+                responsePreview: responsePreview,
+                inputTokens: inputTokens,
+                outputTokens: outputTokens,
+                totalTokens: totalTokens,
+                cost: parseFloat(call.calculatedTotalCost || call.totalCost || 0),
+                latency: calculateLatency(call),
+                timestamp: call.startTime || call.createdAt || null,
+                rawCall: call,
+                // Agent hierarchy information
+                id: call.id,
+                parentId: call.parentObservationId,
+                traceId: call.traceId,
+                agentName: agentInfo.agentName,
+                agentType: agentInfo.agentType,
+                hierarchyLevel: agentInfo.hierarchyLevel,
+                isRootAgent: !call.parentObservationId
+            };
+        }
+
+        function categorizePromptByContent(promptInfo) {
+            const content = (promptInfo.promptContent + ' ' + promptInfo.name).toLowerCase();
+
+            // More sophisticated categorization based on content analysis
+            if (content.includes('plan') || content.includes('planning') || content.includes('strategy') || content.includes('approach')) {
+                return '📋 Planner';
+            }
+            if (content.includes('explore') || content.includes('exploration') || content.includes('search') || content.includes('find') || content.includes('discover')) {
+                return '🔍 Explorer';
+            }
+            if (content.includes('execute') || content.includes('execution') || content.includes('run') || content.includes('perform') || content.includes('action')) {
+                return '⚡ Executor';
+            }
+            if (content.includes('validate') || content.includes('validation') || content.includes('verify') || content.includes('check') || content.includes('test')) {
+                return '✅ Validator';
+            }
+            if (content.includes('analyze') || content.includes('analysis') || content.includes('evaluate') || content.includes('assess') || content.includes('examine')) {
+                return '🔬 Analyzer';
+            }
+            if (content.includes('reason') || content.includes('reasoning') || content.includes('think') || content.includes('logic') || content.includes('deduce')) {
+                return '🧠 Reasoner';
+            }
+            if (content.includes('generate') || content.includes('create') || content.includes('build') || content.includes('construct') || content.includes('produce')) {
+                return '🎯 Generator';
+            }
+            if (content.includes('summarize') || content.includes('summary') || content.includes('conclude') || content.includes('abstract')) {
+                return '📝 Summarizer';
+            }
+            if (content.includes('classify') || content.includes('categorize') || content.includes('tag') || content.includes('label')) {
+                return '🏷️ Classifier';
+            }
+            if (content.includes('orchestrat') || content.includes('coordinat') || content.includes('manage') || content.includes('control')) {
+                return '🎼 Orchestrator';
+            }
+            if (content.includes('system') || content.includes('init') || content.includes('setup') || promptInfo.promptContent.includes('You are')) {
+                return '🔧 System/Setup';
+            }
+
+            return '❓ Other';
+        }
+
+        function togglePromptView(viewType) {
+            currentPromptView = viewType;
+
+            // Update button styles
+            document.getElementById('categoryViewBtn').style.background = viewType === 'category' ? '#007bff' : '#6c757d';
+            document.getElementById('individualViewBtn').style.background = viewType === 'individual' ? '#007bff' : '#6c757d';
+            document.getElementById('timelineViewBtn').style.background = viewType === 'timeline' ? '#007bff' : '#6c757d';
+            document.getElementById('hierarchyViewBtn').style.background = viewType === 'hierarchy' ? '#007bff' : '#6c757d';
+
+            renderPromptView();
+        }
+
+        function renderPromptView() {
+            const container = document.getElementById('promptAnalysis');
+
+            if (currentPromptView === 'category') {
+                renderCategoryView(container);
+            } else if (currentPromptView === 'individual') {
+                renderIndividualView(container);
+            } else if (currentPromptView === 'timeline') {
+                renderTimelineView(container);
+            } else if (currentPromptView === 'hierarchy') {
+                renderHierarchyView(container);
+            }
+        }
+
+        function renderCategoryView(container) {
+            const categories = promptAnalysisData.categories;
+            const sortedCategories = Object.values(categories).sort((a, b) => b.count - a.count);
+
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0;">📊 Prompt Categories Summary</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        ${sortedCategories.map(cat => `
+                            <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #007bff;">
+                                <div style="font-size: 18px; font-weight: bold; color: #007bff;">${cat.count}</div>
+                                <div style="font-size: 12px; color: #6c757d; margin: 2px 0;">${cat.name}</div>
+                                <div style="font-size: 10px; color: #6c757d;">$${cat.totalCost.toFixed(4)} | ${cat.totalTokens.toLocaleString()} tokens</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            sortedCategories.forEach(category => {
+                html += `
+                    <div style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 15px;">
+                            <h5 style="margin: 0; color: #495057; flex: 1;">${category.name} (${category.count} prompts)</h5>
+                            <div style="font-size: 12px; color: #6c757d;">
+                                Avg: ${category.avgLatency.toFixed(0)}ms | $${category.avgCost.toFixed(6)} | ${category.avgTokens.toFixed(0)} tokens
+                            </div>
+                        </div>
+
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            ${category.prompts.map((prompt, index) => `
+                                <div style="margin: 8px 0; padding: 12px; background: white; border-radius: 5px; border-left: 3px solid ${getCategoryColor(category.name)}; cursor: pointer;"
+                                     onclick="showPromptDetails(${prompt.index})"
+                                     onmouseenter="showHoverTooltip(event, ${prompt.index})"
+                                     onmouseleave="hideHoverTooltip()">
+                                    <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 5px;">
+                                        <div style="font-weight: bold; font-size: 12px; color: #495057; flex: 1;">
+                                            ${prompt.name} (${prompt.model})
+                                        </div>
+                                        <div style="font-size: 10px; color: #6c757d; text-align: right;">
+                                            ${prompt.latency}ms | $${prompt.cost.toFixed(6)}<br>
+                                            ${prompt.inputTokens}→${prompt.outputTokens} tokens
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 10px; color: #6c757d; font-family: monospace; background: #f8f9fa; padding: 6px; border-radius: 3px; max-height: 60px; overflow-y: auto;">
+                                        ${prompt.promptPreview}${prompt.promptContent.length > 300 ? '...' : ''}
+                                    </div>
+                                    ${prompt.responsePreview ? `
+                                        <div style="margin-top: 5px; font-size: 10px; color: #28a745; font-family: monospace; background: #f8f9fa; padding: 6px; border-radius: 3px; max-height: 40px; overflow-y: auto; border-left: 2px solid #28a745;">
+                                            <strong>Response:</strong> ${prompt.responsePreview}${prompt.responseContent.length > 200 ? '...' : ''}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderIndividualView(container) {
+            const prompts = promptAnalysisData.individuals;
+
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0;">📄 All Individual Prompts (${prompts.length})</h4>
+                    <div style="font-size: 12px; color: #6c757d;">
+                        Total Cost: $${prompts.reduce((sum, p) => sum + p.cost, 0).toFixed(4)} |
+                        Total Tokens: ${prompts.reduce((sum, p) => sum + p.totalTokens, 0).toLocaleString()} |
+                        Avg Latency: ${(prompts.reduce((sum, p) => sum + p.latency, 0) / prompts.length).toFixed(0)}ms
+                    </div>
+                </div>
+            `;
+
+            html += `
+                <div style="max-height: 600px; overflow-y: auto;">
+                    ${prompts.map((prompt, index) => `
+                        <div style="margin: 8px 0; padding: 15px; background: white; border-radius: 5px; border-left: 4px solid #007bff; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
+                             onclick="showPromptDetails(${prompt.index})"
+                             onmouseenter="showHoverTooltip(event, ${prompt.index})"
+                             onmouseleave="hideHoverTooltip()">
+
+                            <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 10px;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: bold; font-size: 13px; color: #495057; margin-bottom: 3px;">
+                                        #${index + 1}: ${prompt.name}
+                                    </div>
+                                    <div style="font-size: 11px; color: #6c757d;">
+                                        ${prompt.model} | ${prompt.promptType} | ${categorizePromptByContent(prompt)}
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-size: 10px; color: #6c757d;">
+                                    ${prompt.timestamp ? new Date(prompt.timestamp).toLocaleTimeString() : 'No time'}<br>
+                                    ${prompt.latency}ms | $${prompt.cost.toFixed(6)}<br>
+                                    ${prompt.inputTokens}→${prompt.outputTokens} (${prompt.totalTokens} total)
+                                </div>
+                            </div>
+
+                            <div style="font-size: 10px; color: #495057; font-family: monospace; background: #f8f9fa; padding: 8px; border-radius: 3px; margin-bottom: 8px; max-height: 80px; overflow-y: auto; border-left: 3px solid #007bff;">
+                                <strong>PROMPT:</strong><br>
+                                ${prompt.promptPreview}${prompt.promptContent.length > 300 ? '...' : ''}
+                            </div>
+
+                            ${prompt.responsePreview ? `
+                                <div style="font-size: 10px; color: #28a745; font-family: monospace; background: #f8f9fa; padding: 8px; border-radius: 3px; max-height: 60px; overflow-y: auto; border-left: 3px solid #28a745;">
+                                    <strong>RESPONSE:</strong><br>
+                                    ${prompt.responsePreview}${prompt.responseContent.length > 200 ? '...' : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function renderTimelineView(container) {
+            const timeline = promptAnalysisData.timeline;
+
+            if (timeline.length === 0) {
+                container.innerHTML = '<p>No timestamp data available for timeline view.</p>';
+                return;
+            }
+
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0;">⏰ Prompt Timeline (${timeline.length} prompts)</h4>
+                    <div style="font-size: 12px; color: #6c757d;">
+                        From: ${new Date(timeline[0].timestamp).toLocaleString()} |
+                        To: ${new Date(timeline[timeline.length - 1].timestamp).toLocaleString()}
+                    </div>
+                </div>
+            `;
+
+            html += `
+                <div style="max-height: 600px; overflow-y: auto; position: relative;">
+                    <div style="border-left: 2px solid #007bff; margin-left: 20px; padding-left: 20px;">
+                        ${timeline.map((prompt, index) => `
+                            <div style="position: relative; margin: 15px 0; padding: 12px; background: white; border-radius: 5px; border-left: 4px solid ${getCategoryColor(prompt.category)}; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer;"
+                                 onclick="showPromptDetails(${prompt.index})"
+                                 onmouseenter="showHoverTooltip(event, ${prompt.index})"
+                                 onmouseleave="hideHoverTooltip()">
+
+                                <div style="position: absolute; left: -27px; top: 15px; width: 10px; height: 10px; background: ${getCategoryColor(prompt.category)}; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 2px #007bff;"></div>
+
+                                <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 8px;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: bold; font-size: 12px; color: #495057;">
+                                            ${new Date(prompt.timestamp).toLocaleTimeString()} - ${prompt.name}
+                                        </div>
+                                        <div style="font-size: 10px; color: #6c757d; margin-top: 2px;">
+                                            ${prompt.category} | ${prompt.model} | ${prompt.latency}ms | $${prompt.cost.toFixed(6)}
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 10px; color: #6c757d; text-align: right;">
+                                        ${prompt.inputTokens}→${prompt.outputTokens}
+                                    </div>
+                                </div>
+
+                                <div style="font-size: 9px; color: #495057; font-family: monospace; background: #f8f9fa; padding: 6px; border-radius: 3px; max-height: 50px; overflow-y: auto;">
+                                    ${prompt.promptPreview.substring(0, 200)}${prompt.promptContent.length > 200 ? '...' : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function getCategoryColor(categoryName) {
+            const colors = {
+                '📋 Planner': '#007bff',
+                '🔍 Explorer': '#28a745',
+                '⚡ Executor': '#ffc107',
+                '✅ Validator': '#17a2b8',
+                '🔬 Analyzer': '#6f42c1',
+                '🧠 Reasoner': '#e83e8c',
+                '🎯 Generator': '#fd7e14',
+                '📝 Summarizer': '#20c997',
+                '🏷️ Classifier': '#6c757d',
+                '🎼 Orchestrator': '#dc3545',
+                '🔧 System/Setup': '#343a40',
+                '❓ Other': '#adb5bd'
+            };
+            return colors[categoryName] || '#6c757d';
+        }
+
+        function showPromptDetails(observationIndex) {
+            openModal(observationIndex);
+        }
+
+        function extractAgentInfo(call) {
+            // Try to identify agent information from various sources
+            let agentName = 'Unknown Agent';
+            let agentType = 'Unknown';
+            let hierarchyLevel = 0;
+
+            // Check call name for agent information
+            const name = call.name || '';
+            const nameWords = name.toLowerCase().split(/[\s_-]+/);
+
+            // Common agent name patterns
+            if (name.toLowerCase().includes('orchestrator') || name.toLowerCase().includes('workflow')) {
+                agentType = 'Orchestrator';
+                agentName = name;
+            } else if (name.toLowerCase().includes('planner') || name.toLowerCase().includes('planning')) {
+                agentType = 'Planner';
+                agentName = name;
+            } else if (name.toLowerCase().includes('executor') || name.toLowerCase().includes('execution')) {
+                agentType = 'Executor';
+                agentName = name;
+            } else if (name.toLowerCase().includes('analyzer') || name.toLowerCase().includes('analysis')) {
+                agentType = 'Analyzer';
+                agentName = name;
+            } else if (name.toLowerCase().includes('validator') || name.toLowerCase().includes('validation')) {
+                agentType = 'Validator';
+                agentName = name;
+            } else if (name.toLowerCase().includes('explorer') || name.toLowerCase().includes('search')) {
+                agentType = 'Explorer';
+                agentName = name;
+            } else if (name.toLowerCase().includes('reasoner') || name.toLowerCase().includes('reasoning')) {
+                agentType = 'Reasoner';
+                agentName = name;
+            } else if (name.toLowerCase().includes('generator') || name.toLowerCase().includes('generate')) {
+                agentType = 'Generator';
+                agentName = name;
+            } else if (name.toLowerCase().includes('summarizer') || name.toLowerCase().includes('summary')) {
+                agentType = 'Summarizer';
+                agentName = name;
+            } else if (name.toLowerCase().includes('classifier') || name.toLowerCase().includes('classify')) {
+                agentType = 'Classifier';
+                agentName = name;
+            } else if (name.toLowerCase().includes('chatopenai') || name.toLowerCase().includes('chat_openai')) {
+                agentType = 'LLM Call';
+                agentName = 'ChatOpenAI';
+            } else if (name.toLowerCase().includes('openai')) {
+                agentType = 'LLM Call';
+                agentName = 'OpenAI';
+            } else if (name.toLowerCase().includes('claude')) {
+                agentType = 'LLM Call';
+                agentName = 'Claude';
+            } else if (name.toLowerCase().includes('llm') || name.toLowerCase().includes('language_model')) {
+                agentType = 'LLM Call';
+                agentName = name;
+            } else if (name) {
+                agentType = 'Named Agent';
+                agentName = name;
+            }
+
+            // Calculate hierarchy level based on parent chain
+            hierarchyLevel = getHierarchyLevel(call, {});
+
+            return {
+                agentName: agentName,
+                agentType: agentType,
+                hierarchyLevel: hierarchyLevel
+            };
+        }
+
+        function buildHierarchyData(promptInfo, hierarchy) {
+            const agentKey = `${promptInfo.agentType}:${promptInfo.agentName}`;
+
+            // Initialize agent if not exists
+            if (!hierarchy.agents[agentKey]) {
+                hierarchy.agents[agentKey] = {
+                    name: promptInfo.agentName,
+                    type: promptInfo.agentType,
+                    calls: [],
+                    children: [],
+                    parent: null,
+                    totalCost: 0,
+                    totalTokens: 0,
+                    totalLatency: 0,
+                    level: promptInfo.hierarchyLevel
+                };
+            }
+
+            // Add this call to the agent
+            hierarchy.agents[agentKey].calls.push(promptInfo);
+            hierarchy.agents[agentKey].totalCost += promptInfo.cost;
+            hierarchy.agents[agentKey].totalTokens += promptInfo.totalTokens;
+            hierarchy.agents[agentKey].totalLatency += promptInfo.latency;
+
+            // Handle hierarchy relationships
+            if (promptInfo.isRootAgent) {
+                // This is a root agent
+                if (!hierarchy.roots.includes(agentKey)) {
+                    hierarchy.roots.push(agentKey);
+                }
+            } else if (promptInfo.parentId) {
+                // Find parent agent
+                const parentPrompt = allObservations.find(obs => obs.id === promptInfo.parentId);
+                if (parentPrompt) {
+                    const parentAgentInfo = extractAgentInfo(parentPrompt);
+                    const parentKey = `${parentAgentInfo.agentType}:${parentAgentInfo.agentName}`;
+
+                    // Set parent relationship
+                    hierarchy.agents[agentKey].parent = parentKey;
+
+                    // Add to parent's children if not already there
+                    if (hierarchy.agents[parentKey] && !hierarchy.agents[parentKey].children.includes(agentKey)) {
+                        hierarchy.agents[parentKey].children.push(agentKey);
+                    }
+                } else {
+                    // Parent not found, add to orphans
+                    if (!hierarchy.orphans.includes(agentKey)) {
+                        hierarchy.orphans.push(agentKey);
+                    }
+                }
+            } else {
+                // No parent info, add to orphans
+                if (!hierarchy.orphans.includes(agentKey)) {
+                    hierarchy.orphans.push(agentKey);
+                }
+            }
+        }
+
+        function renderHierarchyView(container) {
+            const hierarchy = promptAnalysisData.hierarchy;
+            const agents = hierarchy.agents;
+
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0;">🌳 Agent Hierarchy Analysis</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #007bff;">
+                            <div style="font-size: 18px; font-weight: bold; color: #007bff;">${Object.keys(agents).length}</div>
+                            <div style="font-size: 12px; color: #6c757d;">Total Agents</div>
+                        </div>
+                        <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #28a745;">
+                            <div style="font-size: 18px; font-weight: bold; color: #28a745;">${hierarchy.roots.length}</div>
+                            <div style="font-size: 12px; color: #6c757d;">Root Agents</div>
+                        </div>
+                        <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #ffc107;">
+                            <div style="font-size: 18px; font-weight: bold; color: #ffc107;">${hierarchy.orphans.length}</div>
+                            <div style="font-size: 12px; color: #6c757d;">Orphaned Agents</div>
+                        </div>
+                        <div style="text-align: center; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #dc3545;">
+                            <div style="font-size: 18px; font-weight: bold; color: #dc3545;">${Object.values(agents).reduce((sum, agent) => sum + agent.calls.length, 0)}</div>
+                            <div style="font-size: 12px; color: #6c757d;">Total OpenAI Calls</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Render hierarchy tree starting from roots
+            html += `<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">`;
+            html += `<h5 style="margin: 0 0 15px 0; color: #495057;">🌲 Agent Call Tree</h5>`;
+
+            // Render root agents first
+            hierarchy.roots.forEach(rootKey => {
+                if (agents[rootKey]) {
+                    html += renderAgentNode(agents[rootKey], rootKey, agents, 0);
+                }
+            });
+
+            // Render orphaned agents
+            if (hierarchy.orphans.length > 0) {
+                html += `<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">`;
+                html += `<h6 style="margin: 0 0 10px 0; color: #856404;">⚠️ Orphaned Agents (No Clear Parent)</h6>`;
+                hierarchy.orphans.forEach(orphanKey => {
+                    if (agents[orphanKey]) {
+                        html += renderAgentNode(agents[orphanKey], orphanKey, agents, 0);
+                    }
+                });
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+
+            // Agent details section
+            html += `<div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">`;
+            html += `<h5 style="margin: 0 0 15px 0; color: #495057;">📊 Agent Performance Details</h5>`;
+
+            // Sort agents by total cost descending
+            const sortedAgents = Object.entries(agents).sort(([, a], [, b]) => b.totalCost - a.totalCost);
+
+            sortedAgents.forEach(([agentKey, agent]) => {
+                const avgCost = agent.totalCost / agent.calls.length;
+                const avgLatency = agent.totalLatency / agent.calls.length;
+                const avgTokens = agent.totalTokens / agent.calls.length;
+
+                html += `
+                    <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 5px; border-left: 4px solid ${getAgentTypeColor(agent.type)};">
+                        <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 10px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; font-size: 14px; color: #495057; margin-bottom: 3px;">
+                                    ${getAgentTypeIcon(agent.type)} ${agent.name}
+                                </div>
+                                <div style="font-size: 11px; color: #6c757d;">
+                                    ${agent.type} | Level ${agent.level} | ${agent.calls.length} calls
+                                    ${agent.children.length > 0 ? ` | ${agent.children.length} child agents` : ''}
+                                </div>
+                            </div>
+                            <div style="text-align: right; font-size: 11px; color: #6c757d;">
+                                Total: $${agent.totalCost.toFixed(4)} | ${agent.totalTokens.toLocaleString()} tokens<br>
+                                Avg: $${avgCost.toFixed(6)} | ${avgLatency.toFixed(0)}ms | ${avgTokens.toFixed(0)} tokens
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <div style="font-size: 11px; color: #495057; margin-bottom: 8px;">
+                                <strong>OpenAI Calls (${agent.calls.length}):</strong>
+                            </div>
+                            <div style="max-height: 150px; overflow-y: auto;">
+                                ${agent.calls.map((call, index) => `
+                                    <div style="margin: 4px 0; padding: 8px; background: #f8f9fa; border-radius: 3px; cursor: pointer; border-left: 2px solid ${getAgentTypeColor(agent.type)};"
+                                         onclick="showPromptDetails(${call.index})"
+                                         onmouseenter="showHoverTooltip(event, ${call.index})"
+                                         onmouseleave="hideHoverTooltip()">
+                                        <div style="display: flex; justify-content: between; align-items: center;">
+                                            <div style="font-size: 10px; color: #495057; flex: 1;">
+                                                <strong>${call.timestamp ? new Date(call.timestamp).toLocaleTimeString() : 'No time'}</strong> - ${call.name}
+                                            </div>
+                                            <div style="font-size: 9px; color: #6c757d; text-align: right;">
+                                                ${call.latency}ms | $${call.cost.toFixed(6)}<br>
+                                                ${call.inputTokens}→${call.outputTokens}
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 9px; color: #6c757d; font-family: monospace; margin-top: 4px; max-height: 30px; overflow: hidden;">
+                                            ${call.promptPreview.substring(0, 100)}${call.promptContent.length > 100 ? '...' : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            container.innerHTML = html;
+        }
+
+        function renderAgentNode(agent, agentKey, allAgents, level) {
+            const indent = level * 25;
+            const color = getAgentTypeColor(agent.type);
+            const icon = getAgentTypeIcon(agent.type);
+
+            let html = `
+                <div style="margin: 8px 0; margin-left: ${indent}px; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid ${color}; position: relative;">
+                    ${level > 0 ? `<div style="position: absolute; left: -${indent + 4}px; top: 0; bottom: 0; width: 2px; background: #dee2e6;"></div>` : ''}
+                    ${level > 0 ? `<div style="position: absolute; left: -${indent + 4}px; top: 20px; width: ${indent - 10}px; height: 2px; background: #dee2e6;"></div>` : ''}
+
+                    <div style="display: flex; justify-content: between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 12px; color: #495057;">
+                                ${icon} ${agent.name}
+                            </div>
+                            <div style="font-size: 10px; color: #6c757d; margin-top: 2px;">
+                                ${agent.type} | ${agent.calls.length} calls | $${agent.totalCost.toFixed(4)} | ${agent.totalTokens.toLocaleString()} tokens
+                            </div>
+                        </div>
+                        <div style="font-size: 10px; color: #6c757d;">
+                            Avg: ${(agent.totalLatency / agent.calls.length).toFixed(0)}ms
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Render children recursively
+            agent.children.forEach(childKey => {
+                if (allAgents[childKey]) {
+                    html += renderAgentNode(allAgents[childKey], childKey, allAgents, level + 1);
+                }
+            });
+
+            return html;
+        }
+
+        function getAgentTypeColor(agentType) {
+            const colors = {
+                'Orchestrator': '#dc3545',
+                'Planner': '#007bff',
+                'Executor': '#ffc107',
+                'Analyzer': '#6f42c1',
+                'Validator': '#17a2b8',
+                'Explorer': '#28a745',
+                'Reasoner': '#e83e8c',
+                'Generator': '#fd7e14',
+                'Summarizer': '#20c997',
+                'Classifier': '#6c757d',
+                'LLM Call': '#343a40',
+                'Named Agent': '#495057',
+                'Unknown': '#adb5bd'
+            };
+            return colors[agentType] || '#6c757d';
+        }
+
+        function getAgentTypeIcon(agentType) {
+            const icons = {
+                'Orchestrator': '🎼',
+                'Planner': '📋',
+                'Executor': '⚡',
+                'Analyzer': '🔬',
+                'Validator': '✅',
+                'Explorer': '🔍',
+                'Reasoner': '🧠',
+                'Generator': '🎯',
+                'Summarizer': '📝',
+                'Classifier': '🏷️',
+                'LLM Call': '🤖',
+                'Named Agent': '👤',
+                'Unknown': '❓'
+            };
+            return icons[agentType] || '❓';
+        }
+    </script>
+</body>
+</html>
