@@ -1,11 +1,14 @@
 {
-  "name": "langfuse-trace-analyzer",
+  "name": "github-pr-comment-tool",
   "version": "1.0.0",
-  "description": "Langfuse trace analysis tool for team collaboration",
-  "main": "server.js",
+  "description": "GitHub PR Comment Tool - Monitor actionable comments across repositories",
+  "main": "github-server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node github-server.js",
+    "dev": "nodemon github-server.js",
+    "fetch-data": "node data-fetcher.js --fetch-now",
+    "start-fetcher": "node data-fetcher.js",
+    "start-all": "bash start-all.sh",
     "build": "echo 'No build step needed'",
     "deploy": "bash deploy.sh"
   },

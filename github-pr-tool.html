@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub PR Comment Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f6f8fa;
+            color: #24292f;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #d0d7de;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #d0d7de;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .refresh-btn {
+            background: #0969da;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: #0860ca;
+        }
+
+        .refresh-btn:disabled {
+            background: #8c959f;
+            cursor: not-allowed;
+        }
+
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            background: #f6f8fa;
+            border-bottom: 1px solid #d0d7de;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .repo-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f6f8fa;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .repo-item:hover {
+            background: #f6f8fa;
+        }
+
+        .repo-item.active {
+            background: #dbeafe;
+            border-right: 3px solid #0969da;
+        }
+
+        .repo-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .repo-meta {
+            font-size: 12px;
+            color: #656d76;
+        }
+
+        .pr-list {
+            margin-top: 16px;
+        }
+
+        .pr-item {
+            padding: 8px 16px;
+            border-bottom: 1px solid #f6f8fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pr-item:hover {
+            background: #f6f8fa;
+        }
+
+        .pr-item.active {
+            background: #fff8dc;
+            border-right: 3px solid #fb8500;
+        }
+
+        .pr-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .pr-meta {
+            font-size: 11px;
+            color: #656d76;
+        }
+
+        .comment-badge {
+            background: #0969da;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 16px;
+            color: #656d76;
+        }
+
+        .error {
+            background: #ffeef0;
+            border: 1px solid #ffbdcc;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            color: #cf222e;
+        }
+
+        .comments-container {
+            max-width: 1000px;
+        }
+
+        .pr-header {
+            background: white;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .pr-title-main {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .pr-meta-main {
+            color: #656d76;
+            font-size: 14px;
+        }
+
+        .comment-item {
+            background: white;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .comment-header {
+            background: #f6f8fa;
+            padding: 12px 16px;
+            border-bottom: 1px solid #d0d7de;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .comment-meta {
+            font-size: 12px;
+            color: #656d76;
+        }
+
+        .comment-body {
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .comment-actions {
+            padding: 12px 16px;
+            background: #f6f8fa;
+            border-top: 1px solid #d0d7de;
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #24292f;
+        }
+
+        .action-btn:hover {
+            background: #eaeef2;
+        }
+
+        .action-btn.primary {
+            background: #0969da;
+            color: white;
+            border-color: #0969da;
+        }
+
+        .action-btn.primary:hover {
+            background: #0860ca;
+        }
+
+        .severity-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .severity-high {
+            background: #ffebe9;
+            color: #cf222e;
+        }
+
+        .severity-medium {
+            background: #fff8dc;
+            color: #9a6700;
+        }
+
+        .severity-low {
+            background: #dcfce7;
+            color: #137a2b;
+        }
+
+        .action-type {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            background: #dbeafe;
+            color: #0860ca;
+            margin-left: 8px;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 8px 0;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            color: #656d76;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: white;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0969da;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #656d76;
+            margin-top: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #656d76;
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 300px;
+            }
+
+            .main-content {
+                flex: 1;
+            }
+        }
+
+        .diff-hunk {
+            background: #f8f9fa;
+            border-left: 4px solid #d0d7de;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                📁 GitHub Repositories
+            </div>
+            <div id="repoList" class="loading">
+                Loading repositories...
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1>🚀 GitHub PR Comment Tool</h1>
+                    <div id="breadcrumb" style="font-size: 14px; color: #656d76; margin-top: 4px;">
+                        Select a repository to view pull requests
+                    </div>
+                </div>
+                <button id="refreshBtn" class="refresh-btn" onclick="refreshCurrentPR()" disabled>
+                    🔄 Refresh
+                </button>
+            </header>
+
+            <div class="content">
+                <div id="mainContent" class="empty-state">
+                    <h2>Welcome to GitHub PR Comment Tool</h2>
+                    <p>Select a repository from the sidebar to view its pull requests and actionable comments.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentRepo = null;
+        let currentPR = null;
+        let repos = [];
+        let prs = [];
+
+        // Load repositories on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRepositories();
+        });
+
+        async function loadRepositories() {
+            try {
+                const response = await fetch('/api/repos');
+                const data = await response.json();
+
+                if (data.success) {
+                    repos = data.repos;
+                    renderRepositories();
+                } else {
+                    showError('Failed to load repositories: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error loading repositories: ' + error.message);
+            }
+        }
+
+        function renderRepositories() {
+            const repoList = document.getElementById('repoList');
+
+            if (repos.length === 0) {
+                repoList.innerHTML = '<div class="empty-state">No repositories found</div>';
+                return;
+            }
+
+            repoList.innerHTML = repos.map(repo => `
+                <div class="repo-item" onclick="selectRepository('${repo.owner.login}', '${repo.name}')">
+                    <div class="repo-name">${repo.owner.login}/${repo.name}</div>
+                    <div class="repo-meta">Updated ${new Date(repo.updatedAt).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+
+        async function selectRepository(owner, repoName) {
+            currentRepo = { owner, name: repoName };
+            currentPR = null;
+
+            // Update UI
+            document.querySelectorAll('.repo-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.repo-item').classList.add('active');
+
+            document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Loading pull requests...`;
+            document.getElementById('refreshBtn').disabled = true;
+
+            // Load PRs
+            await loadPullRequests(owner, repoName);
+        }
+
+        async function loadPullRequests(owner, repoName) {
+            try {
+                const response = await fetch(`/api/repos/${owner}/${repoName}/prs`);
+                const data = await response.json();
+
+                if (data.success) {
+                    prs = data.prs;
+                    renderPullRequests();
+                    document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - ${prs.length} pull requests`;
+                } else {
+                    showError('Failed to load pull requests: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error loading pull requests: ' + error.message);
+            }
+        }
+
+        function renderPullRequests() {
+            const repoList = document.getElementById('repoList');
+
+            // Find the active repo item and add PR list after it
+            const activeRepo = repoList.querySelector('.repo-item.active');
+
+            // Remove existing PR list
+            const existingPRList = repoList.querySelector('.pr-list');
+            if (existingPRList) {
+                existingPRList.remove();
+            }
+
+            if (prs.length === 0) {
+                const prList = document.createElement('div');
+                prList.className = 'pr-list';
+                prList.innerHTML = '<div style="padding: 16px; color: #656d76; font-size: 12px;">No recent pull requests</div>';
+                activeRepo.insertAdjacentElement('afterend', prList);
+                return;
+            }
+
+            const prList = document.createElement('div');
+            prList.className = 'pr-list';
+
+            prList.innerHTML = prs.map(pr => `
+                <div class="pr-item" onclick="selectPullRequest(${pr.number})">
+                    <div>
+                        <div class="pr-title">#${pr.number}: ${pr.title}</div>
+                        <div class="pr-meta">by ${pr.author.login} • ${new Date(pr.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <div class="comment-badge">${pr.totalComments}</div>
+                </div>
+            `).join('');
+
+            activeRepo.insertAdjacentElement('afterend', prList);
+        }
+
+        async function selectPullRequest(prNumber) {
+            currentPR = prNumber;
+
+            // Update UI
+            document.querySelectorAll('.pr-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.pr-item').classList.add('active');
+
+            document.getElementById('refreshBtn').disabled = false;
+            document.getElementById('breadcrumb').textContent = `${currentRepo.owner}/${currentRepo.name} - PR #${prNumber} - Loading comments...`;
+
+            // Show loading state
+            document.getElementById('mainContent').innerHTML = '<div class="loading">Loading actionable comments...</div>';
+
+            // Load comments
+            await loadPRComments();
+        }
+
+        async function loadPRComments() {
+            try {
+                const response = await fetch(`/api/repos/${currentRepo.owner}/${currentRepo.name}/prs/${currentPR}/comments`);
+                const data = await response.json();
+
+                if (data.success) {
+                    renderPRComments(data);
+                    document.getElementById('breadcrumb').textContent =
+                        `${currentRepo.owner}/${currentRepo.name} - PR #${currentPR}: ${data.pr.title} (${data.actionableComments.length} actionable comments)`;
+                } else {
+                    showError('Failed to load comments: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error loading comments: ' + error.message);
+            }
+        }
+
+        function renderPRComments(data) {
+            const { pr, actionableComments, stats } = data;
+
+            let html = `
+                <div class="pr-header">
+                    <div class="pr-title-main">#${pr.number}: ${pr.title}</div>
+                    <div class="pr-meta-main">
+                        by ${pr.author.login} • opened ${new Date(pr.createdAt).toLocaleDateString()}
+                        • <a href="${pr.url}" target="_blank">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-number">${stats.total}</div>
+                        <div class="stat-label">Total Actionable</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${stats.bySeverity.high || 0}</div>
+                        <div class="stat-label">High Priority</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${stats.bySeverity.medium || 0}</div>
+                        <div class="stat-label">Medium Priority</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${stats.bySeverity.low || 0}</div>
+                        <div class="stat-label">Low Priority</div>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <label>Filter by severity:</label>
+                    <select class="filter-select" onchange="filterComments(this.value)">
+                        <option value="all">All Severities</option>
+                        <option value="high">High Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+
+                    <label style="margin-left: 16px;">Filter by type:</label>
+                    <select class="filter-select" onchange="filterCommentsByType(this.value)">
+                        <option value="all">All Types</option>
+                        <option value="fix_required">Fix Required</option>
+                        <option value="improvement_needed">Improvement Needed</option>
+                        <option value="suggestion">Suggestion</option>
+                        <option value="question">Question</option>
+                        <option value="request">Request</option>
+                    </select>
+                </div>
+            `;
+
+            if (actionableComments.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <h3>🎉 No actionable comments found!</h3>
+                        <p>This PR looks good to go, or all comments have been addressed.</p>
+                    </div>
+                `;
+            } else {
+                html += '<div id="commentsList">';
+                html += actionableComments.map(comment => renderComment(comment)).join('');
+                html += '</div>';
+            }
+
+            document.getElementById('mainContent').innerHTML = html;
+
+            // Store comments for filtering
+            window.currentComments = actionableComments;
+        }
+
+        function renderComment(comment) {
+            const severityClass = `severity-${comment.severity}`;
+            const authorTime = new Date(comment.createdAt).toLocaleString();
+
+            let typeIcon = '';
+            switch (comment.actionType) {
+                case 'fix_required': typeIcon = '🚨'; break;
+                case 'improvement_needed': typeIcon = '🔧'; break;
+                case 'suggestion': typeIcon = '💡'; break;
+                case 'question': typeIcon = '❓'; break;
+                case 'request': typeIcon = '📝'; break;
+                default: typeIcon = '💬';
+            }
+
+            return `
+                <div class="comment-item" data-severity="${comment.severity}" data-type="${comment.actionType}">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            ${typeIcon} ${comment.author}
+                            <span class="severity-badge ${severityClass}">${comment.severity.toUpperCase()}</span>
+                            <span class="action-type">${comment.actionType.replace('_', ' ').toUpperCase()}</span>
+                        </div>
+                        <div class="comment-meta">${authorTime}</div>
+                    </div>
+
+                    ${comment.path ? `
+                        <div class="file-info">
+                            📁 ${comment.path}${comment.line ? `:${comment.line}` : ''}
+                        </div>
+                    ` : ''}
+
+                    ${comment.diffHunk ? `
+                        <div class="diff-hunk">${comment.diffHunk}</div>
+                    ` : ''}
+
+                    <div class="comment-body">
+                        ${formatCommentBody(comment.body)}
+                    </div>
+
+                    <div class="comment-actions">
+                        <button class="action-btn primary" onclick="copyCommentLink('${comment.copyableLink}')">
+                            📋 Copy Link
+                        </button>
+                        <a class="action-btn" href="${comment.prUrl}" target="_blank">
+                            🔗 View on GitHub
+                        </a>
+                        ${comment.fileLineUrl ? `
+                            <a class="action-btn" href="${comment.fileLineUrl}" target="_blank">
+                                📍 Go to Line
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatCommentBody(body) {
+            // Basic markdown-like formatting
+            return body
+                .replace(/\n/g, '<br>')
+                .replace(/`([^`]+)`/g, '<code style="background: #f6f8fa; padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+
+        function copyCommentLink(link) {
+            navigator.clipboard.writeText(link).then(() => {
+                showCopySuccess();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = link;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopySuccess();
+            });
+        }
+
+        function showCopySuccess() {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'copy-success';
+            successDiv.textContent = '✅ Link copied to clipboard!';
+            document.body.appendChild(successDiv);
+
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+
+        function filterComments(severity) {
+            const comments = document.querySelectorAll('.comment-item');
+            comments.forEach(comment => {
+                if (severity === 'all' || comment.dataset.severity === severity) {
+                    comment.style.display = 'block';
+                } else {
+                    comment.style.display = 'none';
+                }
+            });
+        }
+
+        function filterCommentsByType(type) {
+            const comments = document.querySelectorAll('.comment-item');
+            comments.forEach(comment => {
+                if (type === 'all' || comment.dataset.type === type) {
+                    comment.style.display = 'block';
+                } else {
+                    comment.style.display = 'none';
+                }
+            });
+        }
+
+        async function refreshCurrentPR() {
+            if (!currentPR || !currentRepo) return;
+
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 Refreshing...';
+
+            try {
+                // Refresh PR data
+                await fetch(`/api/repos/${currentRepo.owner}/${currentRepo.name}/prs/${currentPR}/refresh`, {
+                    method: 'POST'
+                });
+
+                // Reload comments
+                await loadPRComments();
+
+                showCopySuccess();
+            } catch (error) {
+                showError('Failed to refresh: ' + error.message);
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 Refresh';
+            }
+        }
+
+        function showError(message) {
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                    <br><br>
+                    <small>Make sure you have the GitHub CLI installed and authenticated: <code>gh auth login</code></small>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

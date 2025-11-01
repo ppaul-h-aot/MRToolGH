@@ -4,9 +4,13 @@ const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
+const GitHubDataFetcher = require('./data-fetcher');
 
 const app = express();
 const PORT = 3611;
+
+// Initialize data fetcher
+const dataFetcher = new GitHubDataFetcher();
 
 // Security configuration
 app.use(helmet({
@@ -39,9 +43,57 @@ function executeGhCommand(command) {
   }
 }
 
+// Get cached data summary
+app.get('/api/cached-data', async (req, res) => {
+  try {
+    const cachedData = dataFetcher.loadCachedData();
+    const lastUpdate = dataFetcher.getLastUpdateInfo();
+
+    if (cachedData) {
+      res.json({
+        success: true,
+        data: cachedData,
+        lastUpdate,
+        fromCache: true
+      });
+    } else {
+      res.json({
+        success: false,
+        error: 'No cached data available. Please wait for the next data fetch or trigger a manual fetch.',
+        lastUpdate: null,
+        fromCache: false
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Get all repositories accessible to the user
 app.get('/api/repos', async (req, res) => {
   try {
+    // Try to use cached data first
+    const cachedData = dataFetcher.loadCachedData();
+    if (cachedData && req.query.use_cache !== 'false') {
+      const repos = cachedData.repositories.map(repo => ({
+        name: repo.name,
+        owner: { login: repo.owner },
+        url: repo.url,
+        updatedAt: repo.lastPush || new Date().toISOString()
+      }));
+
+      return res.json({
+        success: true,
+        repos: repos.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
+        fromCache: true,
+        lastUpdate: cachedData.lastUpdate
+      });
+    }
+
+    // Fallback to live data
     const repos = executeGhCommand('gh repo list --json name,owner,url,updatedAt --limit 100');
 
     // Filter and sort repos by recent activity
@@ -51,7 +103,8 @@ app.get('/api/repos', async (req, res) => {
 
     res.json({
       success: true,
-      repos: sortedRepos
+      repos: sortedRepos,
+      fromCache: false
     });
   } catch (error) {
     res.status(500).json({
@@ -67,7 +120,28 @@ app.get('/api/repos/:owner/:repo/prs', async (req, res) => {
   const { state = 'open' } = req.query;
 
   try {
-    // Get PRs from the last 30 days
+    // Try to use cached data first
+    const cachedData = dataFetcher.loadCachedData();
+    if (cachedData && req.query.use_cache !== 'false') {
+      const repoData = cachedData.repositories.find(r => r.owner === owner && r.name === repo);
+      if (repoData) {
+        const prs = repoData.pullRequests.map(pr => ({
+          ...pr,
+          totalComments: pr.actionableCount,
+          commentCount: pr.actionableCount,
+          reviewCommentCount: 0
+        }));
+
+        return res.json({
+          success: true,
+          prs: prs.sort((a, b) => b.totalComments - a.totalComments),
+          fromCache: true,
+          lastUpdate: cachedData.lastUpdate
+        });
+      }
+    }
+
+    // Fallback to live data
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const prs = executeGhCommand(
@@ -109,7 +183,8 @@ app.get('/api/repos/:owner/:repo/prs', async (req, res) => {
 
     res.json({
       success: true,
-      prs: prsWithComments.sort((a, b) => b.totalComments - a.totalComments)
+      prs: prsWithComments.sort((a, b) => b.totalComments - a.totalComments),
+      fromCache: false
     });
   } catch (error) {
     res.status(500).json({
@@ -124,6 +199,31 @@ app.get('/api/repos/:owner/:repo/prs/:number/comments', async (req, res) => {
   const { owner, repo, number } = req.params;
 
   try {
+    // Try to use cached data first
+    const cachedData = dataFetcher.loadCachedData();
+    if (cachedData && req.query.use_cache !== 'false') {
+      const repoData = cachedData.repositories.find(r => r.owner === owner && r.name === repo);
+      if (repoData) {
+        const prData = repoData.pullRequests.find(pr => pr.number === parseInt(number));
+        if (prData) {
+          return res.json({
+            success: true,
+            pr: prData,
+            actionableComments: prData.actionableComments || [],
+            stats: {
+              total: prData.actionableCount || 0,
+              byType: prData.actionableComments?.reduce((acc, comment) => {
+                acc[comment.actionType] = (acc[comment.actionType] || 0) + 1;
+                return acc;
+              }, {}) || {},
+              bySeverity: prData.severityCounts || { high: 0, medium: 0, low: 0 }
+            },
+            fromCache: true,
+            lastUpdate: cachedData.lastUpdate
+          });
+        }
+      }
+    }
     // Get PR details
     const prDetails = executeGhCommand(
       `gh pr view ${number} --repo ${owner}/${repo} --json number,title,body,author,createdAt,url,files,reviewDecision,isDraft`
@@ -264,6 +364,27 @@ app.post('/api/repos/:owner/:repo/prs/:number/refresh', async (req, res) => {
       pr: prData,
       commentCount: freshComments.length,
       lastRefresh: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Trigger manual data fetch
+app.post('/api/fetch-data', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Data fetch started in background',
+      timestamp: new Date().toISOString()
+    });
+
+    // Start fetch in background
+    dataFetcher.fetchAllData().catch(error => {
+      console.error('❌ Background fetch failed:', error.message);
     });
   } catch (error) {
     res.status(500).json({
