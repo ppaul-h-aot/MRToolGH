@@ -697,61 +697,81 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
-                        // Calculate total statistics
-                        const totalRepos = data.data.repositories.length;
+                        // Calculate total statistics from cached data
+                        const totalReposWithData = data.data.repositories.length;
                         const totalPRs = data.data.repositories.reduce((sum, repo) => sum + repo.pullRequests.length, 0);
                         const totalActionable = data.data.repositories.reduce((sum, repo) =>
                             sum + repo.pullRequests.reduce((prSum, pr) => prSum + pr.actionableCount, 0), 0);
 
-                        // Update total stats display
+                        // Update total stats display including all repos
                         const totalStats = document.getElementById('totalStats');
                         totalStats.innerHTML = `
-                            <span><span class="highlight">${totalRepos}</span> repositories</span>
+                            <span><span class="highlight">${repos.length}</span> repositories</span>
                             <span><span class="highlight">${totalPRs}</span> PRs with comments</span>
                             <span><span class="highlight">${totalActionable}</span> actionable items</span>
                         `;
                         totalStats.style.display = 'flex';
 
-                        // Build repository tree structure
-                        const repoTree = data.data.repositories.map(repoData => {
-                            const matchingRepo = repos.find(r => r.owner.login === repoData.owner && r.name === repoData.name);
-                            if (!matchingRepo) return null;
+                        // Build repository tree structure - include ALL repos, even those with 0 PRs
+                        const repoTree = repos.map(repo => {
+                            // Find matching cached data
+                            const repoData = data.data.repositories.find(r => r.owner === repo.owner.login && r.name === repo.name);
 
-                            const totalActionable = repoData.pullRequests.reduce((sum, pr) => sum + pr.actionableCount, 0);
-                            const severityCounts = {
-                                high: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.high || 0), 0),
-                                medium: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.medium || 0), 0),
-                                low: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.low || 0), 0)
-                            };
+                            if (repoData) {
+                                // Repository has cached data with PRs
+                                const totalActionable = repoData.pullRequests.reduce((sum, pr) => sum + pr.actionableCount, 0);
+                                const severityCounts = {
+                                    high: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.high || 0), 0),
+                                    medium: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.medium || 0), 0),
+                                    low: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.low || 0), 0)
+                                };
 
-                            // Sort PRs by number in reverse order (newest first)
-                            const sortedPRs = [...repoData.pullRequests].sort((a, b) => b.number - a.number);
+                                // Sort PRs by number in reverse order (newest first)
+                                const sortedPRs = [...repoData.pullRequests].sort((a, b) => b.number - a.number);
 
-                            return {
-                                ...matchingRepo,
-                                repoData,
-                                totalActionable,
-                                severityCounts,
-                                pullRequests: sortedPRs
-                            };
-                        }).filter(Boolean);
+                                return {
+                                    ...repo,
+                                    repoData,
+                                    totalActionable,
+                                    severityCounts,
+                                    pullRequests: sortedPRs
+                                };
+                            } else {
+                                // Repository with no actionable PRs or no recent activity
+                                return {
+                                    ...repo,
+                                    repoData: null,
+                                    totalActionable: 0,
+                                    severityCounts: { high: 0, medium: 0, low: 0 },
+                                    pullRequests: []
+                                };
+                            }
+                        });
 
                         renderTreeStructure(repoTree);
                     } else {
-                        // Fallback to simple rendering without PRs
-                        repoList.innerHTML = repos.map(repo => `
-                            <div class="repo-item" onclick="toggleRepository('${repo.owner.login}', '${repo.name}')">
-                                <div class="repo-header">
-                                    <div class="repo-name">📁 ${repo.owner.login}/${repo.name}</div>
-                                </div>
-                                <div class="repo-meta">Updated ${new Date(repo.updatedAt).toLocaleDateString()}</div>
-                            </div>
-                        `).join('');
+                        // Fallback to simple rendering without PR data
+                        const repoTree = repos.map(repo => ({
+                            ...repo,
+                            repoData: null,
+                            totalActionable: 0,
+                            severityCounts: { high: 0, medium: 0, low: 0 },
+                            pullRequests: []
+                        }));
+                        renderTreeStructure(repoTree);
                     }
                 })
                 .catch(error => {
                     console.error('Error loading repo stats:', error);
-                    repoList.innerHTML = '<div class="error">Failed to load repository data</div>';
+                    // Even on error, show all repositories
+                    const repoTree = repos.map(repo => ({
+                        ...repo,
+                        repoData: null,
+                        totalActionable: 0,
+                        severityCounts: { high: 0, medium: 0, low: 0 },
+                        pullRequests: []
+                    }));
+                    renderTreeStructure(repoTree);
                 });
         }
 
@@ -834,40 +854,58 @@
         function toggleRepository(owner, repoName) {
             console.log('Toggling repository:', owner, repoName);
 
+            // Prevent event propagation
+            if (event) {
+                event.stopPropagation();
+            }
+
             const repoId = `repo-${owner}-${repoName}`;
             const prSubtree = document.getElementById(`prs-${repoId}`);
             const repoItem = document.querySelector(`[data-repo-id="${repoId}"]`);
             const treeIcon = repoItem?.querySelector('.tree-icon');
 
+            console.log('Looking for elements:', { repoId, prSubtree, repoItem, treeIcon });
+
             if (!prSubtree) {
                 console.error('PR subtree not found for:', repoId);
+                // Show repository overview even if no PRs
+                showRepositoryOverview(owner, repoName);
                 return;
             }
 
             // Toggle the PR subtree visibility
-            if (prSubtree.style.display === 'none') {
+            const isCurrentlyHidden = prSubtree.style.display === 'none' || !prSubtree.style.display;
+
+            if (isCurrentlyHidden) {
                 prSubtree.style.display = 'block';
                 if (treeIcon) {
                     treeIcon.textContent = '📂';
                     treeIcon.classList.add('expanded');
                 }
-
-                // Update main content to show repository overview
-                showRepositoryOverview(owner, repoName);
+                console.log('Expanded repository:', owner, repoName);
             } else {
                 prSubtree.style.display = 'none';
                 if (treeIcon) {
                     treeIcon.textContent = '📁';
                     treeIcon.classList.remove('expanded');
                 }
+                console.log('Collapsed repository:', owner, repoName);
             }
 
+            // Update main content to show repository overview
+            showRepositoryOverview(owner, repoName);
+
             // Update breadcrumb
-            document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Repository expanded`;
+            document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Repository ${isCurrentlyHidden ? 'expanded' : 'collapsed'}`;
         }
 
         function selectPullRequestFromTree(prNumber, owner, repoName) {
             console.log('Selecting PR from tree:', prNumber, owner, repoName);
+
+            // Prevent event propagation
+            if (event) {
+                event.stopPropagation();
+            }
 
             // Set current context
             currentRepo = { owner, name: repoName };
@@ -875,7 +913,12 @@
 
             // Update UI states
             document.querySelectorAll('.pr-tree-item').forEach(item => item.classList.remove('active'));
-            event.target.closest('.pr-tree-item').classList.add('active');
+            if (event && event.target) {
+                const prItem = event.target.closest('.pr-tree-item');
+                if (prItem) {
+                    prItem.classList.add('active');
+                }
+            }
 
             // Update breadcrumb and enable refresh
             document.getElementById('refreshBtn').disabled = false;

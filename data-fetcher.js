@@ -55,14 +55,12 @@ class GitHubDataFetcher {
         'h1-aot/agent_manager',
         'h1-aot/aot-base',
         'h1-aot/aot-frontend-api',
-        'h1-aot/agent0management-service',
         'h1-aot/aot-user-ui',
         'h1-aot/masp',
-        'h1-aot/cveasts',
         'h1-aot/offsec-benchmarks',
-        'h1-aot/github-aws-tests',
         'h1-aot/aot-terraform',
         'ppaul-h-aot/MRToolGH'
+        // Note: some repositories from the original list may not exist or may not be accessible
       ];
 
       const repos = [];
