@@ -671,16 +671,21 @@
 
         async function loadRepositories() {
             try {
+                console.log('📡 Fetching repositories from /api/repos...');
                 const response = await fetch('/api/repos');
                 const data = await response.json();
+                console.log('📊 Repository data received:', data);
 
                 if (data.success) {
                     repos = data.repos;
+                    console.log('✅ Found repositories:', repos.length);
                     renderRepositories();
                 } else {
+                    console.error('❌ Failed to load repositories:', data.error);
                     showError('Failed to load repositories: ' + data.error);
                 }
             } catch (error) {
+                console.error('❌ Error loading repositories:', error);
                 showError('Error loading repositories: ' + error.message);
             }
         }

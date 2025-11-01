@@ -75,19 +75,64 @@ app.get('/api/cached-data', async (req, res) => {
 // Get all repositories accessible to the user
 app.get('/api/repos', async (req, res) => {
   try {
-    // Try to use cached data first
+    const reposToCheck = [
+      'h1-aot/agent_manager',
+      'h1-aot/aot-base',
+      'h1-aot/aot-frontend-api',
+      'h1-aot/aot-user-ui',
+      'h1-aot/masp',
+      'h1-aot/offsec-benchmarks',
+      'h1-aot/aot-terraform',
+      'ppaul-h-aot/MRToolGH'
+    ];
+
+    // Get ALL repositories, regardless of cache
+    const allRepos = [];
+    for (const repoName of reposToCheck) {
+      try {
+        const repoData = executeGhCommand(`gh repo view ${repoName} --json name,owner,url,updatedAt`);
+        allRepos.push(repoData);
+      } catch (error) {
+        console.error(`Error accessing repository ${repoName}:`, error.message);
+        // Even if we can't access the repo, add it to the list with basic info
+        const [owner, name] = repoName.split('/');
+        allRepos.push({
+          name: name,
+          owner: { login: owner },
+          url: `https://github.com/${repoName}`,
+          updatedAt: new Date().toISOString(),
+          accessible: false
+        });
+      }
+    }
+
+    // Try to use cached data for additional info
     const cachedData = dataFetcher.loadCachedData();
     if (cachedData && req.query.use_cache !== 'false') {
-      const repos = cachedData.repositories.map(repo => ({
-        name: repo.name,
-        owner: { login: repo.owner },
-        url: repo.url,
-        updatedAt: repo.lastPush || new Date().toISOString()
-      }));
+      // Merge cached data with all repos
+      const reposWithCacheInfo = allRepos.map(repo => {
+        const cachedRepo = cachedData.repositories.find(cr =>
+          cr.owner === repo.owner.login && cr.name === repo.name
+        );
+
+        if (cachedRepo) {
+          return {
+            ...repo,
+            updatedAt: cachedRepo.lastPush || repo.updatedAt,
+            hasCachedData: true,
+            actionableCount: cachedRepo.pullRequests?.reduce((sum, pr) => sum + pr.actionableCount, 0) || 0
+          };
+        }
+        return {
+          ...repo,
+          hasCachedData: false,
+          actionableCount: 0
+        };
+      });
 
       return res.json({
         success: true,
-        repos: repos.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
+        repos: reposWithCacheInfo.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
         fromCache: true,
         lastUpdate: cachedData.lastUpdate
       });
