@@ -138,44 +138,10 @@ app.get('/api/repos', async (req, res) => {
       });
     }
 
-    // Fallback to live data - check all h1-aot repositories
-    const reposToCheck = [
-      'h1-aot/agent_manager',
-      'h1-aot/aot-base',
-      'h1-aot/aot-frontend-api',
-      'h1-aot/aot-user-ui',
-      'h1-aot/masp',
-      'h1-aot/offsec-benchmarks',
-      'h1-aot/aot-terraform',
-      'ppaul-h-aot/MRToolGH'
-      // Note: some repositories from the original list may not exist or may not be accessible
-    ];
-
-    const repos = [];
-    for (const repoName of reposToCheck) {
-      try {
-        const repoData = executeGhCommand(`gh repo view ${repoName} --json name,owner,url,updatedAt`);
-        repos.push(repoData);
-      } catch (error) {
-        console.error(`Error accessing repository ${repoName}:`, error.message);
-        // Even if we can't access the repo, we can still add it to the list with basic info
-        const [owner, name] = repoName.split('/');
-        repos.push({
-          name: name,
-          owner: { login: owner },
-          url: `https://github.com/${repoName}`,
-          updatedAt: new Date().toISOString(),
-          accessible: false
-        });
-      }
-    }
-
-    // Sort repos by recent activity
-    const sortedRepos = repos.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
+    // Fallback - return all repos without cache info
     res.json({
       success: true,
-      repos: sortedRepos,
+      repos: allRepos.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
       fromCache: false
     });
   } catch (error) {
@@ -579,7 +545,7 @@ app.get('/health', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 GitHub PR Comment Tool running on port ${PORT}`);
+  console.log(`🚀 GitHub PR Comment Tool running on port ${PORT} (hot reload)`);
   console.log(`📊 Access at: http://localhost:${PORT}`);
   console.log(`🔍 Health check: http://localhost:${PORT}/health`);
 });
