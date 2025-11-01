@@ -708,6 +708,7 @@
         }
 
         async function selectRepository(owner, repoName) {
+            console.log('Selecting repository:', owner, repoName);
             currentRepo = { owner, name: repoName };
             currentPR = null;
 
@@ -718,25 +719,95 @@
             document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Loading pull requests...`;
             document.getElementById('refreshBtn').disabled = true;
 
+            // Show loading state in main content
+            document.getElementById('mainContent').innerHTML = `
+                <div class="loading">Loading PRs for ${owner}/${repoName}...</div>
+            `;
+
             // Load PRs
             await loadPullRequests(owner, repoName);
         }
 
         async function loadPullRequests(owner, repoName) {
             try {
+                console.log('Loading PRs for:', owner, repoName);
                 const response = await fetch(`/api/repos/${owner}/${repoName}/prs`);
                 const data = await response.json();
 
+                console.log('PR data received:', data);
+
                 if (data.success) {
                     prs = data.prs;
+                    console.log('Found PRs:', prs.length);
+
+                    // Show PR list in main content
+                    showPRList();
                     renderPullRequests();
                     document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - ${prs.length} pull requests`;
                 } else {
                     showError('Failed to load pull requests: ' + data.error);
                 }
             } catch (error) {
+                console.error('Error loading PRs:', error);
                 showError('Error loading pull requests: ' + error.message);
             }
+        }
+
+        function showPRList() {
+            const mainContent = document.getElementById('mainContent');
+
+            if (prs.length === 0) {
+                mainContent.innerHTML = `
+                    <div class="empty-state">
+                        <h2>No Pull Requests</h2>
+                        <p>No recent pull requests found for ${currentRepo.owner}/${currentRepo.name}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Show PR list in main content area
+            const prListHtml = prs.map(pr => `
+                <div class="pr-card" onclick="selectPullRequestMain(${pr.number})" style="
+                    background: white;
+                    border: 1px solid #d0d7de;
+                    border-radius: 8px;
+                    padding: 16px;
+                    margin-bottom: 12px;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                " onmouseover="this.style.backgroundColor='#f6f8fa'; this.style.borderColor='#0969da';"
+                   onmouseout="this.style.backgroundColor='white'; this.style.borderColor='#d0d7de';">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #24292f;">
+                            #${pr.number}: ${pr.title}
+                        </h3>
+                        <span style="background: #0969da; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                            ${pr.totalComments} comments
+                        </span>
+                    </div>
+                    <div style="font-size: 14px; color: #656d76; margin-bottom: 8px;">
+                        by ${pr.author.login} • ${new Date(pr.createdAt).toLocaleDateString()}
+                        ${pr.isDraft ? ' • <span style="color: #9a6700;">Draft</span>' : ''}
+                    </div>
+                    <div style="font-size: 13px; color: #0969da;">
+                        Click to view actionable comments →
+                    </div>
+                </div>
+            `).join('');
+
+            mainContent.innerHTML = `
+                <div style="max-width: 800px;">
+                    <h2 style="margin-bottom: 20px; color: #24292f;">
+                        Pull Requests for ${currentRepo.owner}/${currentRepo.name}
+                    </h2>
+                    ${prListHtml}
+                </div>
+            `;
+        }
+
+        function selectPullRequestMain(prNumber) {
+            selectPullRequest(prNumber);
         }
 
         function renderPullRequests() {
@@ -789,11 +860,22 @@
         }
 
         async function selectPullRequest(prNumber) {
+            console.log('Selecting PR:', prNumber);
             currentPR = prNumber;
 
-            // Update UI
+            // Update UI - handle both sidebar and main content PR items
             document.querySelectorAll('.pr-item').forEach(item => item.classList.remove('active'));
-            event.target.closest('.pr-item').classList.add('active');
+            document.querySelectorAll('.pr-card').forEach(item => {
+                item.style.backgroundColor = 'white';
+                item.style.borderColor = '#d0d7de';
+            });
+
+            // Highlight the selected PR card if it exists
+            const selectedCard = document.querySelector(`[onclick="selectPullRequestMain(${prNumber})"]`);
+            if (selectedCard) {
+                selectedCard.style.backgroundColor = '#fff8dc';
+                selectedCard.style.borderColor = '#fb8500';
+            }
 
             document.getElementById('refreshBtn').disabled = false;
             document.getElementById('breadcrumb').textContent = `${currentRepo.owner}/${currentRepo.name} - PR #${prNumber} - Loading comments...`;
@@ -807,17 +889,23 @@
 
         async function loadPRComments() {
             try {
+                console.log('Loading comments for PR:', currentPR);
                 const response = await fetch(`/api/repos/${currentRepo.owner}/${currentRepo.name}/prs/${currentPR}/comments`);
                 const data = await response.json();
 
+                console.log('Comments data received:', data);
+
                 if (data.success) {
+                    console.log('Rendering comments:', data.actionableComments.length);
                     renderPRComments(data);
                     document.getElementById('breadcrumb').textContent =
                         `${currentRepo.owner}/${currentRepo.name} - PR #${currentPR}: ${data.pr.title} (${data.actionableComments.length} actionable comments)`;
                 } else {
+                    console.error('Failed to load comments:', data.error);
                     showError('Failed to load comments: ' + data.error);
                 }
             } catch (error) {
+                console.error('Error loading comments:', error);
                 showError('Error loading comments: ' + error.message);
             }
         }
