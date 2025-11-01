@@ -1425,10 +1425,10 @@
                     </div>
 
                     <div class="comment-actions">
-                        <button class="action-btn primary" onclick="copyCommentLink('${comment.copyableLink}')">
+                        <button class="action-btn primary" onclick="copyCommentLink('${comment.copyableLink || comment.url}')">
                             📋 Copy Link
                         </button>
-                        <a class="action-btn" href="${comment.prUrl}" target="_blank">
+                        <a class="action-btn" href="${comment.url}" target="_blank">
                             🔗 View on GitHub
                         </a>
                         ${comment.fileLineUrl ? `

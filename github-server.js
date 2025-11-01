@@ -300,10 +300,10 @@ app.get('/api/repos/:owner/:repo/prs/:number/comments', async (req, res) => {
           line: comment.original_line || comment.line,
           diffHunk: comment.diff_hunk,
           url: comment.html_url,
-          prUrl: `https://github.com/${owner}/${repo}/pull/${number}#discussion_r${comment.id}`,
+          prUrl: comment.html_url,
           actionType: isActionable.type,
           severity: isActionable.severity,
-          copyableLink: `https://github.com/${owner}/${repo}/pull/${number}/files#discussion_r${comment.id}`,
+          copyableLink: comment.html_url,
           fileLineUrl: comment.path ? `https://github.com/${owner}/${repo}/pull/${number}/files#diff-${Buffer.from(comment.path).toString('hex')}R${comment.line}` : null
         });
       }
