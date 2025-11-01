@@ -188,6 +188,109 @@
             font-style: italic;
         }
 
+        /* Tree structure styles */
+        .repo-tree-item {
+            margin-bottom: 4px;
+        }
+
+        .repo-expand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tree-icon {
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .tree-icon.expanded {
+            transform: rotate(45deg);
+        }
+
+        .pr-subtree {
+            background: #f8f9fa;
+            border-left: 2px solid #e1e4e8;
+            margin-left: 20px;
+        }
+
+        .pr-tree-item {
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .pr-tree-item:hover {
+            background: #e6f3ff;
+        }
+
+        .pr-tree-item.active {
+            background: #fff8dc;
+            border-left: 3px solid #fb8500;
+        }
+
+        .pr-indent {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .tree-branch {
+            color: #8c959f;
+            font-family: monospace;
+        }
+
+        .pr-number {
+            font-weight: 600;
+            color: #0969da;
+            min-width: 40px;
+        }
+
+        .pr-title-short {
+            flex: 1;
+            color: #24292f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pr-badges {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .pr-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .pr-badge.actionable {
+            background: #0969da;
+            color: white;
+        }
+
+        .pr-badge.high {
+            background: #ffebe9;
+            color: #cf222e;
+        }
+
+        .pr-badge.medium {
+            background: #fff8dc;
+            color: #9a6700;
+        }
+
+        .pr-badge.draft {
+            background: #f6f8fa;
+            color: #656d76;
+            border: 1px solid #d0d7de;
+        }
+
         .pr-list {
             width: 100%;
             background: #f8f9fa;
@@ -589,7 +692,7 @@
                 return;
             }
 
-            // Get cached data to show statistics
+            // Get cached data to show statistics and PRs
             fetch('/api/cached-data')
                 .then(response => response.json())
                 .then(data => {
@@ -609,84 +712,37 @@
                         `;
                         totalStats.style.display = 'flex';
 
-                        const repoStats = {};
-                        data.data.repositories.forEach(repo => {
-                            const totalPRs = repo.pullRequests.length;
-                            const totalActionable = repo.pullRequests.reduce((sum, pr) => sum + pr.actionableCount, 0);
+                        // Build repository tree structure
+                        const repoTree = data.data.repositories.map(repoData => {
+                            const matchingRepo = repos.find(r => r.owner.login === repoData.owner && r.name === repoData.name);
+                            if (!matchingRepo) return null;
+
+                            const totalActionable = repoData.pullRequests.reduce((sum, pr) => sum + pr.actionableCount, 0);
                             const severityCounts = {
-                                high: repo.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.high || 0), 0),
-                                medium: repo.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.medium || 0), 0),
-                                low: repo.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.low || 0), 0)
+                                high: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.high || 0), 0),
+                                medium: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.medium || 0), 0),
+                                low: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.low || 0), 0)
                             };
 
-                            repoStats[`${repo.owner}/${repo.name}`] = {
-                                totalPRs,
+                            // Sort PRs by number in reverse order (newest first)
+                            const sortedPRs = [...repoData.pullRequests].sort((a, b) => b.number - a.number);
+
+                            return {
+                                ...matchingRepo,
+                                repoData,
                                 totalActionable,
-                                severityCounts
+                                severityCounts,
+                                pullRequests: sortedPRs
                             };
-                        });
+                        }).filter(Boolean);
 
-                        repoList.innerHTML = repos.map(repo => {
-                            const repoKey = `${repo.owner.login}/${repo.name}`;
-                            const stats = repoStats[repoKey] || { totalPRs: 0, totalActionable: 0, severityCounts: { high: 0, medium: 0, low: 0 } };
-
-                            return `
-                                <div class="repo-item" onclick="selectRepository('${repo.owner.login}', '${repo.name}')">
-                                    <div class="repo-header">
-                                        <div class="repo-name">${repo.owner.login}/${repo.name}</div>
-                                        ${stats.totalPRs > 0 ? `<div class="repo-badge">${stats.totalPRs}</div>` : ''}
-                                    </div>
-
-                                    ${stats.totalActionable > 0 ? `
-                                        <div class="repo-stats">
-                                            <div class="stat-row">
-                                                <span class="stat-label">PRs with comments:</span>
-                                                <span class="stat-value">${stats.totalPRs}</span>
-                                            </div>
-                                            <div class="stat-row">
-                                                <span class="stat-label">Total actionable:</span>
-                                                <span class="stat-value">${stats.totalActionable}</span>
-                                            </div>
-                                            ${stats.severityCounts.high > 0 ? `
-                                                <div class="stat-row">
-                                                    <span class="stat-label">🚨 High priority:</span>
-                                                    <span class="stat-value high">${stats.severityCounts.high}</span>
-                                                </div>
-                                            ` : ''}
-                                            ${stats.severityCounts.medium > 0 ? `
-                                                <div class="stat-row">
-                                                    <span class="stat-label">⚠️ Medium priority:</span>
-                                                    <span class="stat-value medium">${stats.severityCounts.medium}</span>
-                                                </div>
-                                            ` : ''}
-                                            ${stats.severityCounts.low > 0 ? `
-                                                <div class="stat-row">
-                                                    <span class="stat-label">ℹ️ Low priority:</span>
-                                                    <span class="stat-value low">${stats.severityCounts.low}</span>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    ` : `
-                                        <div class="repo-stats">
-                                            <div class="stat-row">
-                                                <span class="stat-label">No actionable comments</span>
-                                                <span class="stat-value">✅</span>
-                                            </div>
-                                        </div>
-                                    `}
-
-                                    <div class="repo-meta">
-                                        Updated ${new Date(repo.updatedAt).toLocaleDateString()}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
+                        renderTreeStructure(repoTree);
                     } else {
-                        // Fallback to simple rendering if cached data not available
+                        // Fallback to simple rendering without PRs
                         repoList.innerHTML = repos.map(repo => `
-                            <div class="repo-item" onclick="selectRepository('${repo.owner.login}', '${repo.name}')">
+                            <div class="repo-item" onclick="toggleRepository('${repo.owner.login}', '${repo.name}')">
                                 <div class="repo-header">
-                                    <div class="repo-name">${repo.owner.login}/${repo.name}</div>
+                                    <div class="repo-name">📁 ${repo.owner.login}/${repo.name}</div>
                                 </div>
                                 <div class="repo-meta">Updated ${new Date(repo.updatedAt).toLocaleDateString()}</div>
                             </div>
@@ -695,16 +751,84 @@
                 })
                 .catch(error => {
                     console.error('Error loading repo stats:', error);
-                    // Fallback to simple rendering
-                    repoList.innerHTML = repos.map(repo => `
-                        <div class="repo-item" onclick="selectRepository('${repo.owner.login}', '${repo.name}')">
-                            <div class="repo-header">
-                                <div class="repo-name">${repo.owner.login}/${repo.name}</div>
-                            </div>
-                            <div class="repo-meta">Updated ${new Date(repo.updatedAt).toLocaleDateString()}</div>
-                        </div>
-                    `).join('');
+                    repoList.innerHTML = '<div class="error">Failed to load repository data</div>';
                 });
+        }
+
+        function renderTreeStructure(repoTree) {
+            const repoList = document.getElementById('repoList');
+
+            const treeHtml = repoTree.map(repo => {
+                const repoId = `repo-${repo.owner.login}-${repo.name}`;
+
+                return `
+                    <div class="repo-tree-item">
+                        <div class="repo-item" onclick="toggleRepository('${repo.owner.login}', '${repo.name}')" data-repo-id="${repoId}">
+                            <div class="repo-header">
+                                <div class="repo-expand">
+                                    <span class="tree-icon">📁</span>
+                                    <div class="repo-name">${repo.owner.login}/${repo.name}</div>
+                                    ${repo.pullRequests.length > 0 ? `<div class="repo-badge">${repo.pullRequests.length}</div>` : ''}
+                                </div>
+                            </div>
+
+                            ${repo.totalActionable > 0 ? `
+                                <div class="repo-stats">
+                                    <div class="stat-row">
+                                        <span class="stat-label">Total actionable:</span>
+                                        <span class="stat-value">${repo.totalActionable}</span>
+                                    </div>
+                                    ${repo.severityCounts.high > 0 ? `
+                                        <div class="stat-row">
+                                            <span class="stat-label">🚨 High:</span>
+                                            <span class="stat-value high">${repo.severityCounts.high}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${repo.severityCounts.medium > 0 ? `
+                                        <div class="stat-row">
+                                            <span class="stat-label">⚠️ Medium:</span>
+                                            <span class="stat-value medium">${repo.severityCounts.medium}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${repo.severityCounts.low > 0 ? `
+                                        <div class="stat-row">
+                                            <span class="stat-label">ℹ️ Low:</span>
+                                            <span class="stat-value low">${repo.severityCounts.low}</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : `
+                                <div class="repo-stats">
+                                    <div class="stat-row">
+                                        <span class="stat-label">No actionable comments</span>
+                                        <span class="stat-value">✅</span>
+                                    </div>
+                                </div>
+                            `}
+                        </div>
+
+                        <div class="pr-subtree" id="prs-${repoId}" style="display: none;">
+                            ${repo.pullRequests.map(pr => `
+                                <div class="pr-tree-item" onclick="selectPullRequestFromTree(${pr.number}, '${repo.owner.login}', '${repo.name}')">
+                                    <div class="pr-indent">
+                                        <span class="tree-branch">├─</span>
+                                        <span class="pr-number">#${pr.number}</span>
+                                        <span class="pr-title-short">${pr.title.length > 40 ? pr.title.substring(0, 40) + '...' : pr.title}</span>
+                                        <div class="pr-badges">
+                                            ${pr.actionableCount > 0 ? `<span class="pr-badge actionable">${pr.actionableCount}</span>` : ''}
+                                            ${pr.severityCounts?.high > 0 ? `<span class="pr-badge high">🚨${pr.severityCounts.high}</span>` : ''}
+                                            ${pr.severityCounts?.medium > 0 ? `<span class="pr-badge medium">⚠️${pr.severityCounts.medium}</span>` : ''}
+                                            ${pr.isDraft ? `<span class="pr-badge draft">Draft</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            repoList.innerHTML = treeHtml;
         }
 
         async function selectRepository(owner, repoName) {
