@@ -831,6 +831,153 @@
             repoList.innerHTML = treeHtml;
         }
 
+        function toggleRepository(owner, repoName) {
+            console.log('Toggling repository:', owner, repoName);
+
+            const repoId = `repo-${owner}-${repoName}`;
+            const prSubtree = document.getElementById(`prs-${repoId}`);
+            const repoItem = document.querySelector(`[data-repo-id="${repoId}"]`);
+            const treeIcon = repoItem?.querySelector('.tree-icon');
+
+            if (!prSubtree) {
+                console.error('PR subtree not found for:', repoId);
+                return;
+            }
+
+            // Toggle the PR subtree visibility
+            if (prSubtree.style.display === 'none') {
+                prSubtree.style.display = 'block';
+                if (treeIcon) {
+                    treeIcon.textContent = '📂';
+                    treeIcon.classList.add('expanded');
+                }
+
+                // Update main content to show repository overview
+                showRepositoryOverview(owner, repoName);
+            } else {
+                prSubtree.style.display = 'none';
+                if (treeIcon) {
+                    treeIcon.textContent = '📁';
+                    treeIcon.classList.remove('expanded');
+                }
+            }
+
+            // Update breadcrumb
+            document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Repository expanded`;
+        }
+
+        function selectPullRequestFromTree(prNumber, owner, repoName) {
+            console.log('Selecting PR from tree:', prNumber, owner, repoName);
+
+            // Set current context
+            currentRepo = { owner, name: repoName };
+            currentPR = prNumber;
+
+            // Update UI states
+            document.querySelectorAll('.pr-tree-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.pr-tree-item').classList.add('active');
+
+            // Update breadcrumb and enable refresh
+            document.getElementById('refreshBtn').disabled = false;
+            document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - PR #${prNumber} - Loading comments...`;
+
+            // Show loading state
+            document.getElementById('mainContent').innerHTML = '<div class="loading">Loading actionable comments...</div>';
+
+            // Load comments
+            loadPRComments();
+        }
+
+        function showRepositoryOverview(owner, repoName) {
+            // Get repository data for overview
+            fetch('/api/cached-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const repoData = data.data.repositories.find(r => r.owner === owner && r.name === repoName);
+                        if (repoData) {
+                            const totalActionable = repoData.pullRequests.reduce((sum, pr) => sum + pr.actionableCount, 0);
+                            const severityCounts = {
+                                high: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.high || 0), 0),
+                                medium: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.medium || 0), 0),
+                                low: repoData.pullRequests.reduce((sum, pr) => sum + (pr.severityCounts?.low || 0), 0)
+                            };
+
+                            // Sort PRs by number in reverse order
+                            const sortedPRs = [...repoData.pullRequests].sort((a, b) => b.number - a.number);
+
+                            document.getElementById('mainContent').innerHTML = `
+                                <div style="max-width: 900px;">
+                                    <div style="background: white; border: 1px solid #d0d7de; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                                        <h2 style="margin: 0 0 12px 0; color: #24292f; display: flex; align-items: center; gap: 8px;">
+                                            📁 ${owner}/${repoName}
+                                        </h2>
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-top: 16px;">
+                                            <div style="text-align: center; padding: 12px; background: #f6f8fa; border-radius: 6px;">
+                                                <div style="font-size: 24px; font-weight: 600; color: #0969da;">${repoData.pullRequests.length}</div>
+                                                <div style="font-size: 12px; color: #656d76;">Pull Requests</div>
+                                            </div>
+                                            <div style="text-align: center; padding: 12px; background: #f6f8fa; border-radius: 6px;">
+                                                <div style="font-size: 24px; font-weight: 600; color: #fb8500;">${totalActionable}</div>
+                                                <div style="font-size: 12px; color: #656d76;">Actionable Items</div>
+                                            </div>
+                                            <div style="text-align: center; padding: 12px; background: #ffebe9; border-radius: 6px;">
+                                                <div style="font-size: 24px; font-weight: 600; color: #cf222e;">${severityCounts.high}</div>
+                                                <div style="font-size: 12px; color: #656d76;">🚨 High Priority</div>
+                                            </div>
+                                            <div style="text-align: center; padding: 12px; background: #fff8dc; border-radius: 6px;">
+                                                <div style="font-size: 24px; font-weight: 600; color: #9a6700;">${severityCounts.medium}</div>
+                                                <div style="font-size: 12px; color: #656d76;">⚠️ Medium Priority</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="background: white; border: 1px solid #d0d7de; border-radius: 8px; padding: 20px;">
+                                        <h3 style="margin: 0 0 16px 0; color: #24292f;">Pull Requests (${sortedPRs.length})</h3>
+                                        <div style="color: #656d76; font-size: 14px; margin-bottom: 16px;">
+                                            Click on any PR in the sidebar tree to view its actionable comments
+                                        </div>
+
+                                        ${sortedPRs.length > 0 ? `
+                                            <div style="display: grid; gap: 8px;">
+                                                ${sortedPRs.slice(0, 10).map(pr => `
+                                                    <div style="padding: 12px; background: #f8f9fa; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                                        <div>
+                                                            <strong style="color: #0969da;">#${pr.number}</strong>
+                                                            <span style="margin-left: 8px; color: #24292f;">${pr.title}</span>
+                                                        </div>
+                                                        <div style="display: flex; gap: 4px; align-items: center;">
+                                                            ${pr.actionableCount > 0 ? `<span style="background: #0969da; color: white; padding: 2px 6px; border-radius: 8px; font-size: 11px;">${pr.actionableCount}</span>` : ''}
+                                                            ${pr.severityCounts?.high > 0 ? `<span style="background: #ffebe9; color: #cf222e; padding: 2px 6px; border-radius: 8px; font-size: 11px;">🚨${pr.severityCounts.high}</span>` : ''}
+                                                            ${pr.isDraft ? `<span style="background: #f6f8fa; color: #656d76; padding: 2px 6px; border-radius: 8px; font-size: 11px; border: 1px solid #d0d7de;">Draft</span>` : ''}
+                                                        </div>
+                                                    </div>
+                                                `).join('')}
+                                                ${sortedPRs.length > 10 ? `
+                                                    <div style="text-align: center; padding: 12px; color: #656d76; font-style: italic;">
+                                                        ... and ${sortedPRs.length - 10} more PRs (expand in sidebar to see all)
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        ` : `
+                                            <div style="text-align: center; padding: 40px; color: #656d76;">
+                                                No pull requests with actionable comments
+                                            </div>
+                                        `}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading repository overview:', error);
+                    document.getElementById('mainContent').innerHTML = `
+                        <div class="error">Failed to load repository overview</div>
+                    `;
+                });
+        }
+
         async function selectRepository(owner, repoName) {
             console.log('Selecting repository:', owner, repoName);
             currentRepo = { owner, name: repoName };
