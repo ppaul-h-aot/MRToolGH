@@ -589,6 +589,94 @@ function isCommentActionable(commentBody) {
   return { actionable: false };
 }
 
+// Get automated analysis results
+app.get('/api/analysis/latest', (req, res) => {
+  try {
+    const latestPath = path.join(__dirname, 'analysis-results', 'latest.json');
+
+    if (fs.existsSync(latestPath)) {
+      const analysisData = JSON.parse(fs.readFileSync(latestPath, 'utf8'));
+      res.json({
+        success: true,
+        analysis: analysisData,
+        lastUpdate: analysisData.timestamp
+      });
+    } else {
+      res.json({
+        success: false,
+        error: 'No analysis results available. Run: node code-analysis-runner.js',
+        lastUpdate: null
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Get analysis history
+app.get('/api/analysis/history', (req, res) => {
+  try {
+    const resultsDir = path.join(__dirname, 'analysis-results');
+
+    if (!fs.existsSync(resultsDir)) {
+      return res.json({ success: true, analyses: [] });
+    }
+
+    const files = fs.readdirSync(resultsDir)
+      .filter(file => file.startsWith('analysis-') && file.endsWith('.json') && file !== 'latest.json')
+      .map(file => {
+        const filePath = path.join(resultsDir, file);
+        const stats = fs.statSync(filePath);
+        return {
+          filename: file,
+          created: stats.birthtime,
+          size: stats.size
+        };
+      })
+      .sort((a, b) => b.created - a.created);
+
+    res.json({
+      success: true,
+      analyses: files
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Trigger manual analysis
+app.post('/api/analysis/run', async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Analysis started in background',
+      timestamp: new Date().toISOString()
+    });
+
+    // Start analysis in background
+    const { spawn } = require('child_process');
+    const analysisProcess = spawn('node', ['code-analysis-runner.js'], {
+      cwd: __dirname,
+      detached: true,
+      stdio: 'ignore'
+    });
+
+    analysisProcess.unref(); // Allow parent to exit
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Serve the main application
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'github-pr-tool.html'));
