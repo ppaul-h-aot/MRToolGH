@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test GitHub URLs</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .url { font-family: monospace; background: #f8f9fa; padding: 2px 4px; }
+    </style>
+</head>
+<body>
+    <h1>GitHub URL Test</h1>
+    <div id="results"></div>
+
+    <script>
+        async function testURLs() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>🔄 Testing GitHub URLs...</p>';
+
+            try {
+                // Test PR 213 comments
+                const response = await fetch('/api/repos/h1-aot/aot-base/prs/213/comments');
+                const data = await response.json();
+
+                if (data.success && data.actionableComments.length > 0) {
+                    const comment = data.actionableComments[0];
+
+                    let testResults = `
+                        <div class="test-result success">
+                            <h3>✅ URL Test Results</h3>
+                            <p><strong>Comment ID:</strong> ${comment.id}</p>
+                            <p><strong>Author:</strong> ${comment.author}</p>
+                            <p><strong>URL:</strong> <span class="url">${comment.url || 'MISSING'}</span></p>
+                            <p><strong>PR URL:</strong> <span class="url">${comment.prUrl || 'MISSING'}</span></p>
+                            <p><strong>Copy Link:</strong> <span class="url">${comment.copyableLink || 'MISSING'}</span></p>
+                        </div>
+                    `;
+
+                    // Test if URLs are valid
+                    if (comment.url && comment.url.includes('github.com')) {
+                        testResults += `<div class="test-result success">✅ Main URL is valid GitHub link</div>`;
+                    } else {
+                        testResults += `<div class="test-result error">❌ Main URL is invalid or missing</div>`;
+                    }
+
+                    // Add clickable test links
+                    testResults += `
+                        <div class="test-result success">
+                            <h3>🔗 Test Links (click to verify they work):</h3>
+                            ${comment.url ? `<p><a href="${comment.url}" target="_blank">🔗 View on GitHub (main)</a></p>` : ''}
+                            ${comment.prUrl ? `<p><a href="${comment.prUrl}" target="_blank">🔗 View on GitHub (PR URL)</a></p>` : ''}
+                            ${comment.copyableLink ? `<p><a href="${comment.copyableLink}" target="_blank">📋 Copyable Link</a></p>` : ''}
+                        </div>
+
+                        <div class="test-result success">
+                            <h3>🎯 Expected Behavior:</h3>
+                            <p>• Links should open in new tab</p>
+                            <p>• Should navigate to GitHub comment on PR #213</p>
+                            <p>• Should NOT show "Cannot GET /undefined"</p>
+                        </div>
+                    `;
+
+                    results.innerHTML = testResults;
+                } else {
+                    results.innerHTML = '<div class="test-result error">❌ No actionable comments found to test</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Run test when page loads
+        window.onload = testURLs;
+    </script>
+</body>
+</html>
