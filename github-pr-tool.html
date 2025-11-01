@@ -211,8 +211,25 @@
 
         .pr-subtree {
             background: #f8f9fa;
-            border-left: 2px solid #e1e4e8;
+            border-left: 3px solid #d0d7de;
             margin-left: 20px;
+            margin-top: 8px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .pr-subtree[style*="display: block"] {
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .pr-tree-item {
@@ -727,8 +744,11 @@
 
                         // Build repository tree structure - include ALL repos, even those with 0 PRs
                         const repoTree = repos.map(repo => {
+                            console.log(`🔍 Processing repo: ${repo.owner.login}/${repo.name}`);
+
                             // Find matching cached data
                             const repoData = data.data.repositories.find(r => r.owner === repo.owner.login && r.name === repo.name);
+                            console.log(`📊 Found cached data for ${repo.name}:`, repoData ? `${repoData.pullRequests.length} PRs` : 'No data');
 
                             if (repoData) {
                                 // Repository has cached data with PRs
@@ -741,6 +761,7 @@
 
                                 // Sort PRs by number in reverse order (newest first)
                                 const sortedPRs = [...repoData.pullRequests].sort((a, b) => b.number - a.number);
+                                console.log(`✅ ${repo.name}: ${sortedPRs.length} PRs, ${totalActionable} actionable comments`);
 
                                 return {
                                     ...repo,
@@ -751,6 +772,7 @@
                                 };
                             } else {
                                 // Repository with no actionable PRs or no recent activity
+                                console.log(`ℹ️ ${repo.name}: No cached data`);
                                 return {
                                     ...repo,
                                     repoData: null,

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Tree Structure</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .repo { background: #f0f0f0; margin: 10px 0; padding: 10px; cursor: pointer; }
+        .repo:hover { background: #e0e0e0; }
+        .pr-list { background: #f8f8f8; margin-left: 20px; padding: 10px; display: none; }
+        .pr-item { background: white; margin: 5px 0; padding: 8px; cursor: pointer; border-left: 3px solid #ccc; }
+        .pr-item:hover { border-left-color: #007acc; }
+        .active { background: #fff8dc !important; border-left-color: #ff8800 !important; }
+    </style>
+</head>
+<body>
+    <h1>Debug: Tree Structure Test</h1>
+    <div id="results"></div>
+
+    <script>
+        async function loadData() {
+            try {
+                // Get repositories
+                const repoResponse = await fetch('/api/repos');
+                const repoData = await repoResponse.json();
+
+                // Get cached data
+                const cacheResponse = await fetch('/api/cached-data');
+                const cacheData = await cacheResponse.json();
+
+                console.log('Repo data:', repoData);
+                console.log('Cache data:', cacheData);
+
+                const results = document.getElementById('results');
+
+                if (cacheData.success && cacheData.data) {
+                    // Build tree structure
+                    const repoTree = repoData.repos.map(repo => {
+                        const cachedRepo = cacheData.data.repositories.find(r =>
+                            r.owner === repo.owner.login && r.name === repo.name
+                        );
+
+                        return {
+                            ...repo,
+                            pullRequests: cachedRepo ? cachedRepo.pullRequests : [],
+                            totalActionable: cachedRepo ? cachedRepo.pullRequests.reduce((sum, pr) => sum + pr.actionableCount, 0) : 0
+                        };
+                    });
+
+                    console.log('Tree structure:', repoTree);
+
+                    // Render tree
+                    results.innerHTML = repoTree.map(repo => `
+                        <div class="repo" onclick="toggleRepo('${repo.owner.login}-${repo.name}')">
+                            📁 ${repo.owner.login}/${repo.name}
+                            (${repo.pullRequests.length} PRs, ${repo.totalActionable} actionable)
+                        </div>
+                        <div class="pr-list" id="prs-${repo.owner.login}-${repo.name}">
+                            ${repo.pullRequests.length > 0 ? repo.pullRequests.map(pr => `
+                                <div class="pr-item" onclick="selectPR(${pr.number}, '${repo.owner.login}', '${repo.name}')">
+                                    #${pr.number}: ${pr.title} (${pr.actionableCount} comments)
+                                </div>
+                            `).join('') : '<div class="pr-item">No PRs with actionable comments</div>'}
+                        </div>
+                    `).join('');
+                } else {
+                    results.innerHTML = '<p>❌ Failed to load cached data</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = '<p>❌ Error: ' + error.message + '</p>';
+            }
+        }
+
+        function toggleRepo(repoId) {
+            const prList = document.getElementById(`prs-${repoId}`);
+            if (prList.style.display === 'none' || prList.style.display === '') {
+                prList.style.display = 'block';
+            } else {
+                prList.style.display = 'none';
+            }
+        }
+
+        function selectPR(prNumber, owner, repo) {
+            // Remove active from all PR items
+            document.querySelectorAll('.pr-item').forEach(item => item.classList.remove('active'));
+            // Add active to clicked item
+            event.target.classList.add('active');
+
+            console.log(`Selected PR #${prNumber} from ${owner}/${repo}`);
+            alert(`Selected PR #${prNumber} from ${owner}/${repo}`);
+        }
+
+        // Load data when page loads
+        window.onload = loadData;
+    </script>
+</body>
+</html>
