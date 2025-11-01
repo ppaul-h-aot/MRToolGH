@@ -93,9 +93,18 @@ app.get('/api/repos', async (req, res) => {
       });
     }
 
-    // Fallback to live data - check specific repositories
+    // Fallback to live data - check all h1-aot repositories
     const reposToCheck = [
+      'h1-aot/agent_manager',
       'h1-aot/aot-base',
+      'h1-aot/aot-frontend-api',
+      'h1-aot/agent0management-service',
+      'h1-aot/aot-user-ui',
+      'h1-aot/masp',
+      'h1-aot/cveasts',
+      'h1-aot/offsec-benchmarks',
+      'h1-aot/github-aws-tests',
+      'h1-aot/aot-terraform',
       'ppaul-h-aot/MRToolGH'
     ];
 

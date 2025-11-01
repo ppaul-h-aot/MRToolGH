@@ -1,6 +1,49 @@
 {
-  "lastUpdate": "2025-11-01T05:49:21.303Z",
+  "lastUpdate": "2025-11-01T05:52:33.640Z",
   "repositories": [
+    {
+      "owner": "h1-aot",
+      "name": "agent_manager",
+      "url": "https://github.com/h1-aot/agent_manager",
+      "lastPush": "2025-11-01T05:33:18Z",
+      "pullRequests": [
+        {
+          "author": {
+            "id": "U_kgDODfckRg",
+            "is_bot": false,
+            "login": "ppaul-h-aot",
+            "name": "Parag"
+          },
+          "createdAt": "2025-10-29T06:10:12Z",
+          "isDraft": false,
+          "number": 2,
+          "reviewDecision": "",
+          "title": "ECS task creation fixes",
+          "updatedAt": "2025-11-01T05:18:42Z",
+          "url": "https://github.com/h1-aot/agent_manager/pull/2",
+          "actionableComments": [
+            {
+              "id": 2475465288,
+              "type": "review_comment",
+              "author": "ppaul-h-aot",
+              "body": "remindr to add to remove this",
+              "createdAt": "2025-10-29T21:02:53Z",
+              "path": ".claude/settings.local.json",
+              "line": 42,
+              "url": "https://github.com/h1-aot/agent_manager/pull/2#discussion_r2475465288",
+              "actionType": "request",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 1,
+          "severityCounts": {
+            "high": 0,
+            "medium": 1,
+            "low": 0
+          }
+        }
+      ]
+    },
     {
       "owner": "h1-aot",
       "name": "aot-base",
@@ -1029,6 +1072,387 @@
             "high": 0,
             "medium": 2,
             "low": 0
+          }
+        }
+      ]
+    },
+    {
+      "owner": "h1-aot",
+      "name": "aot-frontend-api",
+      "url": "https://github.com/h1-aot/aot-frontend-api",
+      "lastPush": "2025-10-31T21:36:06Z",
+      "pullRequests": [
+        {
+          "author": {
+            "id": "MDQ6VXNlcjEwOTI4MTgz",
+            "is_bot": false,
+            "login": "mesamhaider",
+            "name": "MesamH"
+          },
+          "createdAt": "2025-10-31T18:21:47Z",
+          "isDraft": false,
+          "number": 8,
+          "reviewDecision": "",
+          "title": "Integrate DynamoDB",
+          "updatedAt": "2025-10-31T19:27:05Z",
+          "url": "https://github.com/h1-aot/aot-frontend-api/pull/8",
+          "actionableComments": [
+            {
+              "id": 2482330269,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing comment prefix '#' before 'For production:'. This line should be commented out.\n```suggestion\n# For production:\n```",
+              "createdAt": "2025-10-31T18:24:25Z",
+              "path": ".env.template",
+              "line": 147,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482330269",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2482330285,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The error message on line 86 is misleading. If 'Item' is not in the response, it means the run does not exist, not that it exists but couldn't be retrieved. Should return None (matching the Optional return type) or raise a more appropriate exception like KeyError or return None with appropriate logging.\n```suggestion\n            logger.info(f\"Run {run_id} not found in DynamoDB\")\n            return None\n```",
+              "createdAt": "2025-10-31T18:24:25Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 86,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482330285",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2482330291,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Using 'created_at' as a HASH key in the GSI is inefficient because ISO timestamps are unique per record, preventing effective data distribution across partitions. Consider using a constant partition key (e.g., 'ALL') with 'created_at' as a RANGE key, or use date-only values as the HASH key with 'created_at' as RANGE key for better query performance.",
+              "createdAt": "2025-10-31T18:24:25Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 237,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482330291",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2482408417,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "Consider wrapping in custom exception with more context:\r\n  ```\r\nexcept ClientError as e:\r\n      logger.error(f\"Error creating run {run.run_id}: {e}\", exc_info=True)\r\n      raise DynamoDBStorageError(f\"Failed to create run {run.run_id}\") from e\r\n```",
+              "createdAt": "2025-10-31T18:56:31Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 72,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482408417",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2482408806,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "```\r\nlogger.error(f\"Error creating run: {e}\")\r\n  raise  # ❌ Loses context\r\n```",
+              "createdAt": "2025-10-31T18:56:43Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 72,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482408806",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2482413683,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "  If no item exists, the message says \"exists but could not be retrieved\" which is misleading. Should either:\r\n  - Return None (matches return type Optional[AgentRun])\r\n  - Raise a more appropriate exception like KeyError or custom RunNotFoundError",
+              "createdAt": "2025-10-31T18:59:08Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 86,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482413683",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2482417428,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "This doesn't work as intended. Limit parameter limits scanned items, not returned items. This approach fetches all items, sorts in memory, then paginates. \r\n\r\nDynamodb provides baked in pagination with ExclusiveStartKey. \r\n\r\nFeel free to create a separate task since this may take a bit more time.",
+              "createdAt": "2025-10-31T19:01:09Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 95,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482417428",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": 2482418556,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "Ideally we should always use Query instead of Scan if possible with DDB",
+              "createdAt": "2025-10-31T19:01:46Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 95,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482418556",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2482425662,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "What's the intention here? For AWS, this table will be created by IaC - is this for local only? Ideally this should be part of a separate script for creating locally",
+              "createdAt": "2025-10-31T19:05:40Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 199,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482425662",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2482428171,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "```\r\nProvisionedThroughput={\r\n      'ReadCapacityUnits': 5,\r\n      'WriteCapacityUnits': 5\r\n  }\r\n```\r\n\r\n  This creates provisioned tables, but modern best practice is to use on-demand billing for most use cases. Consider:\r\n  - Making this configurable\r\n  - Defaulting to on-demand mode (BillingMode='PAY_PER_REQUEST')\r\n  - Documenting the throughput strategy\r\n\r\n(ofc the table will be created by IaC - terraform)",
+              "createdAt": "2025-10-31T19:06:55Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 231,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482428171",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2482433255,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "Good logging throughout, but consider:\r\n  - Add request IDs to log context for debugging\r\n  - Log timing metrics for DynamoDB operations\r\n  - Include run_id in all relevant log messages for correlation",
+              "createdAt": "2025-10-31T19:09:18Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 25,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482433255",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2482444222,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "is this intentional? I'd assume this would be a local service. `test_dynamo.py` connects to real AWS DynamoDB seems like.\r\n```\r\nself._dynamodb = boto3.client(\r\n      'dynamodb',\r\n      region_name=self.config.region  # Only region specified\r\n  )\r\n```\r\n\r\n  Missing: endpoint_url parameter needed for local DynamoDB:\r\nWhat it should look like for local testing:\r\n ```\r\n boto3.client(\r\n      'dynamodb',\r\n      region_name='us-west-2',\r\n      endpoint_url='http://localhost:8000'  # ← This is missing!\r\n  )\r\n```",
+              "createdAt": "2025-10-31T19:14:10Z",
+              "path": "tests/test_dynamo.py",
+              "line": 1,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482444222",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2482458225,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "you can also consider using moto which helps writing mock tests for aws services\r\n\r\nhttps://docs.getmoto.org/en/latest/docs/getting_started.html\r\n\r\n",
+              "createdAt": "2025-10-31T19:21:15Z",
+              "path": "tests/test_dynamo.py",
+              "line": 1,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482458225",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 13,
+          "severityCounts": {
+            "high": 4,
+            "medium": 7,
+            "low": 2
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOCjx3QA",
+            "is_bot": false,
+            "login": "brycehacker1",
+            "name": ""
+          },
+          "createdAt": "2025-10-30T19:31:18Z",
+          "isDraft": false,
+          "number": 6,
+          "reviewDecision": "APPROVED",
+          "title": "refactor: rename run_id to agent_run_request_id across API",
+          "updatedAt": "2025-10-31T20:36:22Z",
+          "url": "https://github.com/h1-aot/aot-frontend-api/pull/6",
+          "actionableComments": [
+            {
+              "id": 2479290313,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The `from_dict` method lacks backward compatibility for existing Redis data that may still have the old `run_id` field. When deserializing data stored before this change, the code will raise a KeyError. Consider adding a fallback: `run.agent_run_request_id = UUID(data.get(\\\"agent_run_request_id\\\") or data.get(\\\"run_id\\\"))`\n```suggestion\n        run.agent_run_request_id = UUID(data.get(\"agent_run_request_id\") or data.get(\"run_id\"))\n```",
+              "createdAt": "2025-10-30T19:33:14Z",
+              "path": "app/models/agent_run.py",
+              "line": 49,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/6#discussion_r2479290313",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": "IC_kwDOQHP3CM7PF_K_",
+              "type": "general_comment",
+              "author": "brycehacker1",
+              "body": "> LGTM - this would need updates on the AMS side as well to accept `agent_run_request_id`\r\n\r\nWell, I was thinking this should be the session_id in the AMS, but I just realized I don't know what `request.session_id` is in the line `session_id = request.session_id if request.session_id else str(run.agent_run_request_id)`",
+              "createdAt": "2025-10-31T18:49:12Z",
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/6#issuecomment-IC_kwDOQHP3CM7PF_K_",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHP3CM7PGrsP",
+              "type": "general_comment",
+              "author": "skhasnis-cmd",
+              "body": "> > LGTM - this would need updates on the AMS side as well to accept `agent_run_request_id`\r\n> \r\n> Well, I was thinking this should be the session_id in the AMS, but I just realized I don't know what `request.session_id` is in the line `session_id = request.session_id if request.session_id else str(run.agent_run_request_id)`\r\n\r\n`session_id` defaults to `run_id(renamed to agent_run_request_id)` when not provided. read https://github.com/h1-aot/aot-frontend-api/pull/2\r\n\r\nso both are needed",
+              "createdAt": "2025-10-31T19:35:48Z",
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/6#issuecomment-IC_kwDOQHP3CM7PGrsP",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 3,
+          "severityCounts": {
+            "high": 0,
+            "medium": 2,
+            "low": 1
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDODhvk_Q",
+            "is_bot": false,
+            "login": "skhasnis-cmd",
+            "name": ""
+          },
+          "createdAt": "2025-10-29T23:08:52Z",
+          "isDraft": false,
+          "number": 2,
+          "reviewDecision": "APPROVED",
+          "title": "feat: implement complete run_request.v1 contract for Step Functions",
+          "updatedAt": "2025-10-30T00:24:16Z",
+          "url": "https://github.com/h1-aot/aot-frontend-api/pull/2",
+          "actionableComments": [
+            {
+              "id": 2475955206,
+              "type": "review_comment",
+              "author": "amedury-eng",
+              "body": "Suggestion - let's make this required and take in the \"run_id\" (AKA `agent_run_request_id` in recent Slack discussions).",
+              "createdAt": "2025-10-29T23:23:44Z",
+              "path": "app/services/step_functions_service.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/2#discussion_r2475955206",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2475958243,
+              "type": "review_comment",
+              "author": "amedury-eng",
+              "body": "Suggestion - let's rename this to `user_id` and also make this required parameter for `step_functions_service.py` and let's have the caller `agent_management_service.py` set this.",
+              "createdAt": "2025-10-29T23:24:42Z",
+              "path": "app/services/step_functions_service.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/2#discussion_r2475958243",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2475966133,
+              "type": "review_comment",
+              "author": "amedury-eng",
+              "body": "Nice - really like a formalized model for this, and for a follow-up MR - are we thinking about how this can conform to the OpenAI API spec in the near future?",
+              "createdAt": "2025-10-29T23:27:22Z",
+              "path": "app/models/agent_run_request.py",
+              "line": 10,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/2#discussion_r2475966133",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2475975438,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "100% - i just want to make it work as is since work has been put in on the AMS side in defining the initial contract. Here's an issue to track: https://github.com/h1-aot/aot-base/issues/209\r\n",
+              "createdAt": "2025-10-29T23:30:55Z",
+              "path": "app/models/agent_run_request.py",
+              "line": 10,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/2#discussion_r2475975438",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": "IC_kwDOQHP3CM7OiwNs",
+              "type": "general_comment",
+              "author": "skhasnis-cmd",
+              "body": "Example run:\r\n<img width=\"1506\" height=\"831\" alt=\"image\" src=\"https://github.com/user-attachments/assets/49c15fe5-42cb-49ab-872e-124455701274\" />\r\n\r\n\r\nhttps://us-west-2.console.aws.amazon.com/states/home?region=us-west-2#/v2/executions/details/arn:aws:states:us-west-2:627031163350:execution:ams-sfn-dev-agent-workflow:agent-run-c3b83a22-e51b-4a0d-abcc-393521da3814\r\n\r\n<img width=\"1758\" height=\"934\" alt=\"image\" src=\"https://github.com/user-attachments/assets/8fec5ab3-7d84-409e-9514-a584de6af0b6\" />\r\n",
+              "createdAt": "2025-10-29T23:45:44Z",
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/2#issuecomment-IC_kwDOQHP3CM7OiwNs",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 3396906302,
+              "type": "review",
+              "author": "amedury-eng",
+              "body": "LGTM - I see one comment from Co-Pilot that looks helpful, other wise let's ship it.\r\n\r\n```\r\n                __/___            \r\n          _____/______|           \r\n  _______/_____\\_______\\_____     \r\n  \\              < < <       |    \r\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n```",
+              "createdAt": "2025-10-29T23:50:47Z",
+              "state": "APPROVED",
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/2#pullrequestreview-3396906302",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 6,
+          "severityCounts": {
+            "high": 1,
+            "medium": 5,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOCjx3QA",
+            "is_bot": false,
+            "login": "brycehacker1",
+            "name": ""
+          },
+          "createdAt": "2025-10-29T22:21:25Z",
+          "isDraft": false,
+          "number": 1,
+          "reviewDecision": "",
+          "title": "refactor: rename run_id to agent_run_request_id across API",
+          "updatedAt": "2025-10-30T23:56:45Z",
+          "url": "https://github.com/h1-aot/aot-frontend-api/pull/1",
+          "actionableComments": [
+            {
+              "id": 2475756645,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The from_dict method lacks backward compatibility for existing Redis data that may still use the old 'run_id' key. This will cause KeyError when loading existing agent runs from Redis. Consider adding a fallback: `run.agent_run_request_id = UUID(data.get('agent_run_request_id') or data['run_id'])`\n```suggestion\n        run.agent_run_request_id = UUID(data.get(\"agent_run_request_id\") or data[\"run_id\"])\n```",
+              "createdAt": "2025-10-29T22:23:12Z",
+              "path": "app/models/agent_run.py",
+              "line": 49,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/1#discussion_r2475756645",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2475756669,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Error message uses incorrect string interpolation syntax '$' instead of standard f-string syntax. Should be: `f\\\"Run not found {run_key}\\\"`\n```suggestion\n            raise RuntimeError(f\"Run not found {run_key}\")\n```",
+              "createdAt": "2025-10-29T22:23:12Z",
+              "path": "app/storage/redis_storage.py",
+              "line": 138,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/1#discussion_r2475756669",
+              "actionType": "fix_required",
+              "severity": "high"
+            }
+          ],
+          "actionableCount": 2,
+          "severityCounts": {
+            "high": 1,
+            "medium": 0,
+            "low": 1
           }
         }
       ]
