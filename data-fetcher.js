@@ -50,17 +50,31 @@ class GitHubDataFetcher {
   // Get list of repositories to monitor
   async getRepositoriesToMonitor() {
     try {
-      // Get user's repositories (you can customize this query)
-      const repos = this.executeGhCommand(
-        'gh repo list --json name,owner,url,updatedAt,pushedAt --limit 50'
-      );
+      // Hardcoded list of repositories to monitor (add more as needed)
+      const reposToMonitor = [
+        'h1-aot/aot-base',
+        'ppaul-h-aot/MRToolGH'
+      ];
 
-      // Filter to recently active repositories (pushed to in last 30 days)
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const repos = [];
 
-      return repos.filter(repo => {
-        return repo.pushedAt && new Date(repo.pushedAt) >= thirtyDaysAgo;
-      });
+      for (const repoName of reposToMonitor) {
+        try {
+          const repoData = this.executeGhCommand(
+            `gh repo view ${repoName} --json name,owner,url,updatedAt,pushedAt`
+          );
+
+          // Check if repo has recent activity (last 30 days)
+          const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          if (repoData.pushedAt && new Date(repoData.pushedAt) >= thirtyDaysAgo) {
+            repos.push(repoData);
+          }
+        } catch (error) {
+          console.error(`Error accessing repository ${repoName}:`, error.message);
+        }
+      }
+
+      return repos;
     } catch (error) {
       console.error('Error getting repositories:', error.message);
       return [];

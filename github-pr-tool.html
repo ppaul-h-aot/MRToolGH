@@ -414,7 +414,7 @@
                         Select a repository to view pull requests
                     </div>
                 </div>
-                <button id="refreshBtn" class="refresh-btn" onclick="refreshCurrentPR()" disabled>
+                <button id="refreshBtn" class="refresh-btn" onclick="refreshCurrentPR()">
                     🔄 Refresh
                 </button>
             </header>
@@ -759,22 +759,46 @@
         }
 
         async function refreshCurrentPR() {
-            if (!currentPR || !currentRepo) return;
-
             const refreshBtn = document.getElementById('refreshBtn');
             refreshBtn.disabled = true;
             refreshBtn.textContent = '🔄 Refreshing...';
 
             try {
-                // Refresh PR data
-                await fetch(`/api/repos/${currentRepo.owner}/${currentRepo.name}/prs/${currentPR}/refresh`, {
-                    method: 'POST'
-                });
+                if (currentPR && currentRepo) {
+                    // Refresh specific PR data
+                    await fetch(`/api/repos/${currentRepo.owner}/${currentRepo.name}/prs/${currentPR}/refresh`, {
+                        method: 'POST'
+                    });
 
-                // Reload comments
-                await loadPRComments();
+                    // Reload comments with fresh data
+                    await loadPRComments();
+                } else {
+                    // Trigger full data refresh
+                    await fetch('/api/fetch-data', {
+                        method: 'POST'
+                    });
 
-                showCopySuccess();
+                    // Reload repositories
+                    await loadRepositories();
+
+                    document.getElementById('mainContent').innerHTML = `
+                        <div class="empty-state">
+                            <h2>🔄 Data Refreshed!</h2>
+                            <p>Select a repository from the sidebar to view updated pull requests.</p>
+                        </div>
+                    `;
+                }
+
+                // Show success message
+                const successDiv = document.createElement('div');
+                successDiv.className = 'copy-success';
+                successDiv.textContent = '✅ Data refreshed successfully!';
+                document.body.appendChild(successDiv);
+
+                setTimeout(() => {
+                    successDiv.remove();
+                }, 3000);
+
             } catch (error) {
                 showError('Failed to refresh: ' + error.message);
             } finally {

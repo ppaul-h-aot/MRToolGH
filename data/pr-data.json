@@ -1,4 +1,1037 @@
 {
-  "lastUpdate": "2025-11-01T05:25:29.671Z",
-  "repositories": []
+  "lastUpdate": "2025-11-01T05:49:21.303Z",
+  "repositories": [
+    {
+      "owner": "h1-aot",
+      "name": "aot-base",
+      "url": "https://github.com/h1-aot/aot-base",
+      "lastPush": "2025-10-31T23:18:12Z",
+      "pullRequests": [
+        {
+          "author": {
+            "id": "MDQ6VXNlcjMwMDQ2Mzc=",
+            "is_bot": false,
+            "login": "r6e",
+            "name": "Rob Trame"
+          },
+          "createdAt": "2025-10-31T20:35:21Z",
+          "isDraft": true,
+          "number": 224,
+          "reviewDecision": "REVIEW_REQUIRED",
+          "title": "Update ci workflow",
+          "updatedAt": "2025-10-31T23:02:52Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/224",
+          "actionableComments": [
+            {
+              "id": "IC_kwDOQHWW8M7PHWuz",
+              "type": "general_comment",
+              "author": "github-advanced-security",
+              "body": "This pull request sets up GitHub code scanning for this repository. Once the scans have completed and the checks have passed, the analysis results for this pull request branch will appear on [this overview](/h1-aot/aot-base/security/code-scanning?query=pr%3A224+is%3Aopen). Once you merge this pull request, the 'Security' tab will show more code scanning analysis results (for example, for the default branch). Depending on your configuration and choice of analysis tool, future pull requests will be annotated with code scanning analysis results. For more information about GitHub code scanning, check out [the documentation](https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning). ",
+              "createdAt": "2025-10-31T20:35:54Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/224#issuecomment-IC_kwDOQHWW8M7PHWuz",
+              "actionType": "fix_required",
+              "severity": "high"
+            }
+          ],
+          "actionableCount": 1,
+          "severityCounts": {
+            "high": 1,
+            "medium": 0,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDODh47-A",
+            "is_bot": false,
+            "login": "simd-h1",
+            "name": ""
+          },
+          "createdAt": "2025-10-30T23:24:17Z",
+          "isDraft": true,
+          "number": 219,
+          "reviewDecision": "",
+          "title": "Dynamic Tool Discovery and SQLMap Sidecar",
+          "updatedAt": "2025-10-31T18:51:54Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/219",
+          "actionableComments": [
+            {
+              "id": 2481851168,
+              "type": "review_comment",
+              "author": "ppaul-h-aot",
+              "body": "The original PR comment says \n7 new files: Tool registry, executor, SQLMap sidecar, and tests, but I see 3 new files. So wanted to double check on that\n\nIt adds ",
+              "createdAt": "2025-10-31T15:40:29Z",
+              "path": "tests/agentic/tools/conftest.py",
+              "line": 3,
+              "url": "https://github.com/h1-aot/aot-base/pull/219#discussion_r2481851168",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7PGCvy",
+              "type": "general_comment",
+              "author": "simd-h1",
+              "body": "Closing this as I opened up once where it doenst have the source file issues PR #221 ",
+              "createdAt": "2025-10-31T18:51:53Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/219#issuecomment-IC_kwDOQHWW8M7PGCvy",
+              "actionType": "question",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 2,
+          "severityCounts": {
+            "high": 0,
+            "medium": 2,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOB7NDfw",
+            "is_bot": false,
+            "login": "cmoh1",
+            "name": "Colin Monroe"
+          },
+          "createdAt": "2025-10-30T15:52:10Z",
+          "isDraft": false,
+          "number": 213,
+          "reviewDecision": "REVIEW_REQUIRED",
+          "title": "Change cookies -> auth tokens, add new sources for auth tokens",
+          "updatedAt": "2025-10-30T21:09:51Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/213",
+          "actionableComments": [
+            {
+              "id": 2478651023,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The merge logic only uses token name as the key, which could incorrectly merge tokens with the same name but different sources. For example, a cookie named 'token' and a localStorage item named 'token' would overwrite each other. Consider using a composite key of (name, source) to avoid conflicts.",
+              "createdAt": "2025-10-30T15:54:53Z",
+              "path": "src/agentic/models/session.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/213#discussion_r2478651023",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2478651056,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The comment still refers to 'cookies' instead of 'auth tokens', which is inconsistent with the refactoring changes throughout the rest of the file.\n```suggestion\nRIGHT: Call get_session tool, then use the returned auth tokens in a Python script\n```",
+              "createdAt": "2025-10-30T15:54:53Z",
+              "path": "config/agents.toml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/213#discussion_r2478651056",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2478922880,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Accessing the enum value via `.value` is unnecessary here. The comparison can be done directly with the enum member: `c.source == AuthTokenSource.COOKIE`. This is more Pythonic and type-safe.\n```suggestion\n    3.     Create cookie string: \"; \".join([f\"{c.name}={c.value}\" for c in session_data.auth_tokens if c.source == AuthTokenSource.COOKIE])\n```",
+              "createdAt": "2025-10-30T17:21:07Z",
+              "path": "src/agentic/tools/katana.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/213#discussion_r2478922880",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": 2478922904,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The method names `has_cookie` and `get_cookie` are kept for backward compatibility but their docstrings now say 'auth token'. Consider adding a note in the docstrings mentioning these are backward compatibility aliases, similar to how `get_cookie_names()` documents it at line 38.\n```suggestion\n        \"\"\"Check if a specific auth token exists (backward compatibility alias).\"\"\"\n        return any(token.name == name for token in self.auth_tokens)\n\n    def get_cookie(self, name: str) -> AuthToken | None:\n        \"\"\"Get a specific auth token by name (backward compatibility alias).\"\"\"\n```",
+              "createdAt": "2025-10-30T17:21:08Z",
+              "path": "src/agentic/models/session.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/213#discussion_r2478922904",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2478922919,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The example still uses `session.cookies.set()` which is confusing given the refactoring to auth tokens. The example should be updated to demonstrate handling different token sources (e.g., cookies vs. headers) or at least clarify that this example specifically shows cookie-based tokens.\n```suggestion\n        \"\\n\\nAUTH TOKEN USAGE: To use authentication tokens, first call the get_session TOOL (not Python function) to retrieve captured session data, then use the returned auth tokens in your Python requests. \"\n        \"Example for cookie-based token: session = requests.Session(); session.cookies.set('token_name', 'token_value') \"\n        \"Example for header-based token: session = requests.Session(); session.headers.update({'Authorization': 'Bearer token_value'})\"\n```",
+              "createdAt": "2025-10-30T17:21:08Z",
+              "path": "src/agentic/tools/python.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/213#discussion_r2478922919",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2478922928,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "[nitpick] The serialization creates a nested structure with both 'count' and 'details', but the count is redundant since it can be derived from the length of 'details'. Consider simplifying to just `\\\"auth_tokens\\\": [token.model_dump(mode=\\\"json\\\") for token in obj.auth_tokens]` unless the count is specifically needed for optimization or display purposes.\n```suggestion\n                \"auth_tokens\": [token.model_dump(mode=\"json\") for token in obj.auth_tokens],\n```",
+              "createdAt": "2025-10-30T17:21:08Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/213#discussion_r2478922928",
+              "actionType": "suggestion",
+              "severity": "low"
+            }
+          ],
+          "actionableCount": 6,
+          "severityCounts": {
+            "high": 0,
+            "medium": 3,
+            "low": 3
+          }
+        },
+        {
+          "author": {
+            "id": "MDQ6VXNlcjkyODgxMDY=",
+            "is_bot": false,
+            "login": "sherman205",
+            "name": "Sophia Sherman"
+          },
+          "createdAt": "2025-10-30T15:40:54Z",
+          "isDraft": false,
+          "number": 211,
+          "reviewDecision": "APPROVED",
+          "title": "Fix tool unit tests to mock system calls, to allow pytest to run locally",
+          "updatedAt": "2025-10-30T20:01:58Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/211",
+          "actionableComments": [
+            {
+              "id": 2478609828,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Multiple consecutive blank lines (lines 22-24) should be reduced to a single blank line for consistency and cleaner formatting.\n```suggestion\n\n```",
+              "createdAt": "2025-10-30T15:43:27Z",
+              "path": "tests/agentic/utils/test_path.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/211#discussion_r2478609828",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2478609852,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Extra blank line (line 51) should be removed to maintain consistent spacing between test methods.\n```suggestion\n\n```",
+              "createdAt": "2025-10-30T15:43:28Z",
+              "path": "tests/agentic/tools/test_hping3.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/211#discussion_r2478609852",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2478609863,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Multiple consecutive blank lines (lines 50-52) at the end of the file should be reduced to a single blank line for consistency.",
+              "createdAt": "2025-10-30T15:43:28Z",
+              "path": "tests/agentic/tools/test_commix.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/211#discussion_r2478609863",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2478849617,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "Would it just make more sense to remove all of these tests? This is now mocking out the call and mocking out the result, so it's just testing that calling a mock will return the mocked value, right?",
+              "createdAt": "2025-10-30T16:55:48Z",
+              "path": "tests/agentic/tools/test_ping.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/211#discussion_r2478849617",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2478884651,
+              "type": "review_comment",
+              "author": "sherman205",
+              "body": "I agree most of these aren't great (thanks claude), since the tool calls are just thin wrappers, there's not much to unit test. This is basically just asserting command construction was correct. If we wanted to keep these, we probably don't need those extra asserts, and the only one that matters is `mock_cmd.assert_called_once_with(\"ping\", cwd=\"/fake/path\")`\r\n\r\nI think some of them are borderline okay/can be improved like the python tool. \r\n\r\nI would not be opposed to deleting tests for tools we don't even use like goldeneye, ping, etc. What do you think about that? ",
+              "createdAt": "2025-10-30T17:07:53Z",
+              "path": "tests/agentic/tools/test_ping.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/211#discussion_r2478884651",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 5,
+          "severityCounts": {
+            "high": 0,
+            "medium": 5,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOB7NDfw",
+            "is_bot": false,
+            "login": "cmoh1",
+            "name": "Colin Monroe"
+          },
+          "createdAt": "2025-10-30T00:19:55Z",
+          "isDraft": false,
+          "number": 210,
+          "reviewDecision": "",
+          "title": "Refactor config and application entrypoint",
+          "updatedAt": "2025-10-30T22:52:49Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/210",
+          "actionableComments": [
+            {
+              "id": 2476063039,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The logic for determining the Postgres checkpointer backend is incorrect. The condition `os.environ.get('CHECKPOINTER_BACKEND')` will evaluate to True for any non-empty environment variable value, not just 'postgres'. This should be `os.environ.get('CHECKPOINTER_BACKEND') == 'postgres'` to match the pattern used in the other branches.\n```suggestion\n    if args.checkpointer_backend == \"postgres\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"postgres\":\n```",
+              "createdAt": "2025-10-30T00:23:54Z",
+              "path": "src/agentic/__init__.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2476063039",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2476063048,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The variable `checkpointer_backend` is initialized as `None` but is used later without a None check. If none of the conditional branches match (which shouldn't happen due to the final else), this would cause issues. Since the code exits in the else block, this should be initialized to a default value or the type annotation should not include `| None`.\n```suggestion\n    checkpointer_backend: CheckpointingType\n```",
+              "createdAt": "2025-10-30T00:23:54Z",
+              "path": "src/agentic/__init__.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2476063048",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2478949963,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "Is it better to identify this as observability_config and use the type to determine what to setup?",
+              "createdAt": "2025-10-30T17:30:17Z",
+              "path": "src/agentic/app/aot_startup_config.py",
+              "line": 67,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2478949963",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2478994401,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "I think we can require this config now right?",
+              "createdAt": "2025-10-30T17:46:48Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2478994401",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2479036528,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "Personally, I don't think so. I think that it would make sense to have an abstraction over configuring observability providers (potentially) if we wanted to swap out different providers over time. But this config is very specific to Langfuse, and I think it would be confusing to make this less specific.\r\n\r\nFor example, if we wanted to add DataDog, I would foresee us adding a DatadogConfig alongside this class, so that way we could have type checking/testing for properly mapping DataDog config values. But configuring observability for an agent should be abstracted so that you could easily add DataDog or Langfuse or both, depending on your needs.",
+              "createdAt": "2025-10-30T18:02:53Z",
+              "path": "src/agentic/app/aot_startup_config.py",
+              "line": 67,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479036528",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2479040627,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "Agreed, I haven't dug into this config a ton yet, but I think this would be a good candidate for it. I need to come up with a clean config approach that separates config that is expected to change/be injected at runtime vs. config that we specify in source and is not expected to change at runtime.",
+              "createdAt": "2025-10-30T18:04:28Z",
+              "path": "src/agentic/utils/config.py",
+              "line": 321,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479040627",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2479234868,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "@bwillis added target creds handling here. The pattern is a little wonky in current state (it will read from \"initial_state\" to populate this config and then inside the orchestrator run() function will overwrite the state's target_credentials with what's in this config) but I think it will be super helpful for decoupling config population (now we can populate target_credentials however we want) with graph execution. Good idea!",
+              "createdAt": "2025-10-30T19:10:17Z",
+              "path": "src/agentic/__init__.py",
+              "line": 914,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479234868",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2479237929,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "@bwillis here's the corresponding change from adding these to the auth config. It will always overwrite what's in state with what's in this config.",
+              "createdAt": "2025-10-30T19:11:38Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 577,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479237929",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2479432068,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The `callback_handlers` is initialized twice (line 282 and line 312), causing the first initialization to be overwritten. Remove the duplicate assignment on line 312.\n```suggestion\n\n```",
+              "createdAt": "2025-10-30T20:27:35Z",
+              "path": "src/agentic/utils/config.py",
+              "line": 312,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479432068",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": 2479432092,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "If `creds` is `None`, calling `creds.get()` will raise an `AttributeError`. The condition should be `if creds is None or not creds.get(\\\"username\\\") or not creds.get(\\\"password\\\"):` to safely handle the None case and empty strings.\n```suggestion\n        if creds is None or not creds.get(\"username\") or not creds.get(\"password\"):\n```",
+              "createdAt": "2025-10-30T20:27:36Z",
+              "path": "src/agentic/__init__.py",
+              "line": 910,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479432092",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2479432106,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "If `creds.get(\\\"username\\\")` or `creds.get(\\\"password\\\")` returns `None`, the `TargetCredentials` dataclass will be initialized with `None` values. Add default empty strings: `username=creds.get(\\\"username\\\", \\\"\\\")` and `password=creds.get(\\\"password\\\", \\\"\\\")` or validate that these values are not None.\n```suggestion\n        username = creds.get(\"username\", \"\") if creds else \"\"\n        password = creds.get(\"password\", \"\") if creds else \"\"\n        if not username or not password:\n            logger.error(colored(\"target_credentials must be specified in initial state if auth is enabled.\", \"red\"))\n            sys.exit(1)\n\n        auth_config = AuthConfig(\n            allow_auth_failure=False,\n            target_credentials=TargetCredentials(username=username, password=password),\n```",
+              "createdAt": "2025-10-30T20:27:36Z",
+              "path": "src/agentic/__init__.py",
+              "line": 916,
+              "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479432106",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7Oxskf",
+              "type": "general_comment",
+              "author": "bwillis",
+              "body": "I like this change! The only addition I would make is to move the TargetCredentials into the AuthConfig. Understand if that would be a follow-up if you agree.",
+              "createdAt": "2025-10-30T17:18:31Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/210#issuecomment-IC_kwDOQHWW8M7Oxskf",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7OzVjB",
+              "type": "general_comment",
+              "author": "cmoh1",
+              "body": "> I like this change! The only addition I would make is to move the TargetCredentials into the AuthConfig. Understand if that would be a follow-up if you agree.\r\n\r\nGood idea! I'll take a look and see if we can add it here, if it's a bit more involved I'll address it in a follow up.",
+              "createdAt": "2025-10-30T18:46:11Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/210#issuecomment-IC_kwDOQHWW8M7OzVjB",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 3400820792,
+              "type": "review",
+              "author": "bwillis",
+              "body": "Couple of nitpicks, maybe AI can fix them 😁 ",
+              "createdAt": "2025-10-30T17:47:24Z",
+              "state": "DISMISSED",
+              "url": "https://github.com/h1-aot/aot-base/pull/210#pullrequestreview-3400820792",
+              "actionType": "fix_required",
+              "severity": "high"
+            }
+          ],
+          "actionableCount": 14,
+          "severityCounts": {
+            "high": 2,
+            "medium": 9,
+            "low": 3
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOCjx3QA",
+            "is_bot": false,
+            "login": "brycehacker1",
+            "name": ""
+          },
+          "createdAt": "2025-10-29T23:27:29Z",
+          "isDraft": false,
+          "number": 208,
+          "reviewDecision": "REVIEW_REQUIRED",
+          "title": "Refactor: Use session_id for artifact organization instead of timestamp",
+          "updatedAt": "2025-10-31T18:50:14Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/208",
+          "actionableComments": [
+            {
+              "id": "IC_kwDOQHWW8M7PF7-f",
+              "type": "general_comment",
+              "author": "skhasnis-cmd",
+              "body": "Q: If we only have the `session_id` in the upload path name, how would we tie it to the `agent_run_request_id`?",
+              "createdAt": "2025-10-31T18:46:24Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/208#issuecomment-IC_kwDOQHWW8M7PF7-f",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7PGAhY",
+              "type": "general_comment",
+              "author": "brycehacker1",
+              "body": "> Q: If we only have the `session_id` in the upload path name, how would we tie it to the `agent_run_request_id`?\r\n\r\nI was under the impression the `session_id` was the `agent_run_request_id`",
+              "createdAt": "2025-10-31T18:50:14Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/208#issuecomment-IC_kwDOQHWW8M7PGAhY",
+              "actionType": "question",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 2,
+          "severityCounts": {
+            "high": 0,
+            "medium": 2,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOBw6Ixw",
+            "is_bot": false,
+            "login": "jordanhacker1",
+            "name": ""
+          },
+          "createdAt": "2025-10-29T21:56:07Z",
+          "isDraft": false,
+          "number": 205,
+          "reviewDecision": "APPROVED",
+          "title": "83634 logging",
+          "updatedAt": "2025-10-31T23:18:14Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/205",
+          "actionableComments": [
+            {
+              "id": 2475676346,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Invalid log level values could cause silent failures. If a user sets `LOG_LEVEL=INVALID`, `getattr` will return `logging.INFO` as the default, but this failure is not logged or communicated to the user. Consider validating the LOG_LEVEL value and logging a warning if an invalid level is provided, e.g., `if not hasattr(logging, LOG_LEVEL): logger.warning(f'Invalid LOG_LEVEL: {LOG_LEVEL}, defaulting to INFO')`\n```suggestion\nif hasattr(logging, LOG_LEVEL) and isinstance(getattr(logging, LOG_LEVEL), int):\n    log_level = getattr(logging, LOG_LEVEL)\nelse:\n    logging.warning(f\"Invalid LOG_LEVEL: {LOG_LEVEL}, defaulting to INFO\")\n    log_level = logging.INFO\n```",
+              "createdAt": "2025-10-29T21:58:16Z",
+              "path": "src/agentic/__init__.py",
+              "line": 81,
+              "url": "https://github.com/h1-aot/aot-base/pull/205#discussion_r2475676346",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2479371861,
+              "type": "review_comment",
+              "author": "mshackerone",
+              "body": "+1 this is the kind of comment that could be useful for an LLM, but an LLM should also know how logging generally works, which is the bulk of what this info is conveying, so this just seems like extra",
+              "createdAt": "2025-10-30T20:05:46Z",
+              "path": ".env.template",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/205#discussion_r2479371861",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 2,
+          "severityCounts": {
+            "high": 0,
+            "medium": 1,
+            "low": 1
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDODh47-A",
+            "is_bot": false,
+            "login": "simd-h1",
+            "name": ""
+          },
+          "createdAt": "2025-10-29T20:34:07Z",
+          "isDraft": true,
+          "number": 204,
+          "reviewDecision": "",
+          "title": "Phase 1: Tool Registry Base Implementation",
+          "updatedAt": "2025-10-31T15:58:42Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/204",
+          "actionableComments": [
+            {
+              "id": 2478995328,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "There are a lot of these exceptions that probably don't need to be added and should be super fast to fix. Would it be helpful to pair on these today? ",
+              "createdAt": "2025-10-30T17:47:09Z",
+              "path": "ruff.toml",
+              "line": 144,
+              "url": "https://github.com/h1-aot/aot-base/pull/204#discussion_r2478995328",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2479017408,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "[nitpick] could we move this class into its own file? ",
+              "createdAt": "2025-10-30T17:55:20Z",
+              "path": "src/agentic/tools/base_tool.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/204#discussion_r2479017408",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7OdzW-",
+              "type": "general_comment",
+              "author": "simd-h1",
+              "body": "I will merge base branch once people review wanted to start this off as a Draft First so we can get eyes and local testing on it.",
+              "createdAt": "2025-10-29T20:44:43Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/204#issuecomment-IC_kwDOQHWW8M7OdzW-",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7OxxGh",
+              "type": "general_comment",
+              "author": "simd-h1",
+              "body": "https://www.figma.com/board/KYxE4ZkThc8EnV0L1YhZ8w/Tool-Registry-Architecture---Phase-1?node-id=0-1&t=gYjbJIyoUiOqpT1w-1",
+              "createdAt": "2025-10-30T17:22:20Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/204#issuecomment-IC_kwDOQHWW8M7OxxGh",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7O0pds",
+              "type": "general_comment",
+              "author": "cmoh1",
+              "body": "@simd-h1 what is the best way to test this? When I run `bin/agentic -a orchestrator_workflow` it looks like the sqlmap container doesn't spin up, should we add something to `bin/agentic` script to start all tool containers when the graph starts, similar to langfuse?",
+              "createdAt": "2025-10-30T20:10:58Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/204#issuecomment-IC_kwDOQHWW8M7O0pds",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 5,
+          "severityCounts": {
+            "high": 1,
+            "medium": 3,
+            "low": 1
+          }
+        },
+        {
+          "author": {
+            "id": "MDQ6VXNlcjI0NTA5Ng==",
+            "is_bot": false,
+            "login": "bwillis",
+            "name": "Ben"
+          },
+          "createdAt": "2025-10-29T19:12:32Z",
+          "isDraft": false,
+          "number": 202,
+          "reviewDecision": "",
+          "title": "Testing commit signing",
+          "updatedAt": "2025-10-29T19:13:25Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/202",
+          "actionableComments": [
+            {
+              "id": 2474992761,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "This test message should be removed before merging to maintain a professional README. It appears to be a temporary test for commit signing functionality.\n```suggestion\n\n```",
+              "createdAt": "2025-10-29T19:13:24Z",
+              "path": "README.md",
+              "line": 2,
+              "url": "https://github.com/h1-aot/aot-base/pull/202#discussion_r2474992761",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 1,
+          "severityCounts": {
+            "high": 0,
+            "medium": 1,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOCy-udQ",
+            "is_bot": false,
+            "login": "pembroke-davis",
+            "name": ""
+          },
+          "createdAt": "2025-10-29T18:43:12Z",
+          "isDraft": false,
+          "number": 201,
+          "reviewDecision": "",
+          "title": "DRAFT: Add summary and status updates to indicators from exploit agents",
+          "updatedAt": "2025-10-30T14:09:56Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/201",
+          "actionableComments": [
+            {
+              "id": 2474740521,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The return type `dict[str, Any]` contains indicators as a list of dicts, but `PartialOrchestratorState` expects `indicators: NotRequired[list[Indicator]]`. The returned dict should contain Pydantic `Indicator` objects rather than plain dicts. Additionally, `OrchestratorState.indicators` is typed as `list[dict[str, str | bool | None]]`, creating a type mismatch with the `IndicatorStatus` enum being assigned to `exploit_status`.",
+              "createdAt": "2025-10-29T18:45:21Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 466,
+              "url": "https://github.com/h1-aot/aot-base/pull/201#discussion_r2474740521",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474740566,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "This code assumes the first indicator is always the relevant one without any validation or explanation. Consider adding a comment explaining why `indicators[0]` is appropriate, or implement logic to match the indicator to the specific workflow being executed.\n```suggestion\n        # Find the indicator matching the workflow_name\n        indicator = next(\n            (ind for ind in indicators if ind.get(\"workflow\") == workflow_name), None\n        )\n        if indicator is None:\n            logger.warning(\n                f\"No indicator found for workflow '{workflow_name}'. Returning empty update.\"\n            )\n            return {}\n        indicator_id = indicator.get(\"id\")\n```",
+              "createdAt": "2025-10-29T18:45:21Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 432,
+              "url": "https://github.com/h1-aot/aot-base/pull/201#discussion_r2474740566",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2476498533,
+              "type": "review_comment",
+              "author": "pembroke-davis",
+              "body": "working through this revealed a deeper problem, so working to resolve",
+              "createdAt": "2025-10-30T05:51:25Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 466,
+              "url": "https://github.com/h1-aot/aot-base/pull/201#discussion_r2476498533",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2478262321,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "It'd likely be a bit simpler to just unify these enum's for what it's worth. Unless you think they'd be useful to have separate?",
+              "createdAt": "2025-10-30T14:08:07Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 435,
+              "url": "https://github.com/h1-aot/aot-base/pull/201#discussion_r2478262321",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2478266662,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "I think it'd be really interesting to have these fields be part of the ExploitAgentResult, and then make it an expectation of the verify agent to fill these out before finishing. If that blows the scope up for this too much that's fine, we can add that in a follow up MR.",
+              "createdAt": "2025-10-30T14:09:29Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 443,
+              "url": "https://github.com/h1-aot/aot-base/pull/201#discussion_r2478266662",
+              "actionType": "request",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 5,
+          "severityCounts": {
+            "high": 1,
+            "medium": 4,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOCy-udQ",
+            "is_bot": false,
+            "login": "pembroke-davis",
+            "name": ""
+          },
+          "createdAt": "2025-10-29T18:29:45Z",
+          "isDraft": false,
+          "number": 200,
+          "reviewDecision": "",
+          "title": "Add summary and status updates to indicators from exploit agents",
+          "updatedAt": "2025-10-29T18:42:12Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/200",
+          "actionableComments": [
+            {
+              "id": 2474631147,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The pluralization logic for 'vulnerability/vulnerabilities' is duplicated on lines 445 and 447. Consider extracting this to a variable like `vuln_word = 'vulnerability' if vuln_count == 1 else 'vulnerabilities'` to improve maintainability.\n```suggestion\n            vuln_word = \"vulnerability\" if vuln_count == 1 else \"vulnerabilities\"\n            discovered_word = \"discovered\" if vuln_count == 1 else \"ies discovered\"\n            executive = (\n                f\"Found {vuln_count} {vuln_word} during {workflow_name} testing.\"\n            )\n            status_doc = f\"Target tested successfully. {vuln_count} {vuln_word} {discovered_word}.\"\n```",
+              "createdAt": "2025-10-29T18:32:04Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 447,
+              "url": "https://github.com/h1-aot/aot-base/pull/200#discussion_r2474631147",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2474631188,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The `result.get('status')` returns a `ResultStatus` enum, which will display as `ResultStatus.INCONCLUSIVE` or `ResultStatus.FAILURE` in the status documentation. Consider using `result.get('status').value` to display the string value instead (e.g., 'inconclusive' or 'failure').\n```suggestion\n            status_doc = f\"Target tested with no vulnerabilities discovered. Completion: {result.get('status').value}\"\n```",
+              "createdAt": "2025-10-29T18:32:04Z",
+              "path": "src/agentic/workflows/orchestrator.py",
+              "line": 451,
+              "url": "https://github.com/h1-aot/aot-base/pull/200#discussion_r2474631188",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474631236,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The `ExploitAgentResult` import is placed under `TYPE_CHECKING` but is used at runtime in the test methods (lines 17, 28, 39). This import should be moved outside the `TYPE_CHECKING` block to avoid potential runtime errors.\n```suggestion\nfrom agentic.models.workflow.exploit_agent_result import ExploitAgentResult\n```",
+              "createdAt": "2025-10-29T18:32:05Z",
+              "path": "tests/agentic/workflows/test_indicator_enhancement.py",
+              "line": 11,
+              "url": "https://github.com/h1-aot/aot-base/pull/200#discussion_r2474631236",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 3,
+          "severityCounts": {
+            "high": 1,
+            "medium": 2,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "MDQ6VXNlcjUwMjQ0MTc=",
+            "is_bot": false,
+            "login": "NicholasBusby",
+            "name": "Nicholas Busby"
+          },
+          "createdAt": "2025-10-29T16:45:05Z",
+          "isDraft": false,
+          "number": 199,
+          "reviewDecision": "APPROVED",
+          "title": "NBusby/83678/advanced stored xss",
+          "updatedAt": "2025-10-29T20:24:07Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/199",
+          "actionableComments": [
+            {
+              "id": 2474242384,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Inconsistent import style: Using absolute imports with 'src.' prefix in test files while other test files use relative imports from 'agentic.'. For consistency, these should be changed to 'from agentic.utils.encoding_handlers import CharCodeHandler' and 'from agentic.utils.stored_xss import inject_nonce_into_payload'.\n```suggestion\nfrom agentic.utils.encoding_handlers import CharCodeHandler\nfrom agentic.utils.stored_xss import inject_nonce_into_payload\n```",
+              "createdAt": "2025-10-29T16:48:49Z",
+              "path": "tests/agentic/utils/test_stored_xss_nonce_charcode.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474242384",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474242405,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Inconsistent import style: Using absolute imports with 'src.' prefix. Should be 'from agentic.utils.stored_xss import inject_nonce_into_payload' to match other test files.\n```suggestion\nfrom agentic.utils.stored_xss import inject_nonce_into_payload\n```",
+              "createdAt": "2025-10-29T16:48:49Z",
+              "path": "tests/agentic/utils/test_nested_encoding.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474242405",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474242422,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Magic number: The value 9007199254740991 is duplicated in multiple locations (lines 17, 259, 518 in test files). Consider defining this as a module-level constant at the top of the file (e.g., 'JS_MAX_SAFE_INTEGER = 2**53 - 1') with a descriptive comment explaining it's JavaScript's MAX_SAFE_INTEGER, then referencing it throughout the codebase.",
+              "createdAt": "2025-10-29T16:48:49Z",
+              "path": "src/agentic/utils/stored_xss.py",
+              "line": 259,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474242422",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474242436,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Potential data loss: Empty lines are now filtered out before validation. This changes the behavior where previously line count validation would fail if empty lines existed. If a test script intentionally prints empty lines for certain payloads, those results will be lost. Consider preserving empty lines but skipping them only during result parsing (line 818), not during validation (line 687).\n```suggestion\n    # Preserve empty lines for validation\n    result_lines = script_output.split(\"\\n\")\n```",
+              "createdAt": "2025-10-29T16:48:50Z",
+              "path": "src/agentic/utils/stored_xss.py",
+              "line": 684,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474242436",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474242452,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Silent error handling could mask critical issues: Previously, malformed result lines would cause the function to return early with an error. Now they're logged as warnings and skipped. This could allow test scripts with bugs (e.g., incorrect output format) to appear to succeed with partial results. Consider accumulating errors and returning them if too many results are malformed (e.g., >50% failure rate).",
+              "createdAt": "2025-10-29T16:48:50Z",
+              "path": "src/agentic/utils/stored_xss.py",
+              "line": 826,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474242452",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2474242466,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Fragile string matching validation: The validation checks for exact string literals like 'dialog_message in payload' and 'different nonce' in lowercase. This is brittle and may produce false negatives if developers use slightly different but semantically equivalent code (e.g., 'payload.find(dialog_message) != -1' or 'wrong nonce'). Consider either documenting these exact strings as required patterns or implementing more robust AST-based validation.",
+              "createdAt": "2025-10-29T16:48:50Z",
+              "path": "src/agentic/utils/stored_xss.py",
+              "line": 591,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474242466",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2474242478,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Insufficient documentation for magic numbers: While comments explain what these constants represent, they don't explain why these specific values were chosen. For example, why is 20 the threshold for MIN_ENCODED_STRING_LENGTH? Is this based on empirical testing, common XSS payload sizes, or another rationale? Consider adding rationale comments or references to help maintainers understand if these values should be adjusted.\n```suggestion\nMIN_BASE64_LENGTH = 4  # Base64 encoding requires at least 4 characters\n# Rationale: The threshold of 20 for MIN_ENCODED_STRING_LENGTH is based on empirical analysis of typical XSS payload sizes.\n# Most XSS payloads and encoded attack vectors are at least 20 characters long; shorter strings are unlikely to be malicious and are more likely to be false positives.\nMIN_ENCODED_STRING_LENGTH = 20  # Minimum length for hex/URL/HTML entity encoded strings\n# Rationale: The threshold of 20 for MIN_DECODED_XSS_LENGTH is chosen to minimize false positives when scanning decoded content for XSS patterns.\n# This value is based on common XSS payload lengths observed in security research and testing; adjust if new evidence suggests a different threshold is more effective.\n```",
+              "createdAt": "2025-10-29T16:48:50Z",
+              "path": "src/agentic/utils/encoding_handlers.py",
+              "line": 28,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474242478",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2474330625,
+              "type": "review_comment",
+              "author": "NicholasBusby",
+              "body": "thats the point of documentation. But it does help copilot and claude when making changes",
+              "createdAt": "2025-10-29T17:22:49Z",
+              "path": "src/agentic/utils/encoding_handlers.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474330625",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474330866,
+              "type": "review_comment",
+              "author": "NicholasBusby",
+              "body": "thats the point of documentation. But it does help copilot and claude when making changes",
+              "createdAt": "2025-10-29T17:22:56Z",
+              "path": "src/agentic/utils/encoding_handlers.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474330866",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474331174,
+              "type": "review_comment",
+              "author": "NicholasBusby",
+              "body": "thats the point of documentation. But it does help copilot and claude when making changes",
+              "createdAt": "2025-10-29T17:23:03Z",
+              "path": "src/agentic/utils/encoding_handlers.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474331174",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474331487,
+              "type": "review_comment",
+              "author": "NicholasBusby",
+              "body": "thats the point of documentation. But it does help copilot and claude when making changes",
+              "createdAt": "2025-10-29T17:23:11Z",
+              "path": "src/agentic/utils/encoding_handlers.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474331487",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474331765,
+              "type": "review_comment",
+              "author": "NicholasBusby",
+              "body": "thats the point of documentation. But it does help copilot and claude when making changes",
+              "createdAt": "2025-10-29T17:23:17Z",
+              "path": "src/agentic/utils/encoding_handlers.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474331765",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2474366496,
+              "type": "review_comment",
+              "author": "sherman205",
+              "body": "To delete?",
+              "createdAt": "2025-10-29T17:37:23Z",
+              "path": "README.md",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474366496",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2474447306,
+              "type": "review_comment",
+              "author": "NicholasBusby",
+              "body": "Yes, there was an issue with my local GitHub setup, and this was a test to verify it would work. There are a few commits of this in and out, sorry, I should have made a new branch for it.",
+              "createdAt": "2025-10-29T18:03:13Z",
+              "path": "README.md",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/199#discussion_r2474447306",
+              "actionType": "fix_required",
+              "severity": "high"
+            }
+          ],
+          "actionableCount": 14,
+          "severityCounts": {
+            "high": 4,
+            "medium": 10,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDOB7NDfw",
+            "is_bot": false,
+            "login": "cmoh1",
+            "name": "Colin Monroe"
+          },
+          "createdAt": "2025-10-29T16:29:27Z",
+          "isDraft": false,
+          "number": 198,
+          "reviewDecision": "APPROVED",
+          "title": "Remove command from entrypoint and back to bin/run",
+          "updatedAt": "2025-10-30T18:54:05Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/198",
+          "actionableComments": [
+            {
+              "id": 2478445208,
+              "type": "review_comment",
+              "author": "rquinlivan",
+              "body": "How does `uv run agentic` get called now? This is just calling `exec` with the parameters.",
+              "createdAt": "2025-10-30T14:57:49Z",
+              "path": "entrypoint.sh",
+              "line": 32,
+              "url": "https://github.com/h1-aot/aot-base/pull/198#discussion_r2478445208",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2478495511,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "With this change, entrypoint would now get `/app/bin/run \"$@\"`. This would call `bin/run` inside the docker container, which is the `run_local()` function in `bin/run` which would run `uv run <command>`. The `run_docker()` -> `/app/bin/run` -> `run_local()` is how the `bin/run` was working previously I believe, which this would retain.",
+              "createdAt": "2025-10-30T15:11:28Z",
+              "path": "entrypoint.sh",
+              "line": 32,
+              "url": "https://github.com/h1-aot/aot-base/pull/198#discussion_r2478495511",
+              "actionType": "question",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 2,
+          "severityCounts": {
+            "high": 0,
+            "medium": 2,
+            "low": 0
+          }
+        }
+      ]
+    }
+  ]
 }

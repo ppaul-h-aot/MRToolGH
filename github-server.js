@@ -93,13 +93,24 @@ app.get('/api/repos', async (req, res) => {
       });
     }
 
-    // Fallback to live data
-    const repos = executeGhCommand('gh repo list --json name,owner,url,updatedAt --limit 100');
+    // Fallback to live data - check specific repositories
+    const reposToCheck = [
+      'h1-aot/aot-base',
+      'ppaul-h-aot/MRToolGH'
+    ];
 
-    // Filter and sort repos by recent activity
-    const sortedRepos = repos
-      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-      .slice(0, 50); // Limit to 50 most recent repos
+    const repos = [];
+    for (const repoName of reposToCheck) {
+      try {
+        const repoData = executeGhCommand(`gh repo view ${repoName} --json name,owner,url,updatedAt`);
+        repos.push(repoData);
+      } catch (error) {
+        console.error(`Error accessing repository ${repoName}:`, error.message);
+      }
+    }
+
+    // Sort repos by recent activity
+    const sortedRepos = repos.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
     res.json({
       success: true,
