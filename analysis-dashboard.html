@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Analysis Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f6f8fa;
+            color: #24292f;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #0969da;
+            margin-bottom: 10px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #0969da;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.high { border-left-color: #cf222e; }
+        .stat-card.medium { border-left-color: #9a6700; }
+        .stat-card.low { border-left-color: #137a2b; }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #24292f;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #656d76;
+            margin-top: 5px;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f6f8fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #d0d7de;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .issue-item {
+            border-left: 4px solid #0969da;
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .issue-item.high { border-left-color: #cf222e; }
+        .issue-item.medium { border-left-color: #fb8500; }
+        .issue-item.low { border-left-color: #137a2b; }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .issue-title {
+            font-weight: 600;
+            color: #24292f;
+            margin-bottom: 5px;
+        }
+
+        .issue-meta {
+            font-size: 12px;
+            color: #656d76;
+        }
+
+        .severity-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .severity-high { background: #ffebe9; color: #cf222e; }
+        .severity-medium { background: #fff8dc; color: #9a6700; }
+        .severity-low { background: #dcfce7; color: #137a2b; }
+
+        .issue-description {
+            color: #24292f;
+            margin: 10px 0;
+        }
+
+        .issue-location {
+            font-family: 'SF Mono', Monaco, monospace;
+            background: #f6f8fa;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #656d76;
+            margin: 10px 0;
+        }
+
+        .github-link {
+            display: inline-block;
+            background: #0969da;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .github-link:hover {
+            background: #0860ca;
+        }
+
+        .refresh-btn {
+            background: #0969da;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: #0860ca;
+        }
+
+        .last-update {
+            font-size: 12px;
+            color: #656d76;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #656d76;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Code Analysis Dashboard</h1>
+            <p>Automated analysis results for all h1-aot repositories</p>
+            <div class="last-update" id="lastUpdate">Loading...</div>
+            <button class="refresh-btn" onclick="refreshAnalysis()">🔄 Refresh Analysis</button>
+        </div>
+
+        <div id="summarySection" class="loading">
+            Loading analysis results...
+        </div>
+
+        <div class="filter-bar" id="filterBar" style="display: none;">
+            <span>Filter by:</span>
+            <select class="filter-select" onchange="filterIssues('severity', this.value)">
+                <option value="all">All Severities</option>
+                <option value="high">🚨 High Priority</option>
+                <option value="medium">⚠️ Medium Priority</option>
+                <option value="low">ℹ️ Low Priority</option>
+            </select>
+            <select class="filter-select" onchange="filterIssues('repository', this.value)">
+                <option value="all">All Repositories</option>
+            </select>
+        </div>
+
+        <div id="issuesSection">
+        </div>
+    </div>
+
+    <script>
+        let analysisData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAnalysisResults();
+        });
+
+        async function loadAnalysisResults() {
+            try {
+                const response = await fetch('/api/analysis/latest');
+                const data = await response.json();
+
+                if (data.success) {
+                    analysisData = data.analysis;
+                    renderAnalysisResults();
+                    document.getElementById('lastUpdate').textContent =
+                        `Last updated: ${new Date(data.lastUpdate).toLocaleString()}`;
+                } else {
+                    document.getElementById('summarySection').innerHTML = `
+                        <div class="section">
+                            <div class="section-content">
+                                <p>❌ ${data.error}</p>
+                                <button class="refresh-btn" onclick="runAnalysis()">Run Analysis Now</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading analysis:', error);
+                document.getElementById('summarySection').innerHTML = `
+                    <div class="section">
+                        <div class="section-content">
+                            <p>❌ Failed to load analysis results: ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAnalysisResults() {
+            if (!analysisData) return;
+
+            // Render summary
+            renderSummary();
+
+            // Render issues by severity
+            renderIssues();
+
+            // Show filter bar
+            document.getElementById('filterBar').style.display = 'flex';
+            populateRepositoryFilter();
+        }
+
+        function renderSummary() {
+            const summary = analysisData.summary;
+            const summaryHtml = `
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">${summary.totalRepositories}</div>
+                        <div class="stat-label">Repositories Analyzed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${summary.totalPRs}</div>
+                        <div class="stat-label">Open Pull Requests</div>
+                    </div>
+                    <div class="stat-card high">
+                        <div class="stat-number">${summary.issuesBySeverity.high}</div>
+                        <div class="stat-label">🚨 High Priority Issues</div>
+                    </div>
+                    <div class="stat-card medium">
+                        <div class="stat-number">${summary.issuesBySeverity.medium}</div>
+                        <div class="stat-label">⚠️ Medium Priority Issues</div>
+                    </div>
+                    <div class="stat-card low">
+                        <div class="stat-number">${summary.issuesBySeverity.low}</div>
+                        <div class="stat-label">ℹ️ Low Priority Issues</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${summary.totalIssues}</div>
+                        <div class="stat-label">Total Issues Found</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('summarySection').innerHTML = summaryHtml;
+        }
+
+        function renderIssues() {
+            const allIssues = [];
+
+            // Collect all issues from all repositories
+            analysisData.repositories.forEach(repo => {
+                repo.issues.forEach(issue => {
+                    allIssues.push({
+                        ...issue,
+                        repositoryName: repo.name
+                    });
+                });
+            });
+
+            // Sort by severity (high -> medium -> low)
+            const severityOrder = { high: 3, medium: 2, low: 1 };
+            allIssues.sort((a, b) => severityOrder[b.severity] - severityOrder[a.severity]);
+
+            // Group by severity
+            const issuesBySeverity = {
+                high: allIssues.filter(i => i.severity === 'high'),
+                medium: allIssues.filter(i => i.severity === 'medium'),
+                low: allIssues.filter(i => i.severity === 'low')
+            };
+
+            let sectionsHtml = '';
+
+            // Render High Priority Issues
+            if (issuesBySeverity.high.length > 0) {
+                sectionsHtml += renderIssueSection('🚨 HIGH PRIORITY Issues', issuesBySeverity.high, 'high');
+            }
+
+            // Render Medium Priority Issues
+            if (issuesBySeverity.medium.length > 0) {
+                sectionsHtml += renderIssueSection('⚠️ MEDIUM PRIORITY Issues', issuesBySeverity.medium, 'medium');
+            }
+
+            // Render Low Priority Issues
+            if (issuesBySeverity.low.length > 0) {
+                sectionsHtml += renderIssueSection('ℹ️ LOW PRIORITY Issues', issuesBySeverity.low, 'low');
+            }
+
+            document.getElementById('issuesSection').innerHTML = sectionsHtml;
+        }
+
+        function renderIssueSection(title, issues, severity) {
+            const issuesHtml = issues.map(issue => `
+                <div class="issue-item ${severity}" data-severity="${severity}" data-repository="${issue.repositoryName}">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">${getIssueTitle(issue)}</div>
+                            <div class="issue-meta">
+                                Repo: ${issue.repositoryName} | PR #${issue.prNumber} | File: ${issue.file}:${issue.line}
+                            </div>
+                        </div>
+                        <span class="severity-badge severity-${severity}">${severity}</span>
+                    </div>
+
+                    <div class="issue-description">${issue.message}</div>
+
+                    ${issue.codeSnippet ? `
+                        <div class="issue-location">
+                            <strong>Code:</strong> ${escapeHtml(issue.codeSnippet)}
+                        </div>
+                    ` : ''}
+
+                    <a href="${issue.githubUrl}" target="_blank" class="github-link">
+                        🔗 View on GitHub
+                    </a>
+                </div>
+            `).join('');
+
+            return `
+                <div class="section">
+                    <div class="section-header">
+                        <span>${title}</span>
+                        <span>${issues.length} issues</span>
+                    </div>
+                    <div class="section-content">
+                        ${issuesHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getIssueTitle(issue) {
+            // Generate descriptive titles based on the issue type and message
+            const message = issue.message;
+            if (message.includes('password') || message.includes('secret')) {
+                return 'Security: Potential Hardcoded Secret';
+            } else if (message.includes('exec') || message.includes('eval')) {
+                return 'Security: Dynamic Code Execution Risk';
+            } else if (message.includes('split()')) {
+                return 'Code Quality: Unsafe Argument Parsing';
+            } else if (message.includes('except:')) {
+                return 'Code Quality: Bare Exception Handler';
+            } else if (message.includes('0.0.0.0')) {
+                return 'Security: Unsafe Network Binding';
+            } else if (message.includes('latest')) {
+                return 'DevOps: Unpinned Docker Tag';
+            } else if (message.includes('root')) {
+                return 'Security: Container Running as Root';
+            } else if (message.includes('SELECT *')) {
+                return 'Performance: Inefficient Database Query';
+            } else if (message.includes('DROP') || message.includes('DELETE')) {
+                return 'Security: Destructive Database Operation';
+            }
+            return 'Code Review Issue';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function populateRepositoryFilter() {
+            const repoSelect = document.querySelector('select[onchange*="repository"]');
+            const repositories = [...new Set(analysisData.repositories.map(r => r.name))];
+
+            repositories.forEach(repoName => {
+                const option = document.createElement('option');
+                option.value = repoName;
+                option.textContent = repoName;
+                repoSelect.appendChild(option);
+            });
+        }
+
+        function filterIssues(filterType, filterValue) {
+            const issues = document.querySelectorAll('.issue-item');
+
+            issues.forEach(issue => {
+                const shouldShow = filterValue === 'all' ||
+                                 issue.dataset[filterType] === filterValue;
+                issue.style.display = shouldShow ? 'block' : 'none';
+            });
+        }
+
+        async function refreshAnalysis() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.textContent = '🔄 Refreshing...';
+            btn.disabled = true;
+
+            try {
+                await fetch('/api/analysis/run', { method: 'POST' });
+
+                // Wait a few seconds then reload
+                setTimeout(() => {
+                    location.reload();
+                }, 5000);
+            } catch (error) {
+                alert('Failed to start analysis: ' + error.message);
+            } finally {
+                btn.textContent = '🔄 Refresh Analysis';
+                btn.disabled = false;
+            }
+        }
+
+        async function runAnalysis() {
+            await refreshAnalysis();
+        }
+    </script>
+</body>
+</html>

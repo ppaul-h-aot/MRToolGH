@@ -677,6 +677,11 @@ app.post('/api/analysis/run', async (req, res) => {
   }
 });
 
+// Serve the analysis dashboard
+app.get('/analysis', (req, res) => {
+  res.sendFile(path.join(__dirname, 'analysis-dashboard.html'));
+});
+
 // Serve the main application
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'github-pr-tool.html'));
