@@ -678,7 +678,7 @@
 
                 if (data.success) {
                     repos = data.repos;
-                    console.log('✅ Found repositories:', repos.length);
+                    console.log('✅ Found repositories:', repos.length, 'with hot reload working!');
                     renderRepositories();
                 } else {
                     console.error('❌ Failed to load repositories:', data.error);
