@@ -381,6 +381,66 @@ app.get('/api/repos/:owner/:repo/prs/:number/comments', async (req, res) => {
   }
 });
 
+// Add a new comment to a PR
+app.post('/api/repos/:owner/:repo/prs/:number/comments', async (req, res) => {
+  const { owner, repo, number } = req.params;
+  const { type, severity, body, file, line } = req.body;
+
+  try {
+    if (!body || !body.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'Comment body is required'
+      });
+    }
+
+    // Add severity and type indicators to the comment body
+    const severityEmoji = {
+      high: '🚨',
+      medium: '⚠️',
+      low: 'ℹ️'
+    };
+
+    const typeEmoji = {
+      fix_required: '🚨',
+      improvement_needed: '🔧',
+      suggestion: '💡',
+      question: '❓',
+      request: '📝'
+    };
+
+    let commentBody = `${severityEmoji[severity]} **${type.replace('_', ' ').toUpperCase()}** (${severity.toUpperCase()} priority)\n\n${body}`;
+
+    if (file && line) {
+      commentBody += `\n\n📁 **File:** ${file}\n📍 **Line:** ${line}`;
+    } else if (file) {
+      commentBody += `\n\n📁 **File:** ${file}`;
+    }
+
+    commentBody += '\n\n---\n*Added via GitHub PR Comment Tool*';
+
+    // Create the comment using GitHub CLI
+    const result = executeGhCommand(
+      `gh pr comment ${number} --repo ${owner}/${repo} --body "${commentBody.replace(/"/g, '\\"')}"`
+    );
+
+    console.log('✅ Comment added successfully:', result);
+
+    res.json({
+      success: true,
+      message: 'Comment added successfully',
+      commentUrl: `https://github.com/${owner}/${repo}/pull/${number}`,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Error adding comment:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Refresh data for a specific PR (gets latest state)
 app.post('/api/repos/:owner/:repo/prs/:number/refresh', async (req, res) => {
   const { owner, repo, number } = req.params;

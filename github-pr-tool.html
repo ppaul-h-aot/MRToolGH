@@ -643,6 +643,85 @@
             white-space: pre-wrap;
             overflow-x: auto;
         }
+
+        .add-comment-section {
+            background: #f8f9fa;
+            border: 2px solid #0969da;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .add-comment-section h3 {
+            margin: 0 0 16px 0;
+            color: #0969da;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #24292f;
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0969da;
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .success-message {
+            background: #dcf8c6;
+            border: 1px solid #4caf50;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 16px 0;
+            color: #2e7d32;
+        }
+
+        .error-message {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 16px 0;
+            color: #c62828;
+        }
     </style>
 </head>
 <body>
@@ -1366,11 +1445,61 @@
                 </div>
             `;
 
+            // Add comment form
+            html += `
+                <div class="add-comment-section">
+                    <h3>📝 Add New Comment</h3>
+                    <div class="comment-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="commentType">Comment Type:</label>
+                                <select id="commentType" class="form-control">
+                                    <option value="fix_required">🚨 Fix Required (High Priority)</option>
+                                    <option value="improvement_needed">🔧 Improvement Needed (Medium Priority)</option>
+                                    <option value="suggestion">💡 Suggestion (Low Priority)</option>
+                                    <option value="question">❓ Question</option>
+                                    <option value="request">📝 Request</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="commentSeverity">Severity:</label>
+                                <select id="commentSeverity" class="form-control">
+                                    <option value="high">🚨 High</option>
+                                    <option value="medium">⚠️ Medium</option>
+                                    <option value="low">ℹ️ Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="commentBody">Comment:</label>
+                            <textarea id="commentBody" class="form-control" rows="4" placeholder="Describe the issue or suggestion..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="commentFile">File (optional):</label>
+                            <input type="text" id="commentFile" class="form-control" placeholder="path/to/file.js">
+                        </div>
+                        <div class="form-group">
+                            <label for="commentLine">Line (optional):</label>
+                            <input type="number" id="commentLine" class="form-control" placeholder="123">
+                        </div>
+                        <div class="form-actions">
+                            <button class="action-btn primary" onclick="addNewComment()">
+                                💬 Add Comment to PR
+                            </button>
+                            <button class="action-btn" onclick="clearCommentForm()">
+                                🗑️ Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
             if (actionableComments.length === 0) {
                 html += `
                     <div class="empty-state">
                         <h3>🎉 No actionable comments found!</h3>
                         <p>This PR looks good to go, or all comments have been addressed.</p>
+                        <p>You can add new comments using the form above.</p>
                     </div>
                 `;
             } else {
@@ -1546,6 +1675,75 @@
                 refreshBtn.disabled = false;
                 refreshBtn.textContent = '🔄 Refresh';
             }
+        }
+
+        async function addNewComment() {
+            const commentType = document.getElementById('commentType').value;
+            const commentSeverity = document.getElementById('commentSeverity').value;
+            const commentBody = document.getElementById('commentBody').value.trim();
+            const commentFile = document.getElementById('commentFile').value.trim();
+            const commentLine = document.getElementById('commentLine').value.trim();
+
+            if (!commentBody) {
+                alert('Please enter a comment body');
+                return;
+            }
+
+            if (!currentRepo || !currentPR) {
+                alert('No PR selected');
+                return;
+            }
+
+            try {
+                const requestData = {
+                    type: commentType,
+                    severity: commentSeverity,
+                    body: commentBody,
+                    file: commentFile || null,
+                    line: commentLine ? parseInt(commentLine) : null
+                };
+
+                const response = await fetch(`/api/repos/${currentRepo.owner}/${currentRepo.name}/prs/${currentPR}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success message
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'copy-success';
+                    successDiv.textContent = '✅ Comment added successfully!';
+                    document.body.appendChild(successDiv);
+
+                    setTimeout(() => {
+                        successDiv.remove();
+                    }, 3000);
+
+                    // Clear the form
+                    clearCommentForm();
+
+                    // Refresh the PR comments to show the new comment
+                    await loadPRComments();
+                } else {
+                    alert('Failed to add comment: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                alert('Error adding comment: ' + error.message);
+            }
+        }
+
+        function clearCommentForm() {
+            document.getElementById('commentType').value = 'fix_required';
+            document.getElementById('commentSeverity').value = 'high';
+            document.getElementById('commentBody').value = '';
+            document.getElementById('commentFile').value = '';
+            document.getElementById('commentLine').value = '';
         }
 
         function showError(message) {
