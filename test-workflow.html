@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Workflow</title>
+</head>
+<body>
+    <h1>Testing PR Comment Workflow</h1>
+    <div id="results"></div>
+
+    <script>
+        async function testWorkflow() {
+            const results = document.getElementById('results');
+
+            // Test 1: Get repositories
+            results.innerHTML += '<h2>1. Testing Repository List</h2>';
+            try {
+                const repoResponse = await fetch('/api/repos');
+                const repoData = await repoResponse.json();
+                results.innerHTML += `<p>✅ Found ${repoData.repos.length} repositories</p>`;
+                results.innerHTML += `<ul>${repoData.repos.map(r => `<li>${r.owner.login}/${r.name}</li>`).join('')}</ul>`;
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+
+            // Test 2: Get PRs for aot-base
+            results.innerHTML += '<h2>2. Testing PR List for aot-base</h2>';
+            try {
+                const prResponse = await fetch('/api/repos/h1-aot/aot-base/prs');
+                const prData = await prResponse.json();
+                results.innerHTML += `<p>✅ Found ${prData.prs.length} PRs with actionable comments</p>`;
+                results.innerHTML += `<ul>${prData.prs.slice(0, 5).map(pr => `<li>PR #${pr.number}: ${pr.title} (${pr.actionableCount || 0} comments)</li>`).join('')}</ul>`;
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+
+            // Test 3: Get comments for PR 213
+            results.innerHTML += '<h2>3. Testing Comments for PR #213</h2>';
+            try {
+                const commentResponse = await fetch('/api/repos/h1-aot/aot-base/prs/213/comments');
+                const commentData = await commentResponse.json();
+                results.innerHTML += `<p>✅ Found ${commentData.actionableComments.length} actionable comments</p>`;
+                results.innerHTML += `<p>PR Title: ${commentData.pr.title}</p>`;
+                results.innerHTML += `<ul>${commentData.actionableComments.slice(0, 3).map(c => `<li>${c.author}: ${c.body.substring(0, 100)}...</li>`).join('')}</ul>`;
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+
+            results.innerHTML += '<h2>🎉 All tests completed!</h2>';
+        }
+
+        // Run tests when page loads
+        window.onload = testWorkflow;
+    </script>
+</body>
+</html>
