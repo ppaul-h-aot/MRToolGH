@@ -24,11 +24,13 @@
         }
 
         .sidebar {
-            width: 300px;
+            width: 350px;
             background: white;
             border-right: 1px solid #d0d7de;
             overflow-y: auto;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .main-content {
@@ -95,12 +97,22 @@
             color: #0969da;
         }
 
+        #repoList {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+        }
+
         .repo-item {
+            display: block;
+            width: 100%;
             padding: 16px;
             border-bottom: 1px solid #e1e4e8;
             cursor: pointer;
             transition: all 0.15s ease;
             position: relative;
+            box-sizing: border-box;
         }
 
         .repo-item:hover {
@@ -177,10 +189,13 @@
         }
 
         .pr-list {
-            margin-top: 8px;
+            width: 100%;
+            background: #f8f9fa;
             border-top: 1px solid #e1e4e8;
-            max-height: 300px;
+            border-bottom: 2px solid #e1e4e8;
+            max-height: 250px;
             overflow-y: auto;
+            margin-bottom: 8px;
         }
 
         .pr-item {
@@ -456,13 +471,13 @@
 
             .sidebar {
                 width: 100%;
-                height: 40vh;
-                min-height: 300px;
+                height: 50vh;
+                min-height: 350px;
             }
 
             .main-content {
                 flex: 1;
-                height: 60vh;
+                height: 50vh;
             }
 
             .repo-item {
@@ -478,7 +493,16 @@
             }
 
             .pr-list {
-                max-height: 150px;
+                max-height: 120px;
+            }
+
+            .total-stats {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .total-stats span {
+                font-size: 11px;
             }
         }
 
@@ -721,17 +745,24 @@
             // Find the active repo item and add PR list after it
             const activeRepo = repoList.querySelector('.repo-item.active');
 
-            // Remove existing PR list
-            const existingPRList = repoList.querySelector('.pr-list');
-            if (existingPRList) {
-                existingPRList.remove();
-            }
+            // Remove existing PR lists from all repos
+            const existingPRLists = repoList.querySelectorAll('.pr-list');
+            existingPRLists.forEach(list => list.remove());
+
+            if (!activeRepo) return;
 
             if (prs.length === 0) {
                 const prList = document.createElement('div');
                 prList.className = 'pr-list';
                 prList.innerHTML = '<div style="padding: 16px; color: #656d76; font-size: 12px;">No recent pull requests</div>';
-                activeRepo.insertAdjacentElement('afterend', prList);
+
+                // Insert after the active repo in the flex container
+                const nextSibling = activeRepo.nextElementSibling;
+                if (nextSibling) {
+                    repoList.insertBefore(prList, nextSibling);
+                } else {
+                    repoList.appendChild(prList);
+                }
                 return;
             }
 
@@ -748,7 +779,13 @@
                 </div>
             `).join('');
 
-            activeRepo.insertAdjacentElement('afterend', prList);
+            // Insert after the active repo in the flex container
+            const nextSibling = activeRepo.nextElementSibling;
+            if (nextSibling) {
+                repoList.insertBefore(prList, nextSibling);
+            } else {
+                repoList.appendChild(prList);
+            }
         }
 
         async function selectPullRequest(prNumber) {
