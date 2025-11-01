@@ -814,143 +814,172 @@
             const repoList = document.getElementById('repoList');
             console.log('🌳 Rendering tree structure for', repoTree.length, 'repositories');
 
-            const treeHtml = repoTree.map(repo => {
+            // Clear existing content
+            repoList.innerHTML = '';
+
+            repoTree.forEach((repo, index) => {
                 const repoId = `repo-${repo.owner.login}-${repo.name}`;
                 console.log(`📁 Processing repo: ${repo.owner.login}/${repo.name} with ${repo.pullRequests.length} PRs`);
 
-                return `
-                    <div class="repo-tree-item">
-                        <div class="repo-item" onclick="toggleRepository('${repo.owner.login}', '${repo.name}')" data-repo-id="${repoId}">
-                            <div class="repo-header">
-                                <div class="repo-expand">
-                                    <span class="tree-icon">📁</span>
-                                    <div class="repo-name">${repo.owner.login}/${repo.name}</div>
-                                    ${repo.pullRequests.length > 0 ? `<div class="repo-badge">${repo.pullRequests.length}</div>` : ''}
-                                </div>
-                            </div>
+                // Create repository container
+                const repoContainer = document.createElement('div');
+                repoContainer.className = 'repo-tree-item';
 
-                            ${repo.totalActionable > 0 ? `
-                                <div class="repo-stats">
-                                    <div class="stat-row">
-                                        <span class="stat-label">Total actionable:</span>
-                                        <span class="stat-value">${repo.totalActionable}</span>
-                                    </div>
-                                    ${repo.severityCounts.high > 0 ? `
-                                        <div class="stat-row">
-                                            <span class="stat-label">🚨 High:</span>
-                                            <span class="stat-value high">${repo.severityCounts.high}</span>
-                                        </div>
-                                    ` : ''}
-                                    ${repo.severityCounts.medium > 0 ? `
-                                        <div class="stat-row">
-                                            <span class="stat-label">⚠️ Medium:</span>
-                                            <span class="stat-value medium">${repo.severityCounts.medium}</span>
-                                        </div>
-                                    ` : ''}
-                                    ${repo.severityCounts.low > 0 ? `
-                                        <div class="stat-row">
-                                            <span class="stat-label">ℹ️ Low:</span>
-                                            <span class="stat-value low">${repo.severityCounts.low}</span>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            ` : `
-                                <div class="repo-stats">
-                                    <div class="stat-row">
-                                        <span class="stat-label">${repo.pullRequests.length > 0 ? 'No actionable comments' : 'No recent PRs'}</span>
-                                        <span class="stat-value">✅</span>
-                                    </div>
-                                </div>
-                            `}
-                        </div>
+                // Repository header
+                const repoHeader = document.createElement('div');
+                repoHeader.className = 'repo-item';
+                repoHeader.setAttribute('data-repo-id', repoId);
+                repoHeader.onclick = () => toggleRepository(repo.owner.login, repo.name);
 
-                        <div class="pr-subtree" id="prs-${repoId}" style="display: none;">
-                            ${repo.pullRequests.length > 0 ? repo.pullRequests.map(pr => `
-                                <div class="pr-tree-item" onclick="selectPullRequestFromTree(${pr.number}, '${repo.owner.login}', '${repo.name}')" title="Click to view actionable comments for PR #${pr.number}">
-                                    <div class="pr-indent">
-                                        <span class="tree-branch">├─</span>
-                                        <span class="pr-number">#${pr.number}</span>
-                                        <span class="pr-title-short">${pr.title.length > 35 ? pr.title.substring(0, 35) + '...' : pr.title}</span>
-                                        <div class="pr-badges">
-                                            ${pr.actionableCount > 0 ? `<span class="pr-badge actionable" title="${pr.actionableCount} actionable comments">${pr.actionableCount}</span>` : ''}
-                                            ${pr.severityCounts?.high > 0 ? `<span class="pr-badge high" title="${pr.severityCounts.high} high priority">🚨${pr.severityCounts.high}</span>` : ''}
-                                            ${pr.severityCounts?.medium > 0 ? `<span class="pr-badge medium" title="${pr.severityCounts.medium} medium priority">⚠️${pr.severityCounts.medium}</span>` : ''}
-                                            ${pr.isDraft ? `<span class="pr-badge draft">Draft</span>` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('') : `
-                                <div class="pr-tree-item" style="color: #656d76; font-style: italic; padding: 12px;">
-                                    <div class="pr-indent">
-                                        <span class="tree-branch">├─</span>
-                                        <span>No recent PRs with actionable comments</span>
-                                    </div>
-                                </div>
-                            `}
+                repoHeader.innerHTML = `
+                    <div class="repo-header">
+                        <div class="repo-expand">
+                            <span class="tree-icon" id="icon-${repoId}">📁</span>
+                            <div class="repo-name">${repo.owner.login}/${repo.name}</div>
+                            ${repo.pullRequests.length > 0 ? `<div class="repo-badge">${repo.pullRequests.length}</div>` : ''}
                         </div>
                     </div>
-                `;
-            }).join('');
 
-            repoList.innerHTML = treeHtml;
+                    ${repo.totalActionable > 0 ? `
+                        <div class="repo-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Total actionable:</span>
+                                <span class="stat-value">${repo.totalActionable}</span>
+                            </div>
+                            ${repo.severityCounts.high > 0 ? `
+                                <div class="stat-row">
+                                    <span class="stat-label">🚨 High:</span>
+                                    <span class="stat-value high">${repo.severityCounts.high}</span>
+                                </div>
+                            ` : ''}
+                            ${repo.severityCounts.medium > 0 ? `
+                                <div class="stat-row">
+                                    <span class="stat-label">⚠️ Medium:</span>
+                                    <span class="stat-value medium">${repo.severityCounts.medium}</span>
+                                </div>
+                            ` : ''}
+                            ${repo.severityCounts.low > 0 ? `
+                                <div class="stat-row">
+                                    <span class="stat-label">ℹ️ Low:</span>
+                                    <span class="stat-value low">${repo.severityCounts.low}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : `
+                        <div class="repo-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">${repo.pullRequests.length > 0 ? 'No actionable comments' : 'No recent PRs'}</span>
+                                <span class="stat-value">✅</span>
+                            </div>
+                        </div>
+                    `}
+                `;
+
+                // PR subtree
+                const prSubtree = document.createElement('div');
+                prSubtree.className = 'pr-subtree';
+                prSubtree.id = `prs-${repoId}`;
+                prSubtree.style.display = 'none';
+
+                if (repo.pullRequests.length > 0) {
+                    repo.pullRequests.forEach(pr => {
+                        const prItem = document.createElement('div');
+                        prItem.className = 'pr-tree-item';
+                        prItem.title = `Click to view actionable comments for PR #${pr.number}`;
+                        prItem.onclick = (e) => {
+                            e.stopPropagation();
+                            selectPullRequestFromTree(pr.number, repo.owner.login, repo.name);
+                        };
+
+                        prItem.innerHTML = `
+                            <div class="pr-indent">
+                                <span class="tree-branch">├─</span>
+                                <span class="pr-number">#${pr.number}</span>
+                                <span class="pr-title-short">${pr.title.length > 35 ? pr.title.substring(0, 35) + '...' : pr.title}</span>
+                                <div class="pr-badges">
+                                    ${pr.actionableCount > 0 ? `<span class="pr-badge actionable" title="${pr.actionableCount} actionable comments">${pr.actionableCount}</span>` : ''}
+                                    ${pr.severityCounts?.high > 0 ? `<span class="pr-badge high" title="${pr.severityCounts.high} high priority">🚨${pr.severityCounts.high}</span>` : ''}
+                                    ${pr.severityCounts?.medium > 0 ? `<span class="pr-badge medium" title="${pr.severityCounts.medium} medium priority">⚠️${pr.severityCounts.medium}</span>` : ''}
+                                    ${pr.isDraft ? `<span class="pr-badge draft">Draft</span>` : ''}
+                                </div>
+                            </div>
+                        `;
+
+                        prSubtree.appendChild(prItem);
+                    });
+                } else {
+                    const noPRsItem = document.createElement('div');
+                    noPRsItem.className = 'pr-tree-item';
+                    noPRsItem.style.color = '#656d76';
+                    noPRsItem.style.fontStyle = 'italic';
+                    noPRsItem.style.padding = '12px';
+                    noPRsItem.innerHTML = `
+                        <div class="pr-indent">
+                            <span class="tree-branch">├─</span>
+                            <span>No recent PRs with actionable comments</span>
+                        </div>
+                    `;
+                    prSubtree.appendChild(noPRsItem);
+                }
+
+                // Assemble the container
+                repoContainer.appendChild(repoHeader);
+                repoContainer.appendChild(prSubtree);
+                repoList.appendChild(repoContainer);
+            });
+
             console.log('✅ Tree structure rendered successfully');
         }
 
         function toggleRepository(owner, repoName) {
-            console.log('Toggling repository:', owner, repoName);
-
-            // Prevent event propagation
-            if (event) {
-                event.stopPropagation();
-            }
+            console.log('🔄 Toggling repository:', owner, repoName);
 
             const repoId = `repo-${owner}-${repoName}`;
             const prSubtree = document.getElementById(`prs-${repoId}`);
-            const repoItem = document.querySelector(`[data-repo-id="${repoId}"]`);
-            const treeIcon = repoItem?.querySelector('.tree-icon');
+            const treeIcon = document.getElementById(`icon-${repoId}`);
 
-            console.log('Looking for elements:', { repoId, prSubtree, repoItem, treeIcon });
+            console.log('🔍 Looking for elements:', { repoId, prSubtree: !!prSubtree, treeIcon: !!treeIcon });
 
             if (!prSubtree) {
-                console.error('PR subtree not found for:', repoId);
-                // Show repository overview even if no PRs
+                console.error('❌ PR subtree not found for:', repoId);
                 showRepositoryOverview(owner, repoName);
                 return;
             }
 
             // Toggle the PR subtree visibility
-            const isCurrentlyHidden = prSubtree.style.display === 'none' || !prSubtree.style.display;
+            const isCurrentlyHidden = prSubtree.style.display === 'none';
+            console.log('📊 Current state - hidden:', isCurrentlyHidden);
 
             if (isCurrentlyHidden) {
+                // Expand
                 prSubtree.style.display = 'block';
                 if (treeIcon) {
                     treeIcon.textContent = '📂';
                     treeIcon.classList.add('expanded');
                 }
-                console.log('Expanded repository:', owner, repoName);
+                console.log('✅ Expanded repository:', owner, repoName);
+
+                // Update breadcrumb
+                document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Repository expanded (click PRs to view comments)`;
             } else {
+                // Collapse
                 prSubtree.style.display = 'none';
                 if (treeIcon) {
                     treeIcon.textContent = '📁';
                     treeIcon.classList.remove('expanded');
                 }
-                console.log('Collapsed repository:', owner, repoName);
+                console.log('📁 Collapsed repository:', owner, repoName);
+
+                // Update breadcrumb
+                document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Repository collapsed`;
             }
 
-            // Update main content to show repository overview
+            // Always show repository overview in main window
             showRepositoryOverview(owner, repoName);
-
-            // Update breadcrumb
-            document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - Repository ${isCurrentlyHidden ? 'expanded' : 'collapsed'}`;
         }
 
         function selectPullRequestFromTree(prNumber, owner, repoName) {
             console.log('🎯 Selecting PR from tree:', prNumber, owner, repoName);
-
-            // Prevent event propagation
-            if (event) {
-                event.stopPropagation();
-            }
 
             // Set current context
             currentRepo = { owner, name: repoName };
@@ -958,13 +987,16 @@
 
             // Update UI states - highlight selected PR
             document.querySelectorAll('.pr-tree-item').forEach(item => item.classList.remove('active'));
-            if (event && event.target) {
-                const prItem = event.target.closest('.pr-tree-item');
-                if (prItem) {
-                    prItem.classList.add('active');
-                    console.log('✅ Highlighted PR item:', prItem);
+
+            // Find the clicked PR item and highlight it
+            const allPRItems = document.querySelectorAll('.pr-tree-item');
+            allPRItems.forEach(item => {
+                const prNumberSpan = item.querySelector('.pr-number');
+                if (prNumberSpan && prNumberSpan.textContent === `#${prNumber}`) {
+                    item.classList.add('active');
+                    console.log('✅ Highlighted PR item:', prNumber);
                 }
-            }
+            });
 
             // Update breadcrumb and enable refresh
             document.getElementById('refreshBtn').disabled = false;
