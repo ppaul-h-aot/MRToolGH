@@ -797,6 +797,11 @@ app.get('/analysis', (req, res) => {
   res.sendFile(path.join(__dirname, 'analysis-dashboard.html'));
 });
 
+// Serve the PR analysis page
+app.get('/pr-analysis', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pr-analysis.html'));
+});
+
 // Serve the main application
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'github-pr-tool.html'));

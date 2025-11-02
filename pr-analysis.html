@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Analysis - Existing Comments + Claude Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f6f8fa;
+            color: #24292f;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .pr-title {
+            color: #0969da;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .pr-meta {
+            color: #656d76;
+            font-size: 14px;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f6f8fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #d0d7de;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header.existing-comments {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .section-header.claude-analysis {
+            background: #d1ecf1;
+            border-left: 4px solid #0969da;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .comment-item {
+            border-left: 4px solid #6f42c1;
+            background: #f8f9ff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .comment-item.copilot {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .comment-item.human {
+            border-left-color: #0969da;
+            background: #f0f6ff;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #24292f;
+        }
+
+        .comment-date {
+            font-size: 12px;
+            color: #656d76;
+        }
+
+        .comment-body {
+            color: #24292f;
+            line-height: 1.6;
+        }
+
+        .analysis-item {
+            border-left: 4px solid #0969da;
+            background: #f0f6ff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .analysis-item.high { border-left-color: #cf222e; background: #ffebee; }
+        .analysis-item.medium { border-left-color: #fb8500; background: #fff3e0; }
+        .analysis-item.low { border-left-color: #137a2b; background: #e8f5e8; }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .severity-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .severity-high { background: #ffebe9; color: #cf222e; }
+        .severity-medium { background: #fff8dc; color: #9a6700; }
+        .severity-low { background: #dcfce7; color: #137a2b; }
+
+        .code-snippet {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            margin: 10px 0;
+            color: #24292f;
+        }
+
+        .github-link {
+            display: inline-block;
+            background: #0969da;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .github-link:hover {
+            background: #0860ca;
+        }
+
+        .summary-box {
+            background: #e6f3ff;
+            border: 1px solid #0969da;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0969da;
+            margin-bottom: 10px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #24292f;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #656d76;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #656d76;
+        }
+
+        .input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .input-field {
+            padding: 8px 12px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .analyze-btn {
+            background: #0969da;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .analyze-btn:hover {
+            background: #0860ca;
+        }
+
+        .analyze-btn:disabled {
+            background: #8c959f;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <h2>🔍 PR Analysis Tool</h2>
+            <div class="input-row">
+                <span>Analyze PR:</span>
+                <input type="text" id="repoInput" class="input-field" placeholder="h1-aot/aot-base" style="width: 200px;">
+                <span>#</span>
+                <input type="number" id="prInput" class="input-field" placeholder="210" style="width: 100px;">
+                <button class="analyze-btn" onclick="analyzePR()">🔍 Analyze</button>
+            </div>
+        </div>
+
+        <div id="content" class="loading">
+            Enter a repository and PR number above to analyze
+        </div>
+    </div>
+
+    <script>
+        let currentAnalysis = null;
+
+        async function analyzePR() {
+            const repoInput = document.getElementById('repoInput').value.trim();
+            const prInput = document.getElementById('prInput').value.trim();
+
+            if (!repoInput || !prInput) {
+                alert('Please enter both repository and PR number');
+                return;
+            }
+
+            const [owner, repo] = repoInput.split('/');
+            if (!owner || !repo) {
+                alert('Repository format should be: owner/repo (e.g., h1-aot/aot-base)');
+                return;
+            }
+
+            const btn = document.querySelector('.analyze-btn');
+            btn.textContent = '🔄 Analyzing...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/analysis/pr/${owner}/${repo}/${prInput}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    currentAnalysis = data;
+                    renderAnalysis();
+                } else {
+                    document.getElementById('content').innerHTML = `
+                        <div class="section">
+                            <div class="section-content">
+                                <p>❌ ${data.error}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error analyzing PR:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="section">
+                        <div class="section-content">
+                            <p>❌ Failed to analyze PR: ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            } finally {
+                btn.textContent = '🔍 Analyze';
+                btn.disabled = false;
+            }
+        }
+
+        function renderAnalysis() {
+            if (!currentAnalysis) return;
+
+            const { pr, existingComments, claudeAnalysis } = currentAnalysis;
+
+            let html = `
+                <div class="header">
+                    <div class="pr-title">#${pr.number}: ${pr.title}</div>
+                    <div class="pr-meta">
+                        by ${pr.author.login} • created ${new Date(pr.createdAt).toLocaleDateString()}
+                        • <a href="${pr.url}" target="_blank">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="summary-box">
+                    <div class="summary-title">📊 Analysis Summary</div>
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">${existingComments.length}</div>
+                            <div class="stat-label">Existing Comments</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${claudeAnalysis.length}</div>
+                            <div class="stat-label">Claude Suggestions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${claudeAnalysis.filter(c => c.severity === 'high').length}</div>
+                            <div class="stat-label">🚨 High Priority</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${claudeAnalysis.filter(c => c.severity === 'medium').length}</div>
+                            <div class="stat-label">⚠️ Medium Priority</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Existing Comments Section
+            html += `
+                <div class="section">
+                    <div class="section-header existing-comments">
+                        <span>💬 Existing Comments (${existingComments.length})</span>
+                        <span>From GitHub PR</span>
+                    </div>
+                    <div class="section-content">
+            `;
+
+            if (existingComments.length === 0) {
+                html += '<p>No existing comments found on this PR.</p>';
+            } else {
+                existingComments.forEach(comment => {
+                    const isBot = comment.author.login.includes('bot') || comment.author.login.includes('copilot');
+                    const commentClass = isBot ? 'copilot' : 'human';
+
+                    html += `
+                        <div class="comment-item ${commentClass}">
+                            <div class="comment-header">
+                                <div class="comment-author">
+                                    ${isBot ? '🤖' : '👤'} ${comment.author.login}
+                                    ${isBot ? '(Bot/Copilot)' : '(Human)'}
+                                </div>
+                                <div class="comment-date">${new Date(comment.createdAt).toLocaleString()}</div>
+                            </div>
+                            <div class="comment-body">${escapeHtml(comment.body)}</div>
+                            <a href="${comment.url}" target="_blank" class="github-link">🔗 View Comment</a>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            // Claude Analysis Section
+            html += `
+                <div class="section">
+                    <div class="section-header claude-analysis">
+                        <span>🧠 Claude Analysis (${claudeAnalysis.length})</span>
+                        <span>NEW suggestions from diff analysis</span>
+                    </div>
+                    <div class="section-content">
+            `;
+
+            if (claudeAnalysis.length === 0) {
+                html += '<p>No new issues detected by Claude analysis.</p>';
+            } else {
+                // Group by severity
+                const bySeverity = {
+                    high: claudeAnalysis.filter(c => c.severity === 'high'),
+                    medium: claudeAnalysis.filter(c => c.severity === 'medium'),
+                    low: claudeAnalysis.filter(c => c.severity === 'low')
+                };
+
+                ['high', 'medium', 'low'].forEach(severity => {
+                    if (bySeverity[severity].length > 0) {
+                        const severityIcon = severity === 'high' ? '🚨' : severity === 'medium' ? '⚠️' : 'ℹ️';
+                        html += `<h4>${severityIcon} ${severity.toUpperCase()} Priority (${bySeverity[severity].length})</h4>`;
+
+                        bySeverity[severity].forEach(issue => {
+                            html += `
+                                <div class="analysis-item ${severity}">
+                                    <div class="analysis-header">
+                                        <div style="flex: 1;">
+                                            <strong>${getIssueTitle(issue)}</strong>
+                                            <div style="font-size: 12px; color: #656d76; margin-top: 5px;">
+                                                Line ${issue.line} • Type: ${issue.type.replace('_', ' ')}
+                                            </div>
+                                        </div>
+                                        <span class="severity-badge severity-${severity}">${severity}</span>
+                                    </div>
+                                    <div class="comment-body">${issue.message}</div>
+                                    ${issue.codeSnippet ? `
+                                        <div class="code-snippet">
+                                            <strong>Code:</strong> ${escapeHtml(issue.codeSnippet)}
+                                        </div>
+                                    ` : ''}
+                                    <a href="${issue.githubUrl}" target="_blank" class="github-link">🔗 View on GitHub</a>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function getIssueTitle(issue) {
+            const message = issue.message.toLowerCase();
+            if (message.includes('config class')) return 'Config Class Validation';
+            if (message.includes('sys.exit')) return 'Testability: Hard Exit Calls';
+            if (message.includes('environment')) return 'Environment Variable Handling';
+            if (message.includes('todo')) return 'TODO Comment Management';
+            if (message.includes('dataclass')) return 'Dataclass Field Validation';
+            if (message.includes('import')) return 'Import Organization';
+            if (message.includes('private method')) return 'Method Return Type Design';
+            return 'Code Quality Issue';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-populate if URL has parameters
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const repo = params.get('repo');
+            const pr = params.get('pr');
+
+            if (repo && pr) {
+                document.getElementById('repoInput').value = repo;
+                document.getElementById('prInput').value = pr;
+                analyzePR();
+            }
+        });
+    </script>
+</body>
+</html>
