@@ -15,14 +15,42 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background-color: #f6f8fa;
             color: #24292f;
-            line-height: 1.6;
+            line-height: 1.4;
+            font-size: 12px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 95vw;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
+
+        .columns-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .column {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .column-header {
+            padding: 10px 15px;
+            font-weight: 600;
+            font-size: 13px;
+            border-bottom: 1px solid #d0d7de;
+            color: white;
+        }
+
+        .column-header.existing { background: #fb8500; }
+        .column-header.high { background: #cf222e; }
+        .column-header.medium { background: #fb8500; }
+        .column-header.low { background: #137a2b; }
 
         .header {
             background: white;
@@ -75,12 +103,16 @@
             padding: 20px;
         }
 
+        .comment-item, .analysis-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 3px solid;
+        }
+
         .comment-item {
-            border-left: 4px solid #6f42c1;
+            border-left-color: #6f42c1;
             background: #f8f9ff;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 0 6px 6px 0;
         }
 
         .comment-item.copilot {
@@ -93,39 +125,38 @@
             background: #f0f6ff;
         }
 
-        .comment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .comment-author {
-            font-weight: 600;
-            color: #24292f;
-        }
-
-        .comment-date {
-            font-size: 12px;
-            color: #656d76;
-        }
-
-        .comment-body {
-            color: #24292f;
-            line-height: 1.6;
-        }
-
         .analysis-item {
-            border-left: 4px solid #0969da;
+            border-left-color: #0969da;
             background: #f0f6ff;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 0 6px 6px 0;
         }
 
         .analysis-item.high { border-left-color: #cf222e; background: #ffebee; }
         .analysis-item.medium { border-left-color: #fb8500; background: #fff3e0; }
         .analysis-item.low { border-left-color: #137a2b; background: #e8f5e8; }
+
+        .comment-header, .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #24292f;
+            font-size: 11px;
+        }
+
+        .comment-date {
+            font-size: 10px;
+            color: #656d76;
+        }
+
+        .comment-body {
+            color: #24292f;
+            line-height: 1.4;
+            font-size: 11px;
+        }
 
         .analysis-header {
             display: flex;
@@ -299,26 +330,28 @@
         .diff-context {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
-            border-radius: 6px;
-            margin: 10px 0;
+            border-radius: 4px;
+            margin: 6px 0;
             overflow: hidden;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .diff-context-header {
             background: #e9ecef;
-            padding: 8px 12px;
-            font-size: 12px;
+            padding: 4px 8px;
+            font-size: 10px;
             font-weight: 600;
             color: #495057;
             border-bottom: 1px solid #dee2e6;
         }
 
         .diff-line {
-            padding: 2px 12px;
+            padding: 1px 8px;
             font-family: 'SF Mono', Monaco, monospace;
-            font-size: 13px;
-            line-height: 1.4;
-            border-left: 3px solid transparent;
+            font-size: 10px;
+            line-height: 1.2;
+            border-left: 2px solid transparent;
         }
 
         .diff-line.added {
@@ -446,154 +479,116 @@
 
             const { pr, existingComments, claudeAnalysis } = currentAnalysis;
 
+            // Group Claude analysis by severity
+            const bySeverity = {
+                high: claudeAnalysis.filter(c => c.severity === 'high'),
+                medium: claudeAnalysis.filter(c => c.severity === 'medium'),
+                low: claudeAnalysis.filter(c => c.severity === 'low')
+            };
+
             let html = `
                 <div class="header">
                     <div class="pr-title">#${pr.number}: ${pr.title}</div>
                     <div class="pr-meta">
-                        by ${pr.author.login} • created ${new Date(pr.createdAt).toLocaleDateString()}
-                        • <a href="${pr.url}" target="_blank">View on GitHub</a>
+                        by ${pr.author.login} • ${new Date(pr.createdAt).toLocaleDateString()} •
+                        <a href="${pr.url}" target="_blank">View on GitHub</a> •
+                        Existing: ${existingComments.length} • Claude: ${claudeAnalysis.length}
+                        (🚨${bySeverity.high.length} ⚠️${bySeverity.medium.length} ℹ️${bySeverity.low.length})
                     </div>
                 </div>
 
-                <div class="summary-box">
-                    <div class="summary-title">📊 Analysis Summary</div>
-                    <div class="summary-stats">
-                        <div class="stat-item">
-                            <div class="stat-number">${existingComments.length}</div>
-                            <div class="stat-label">Existing Comments</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">${claudeAnalysis.length}</div>
-                            <div class="stat-label">Claude Suggestions</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">${claudeAnalysis.filter(c => c.severity === 'high').length}</div>
-                            <div class="stat-label">🚨 High Priority</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">${claudeAnalysis.filter(c => c.severity === 'medium').length}</div>
-                            <div class="stat-label">⚠️ Medium Priority</div>
+                <div class="columns-layout">
+                    <div class="column">
+                        <div class="column-header existing">💬 Existing Comments (${existingComments.length})</div>
+                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                            ${renderExistingComments(existingComments)}
                         </div>
                     </div>
-                </div>
-            `;
 
-            // Existing Comments Section
-            html += `
-                <div class="section">
-                    <div class="section-header existing-comments">
-                        <span>💬 Existing Comments (${existingComments.length})</span>
-                        <span>From GitHub PR</span>
-                    </div>
-                    <div class="section-content">
-            `;
-
-            if (existingComments.length === 0) {
-                html += '<p>No existing comments found on this PR.</p>';
-            } else {
-                existingComments.forEach(comment => {
-                    const isBot = comment.author.login.includes('bot') || comment.author.login.includes('copilot');
-                    const commentClass = isBot ? 'copilot' : 'human';
-
-                    html += `
-                        <div class="comment-item ${commentClass}">
-                            <div class="comment-header">
-                                <div class="comment-author">
-                                    ${isBot ? '🤖' : '👤'} ${comment.author.login}
-                                    ${isBot ? '(Bot/Copilot)' : '(Human)'}
-                                </div>
-                                <div class="comment-date">${new Date(comment.createdAt).toLocaleString()}</div>
-                            </div>
-                            <div class="comment-body">${escapeHtml(comment.body)}</div>
-                            <a href="${comment.url}" target="_blank" class="github-link">🔗 View Comment</a>
+                    <div class="column">
+                        <div class="column-header high">🚨 High Priority (${bySeverity.high.length})</div>
+                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                            ${renderClaudeIssues(bySeverity.high, 'high')}
                         </div>
-                    `;
-                });
-            }
-
-            html += `
                     </div>
-                </div>
-            `;
 
-            // Claude Analysis Section
-            html += `
-                <div class="section">
-                    <div class="section-header claude-analysis">
-                        <span>🧠 Claude Analysis (${claudeAnalysis.length})</span>
-                        <span>NEW suggestions from diff analysis</span>
+                    <div class="column">
+                        <div class="column-header medium">⚠️ Medium Priority (${bySeverity.medium.length})</div>
+                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                            ${renderClaudeIssues(bySeverity.medium, 'medium')}
+                        </div>
                     </div>
-                    <div class="section-content">
-            `;
 
-            if (claudeAnalysis.length === 0) {
-                html += '<p>No new issues detected by Claude analysis.</p>';
-            } else {
-                // Group by severity
-                const bySeverity = {
-                    high: claudeAnalysis.filter(c => c.severity === 'high'),
-                    medium: claudeAnalysis.filter(c => c.severity === 'medium'),
-                    low: claudeAnalysis.filter(c => c.severity === 'low')
-                };
-
-                ['high', 'medium', 'low'].forEach(severity => {
-                    if (bySeverity[severity].length > 0) {
-                        const severityIcon = severity === 'high' ? '🚨' : severity === 'medium' ? '⚠️' : 'ℹ️';
-                        html += `<h4>${severityIcon} ${severity.toUpperCase()} Priority (${bySeverity[severity].length})</h4>`;
-
-                        bySeverity[severity].forEach(issue => {
-                            html += `
-                                <div class="analysis-item ${severity}">
-                                    <div class="analysis-header">
-                                        <div style="flex: 1;">
-                                            <strong>${getIssueTitle(issue)}</strong>
-                                            <div style="font-size: 12px; color: #656d76; margin-top: 5px;">
-                                                ${issue.fileName ? `📁 ${issue.fileName}:${issue.fileLineNumber}` : `Line ${issue.line}`} • Type: ${issue.type.replace('_', ' ')}
-                                            </div>
-                                        </div>
-                                        <span class="severity-badge severity-${severity}">${severity}</span>
-                                    </div>
-                                    <div class="comment-body">${issue.message}</div>
-                                    ${issue.fileName ? `
-                                        <div class="file-info">
-                                            📁 <strong>File:</strong> ${issue.fileName}<br>
-                                            📍 <strong>Line:</strong> ${issue.fileLineNumber}
-                                        </div>
-                                    ` : ''}
-                                    ${issue.diffContext ? `
-                                        <div class="diff-context">
-                                            <div class="diff-context-header">
-                                                📄 Diff Context (${issue.fileName})
-                                            </div>
-                                            ${issue.diffContext.map(line => `
-                                                <div class="diff-line ${line.type} ${line.isTarget ? 'target' : ''}">
-                                                    <span class="diff-line-number">${line.lineNumber}</span>${escapeHtml(line.content)}
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    ` : issue.codeSnippet ? `
-                                        <div class="code-snippet">
-                                            <strong>Code:</strong><br>${escapeHtml(issue.codeSnippet)}
-                                        </div>
-                                    ` : ''}
-                                    <div class="action-buttons">
-                                        <a href="${issue.githubUrl}" target="_blank" class="github-link">📂 View File:${issue.fileLineNumber}</a>
-                                        <a href="${issue.prFilesUrl}" target="_blank" class="github-link" style="background: #6f42c1;">📋 View PR Diff</a>
-                                        <button class="copy-btn" onclick="copyToClipboard('${escapeForJs(issue.copyableComment || issue.message)}')">📋 Copy Comment</button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                });
-            }
-
-            html += `
+                    <div class="column">
+                        <div class="column-header low">ℹ️ Low Priority (${bySeverity.low.length})</div>
+                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                            ${renderClaudeIssues(bySeverity.low, 'low')}
+                        </div>
                     </div>
                 </div>
             `;
 
             document.getElementById('content').innerHTML = html;
+        }
+
+        function renderExistingComments(comments) {
+            if (comments.length === 0) {
+                return '<p style="text-align: center; color: #6c757d; margin: 20px 0;">No existing comments</p>';
+            }
+
+            return comments.map(comment => {
+                const isBot = comment.author.login.includes('bot') || comment.author.login.includes('copilot');
+                const commentClass = isBot ? 'copilot' : 'human';
+
+                return `
+                    <div class="comment-item ${commentClass}">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                ${isBot ? '🤖' : '👤'} ${comment.author.login}
+                            </div>
+                            <div class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</div>
+                        </div>
+                        <div class="comment-body">${escapeHtml(comment.body.substring(0, 200))}${comment.body.length > 200 ? '...' : ''}</div>
+                        <div style="margin-top: 4px;">
+                            <a href="${comment.url}" target="_blank" style="font-size: 10px; color: #0969da;">🔗 View</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderClaudeIssues(issues, severity) {
+            if (issues.length === 0) {
+                return '<p style="text-align: center; color: #6c757d; margin: 20px 0;">No issues</p>';
+            }
+
+            return issues.map(issue => `
+                <div class="analysis-item ${severity}">
+                    <div class="analysis-header">
+                        <div style="flex: 1;">
+                            <strong style="font-size: 11px;">${getIssueTitle(issue)}</strong>
+                            <div style="font-size: 9px; color: #656d76; margin-top: 2px;">
+                                📁 ${issue.fileName}:${issue.fileLineNumber}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 10px; margin: 4px 0;">${issue.message}</div>
+                    ${issue.diffContext ? `
+                        <div class="diff-context">
+                            <div class="diff-context-header">📄 Context</div>
+                            ${issue.diffContext.slice(Math.max(0, issue.diffContext.length - 40)).map(line => `
+                                <div class="diff-line ${line.type} ${line.isTarget ? 'target' : ''}">
+                                    <span class="diff-line-number">${line.lineNumber}</span>${escapeHtml(line.content)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div style="margin-top: 6px; display: flex; gap: 4px;">
+                        <a href="${issue.githubUrl}" target="_blank" style="font-size: 9px; padding: 2px 6px; background: #0969da; color: white; text-decoration: none; border-radius: 3px;">📂 File</a>
+                        <button onclick="copyToClipboard('${escapeForJs(issue.copyableComment || issue.message)}')" style="font-size: 9px; padding: 2px 6px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">📋 Copy</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function getIssueTitle(issue) {
