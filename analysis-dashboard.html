@@ -202,9 +202,61 @@
             background: white;
             font-size: 14px;
         }
+
+        .navbar {
+            background: #24292f;
+            padding: 8px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .navbar-brand:hover {
+            color: #58a6ff;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar-link {
+            color: #f0f6fc;
+            text-decoration: none;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .navbar-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .navbar-link.active {
+            background: #58a6ff;
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">🔍 GitHub PR Comment Tool</a>
+        <div class="navbar-links">
+            <a href="/" class="navbar-link">🏠 Home</a>
+            <a href="/pr-analysis" class="navbar-link">📋 PR Analysis</a>
+            <a href="/analysis" class="navbar-link active">📊 Dashboard</a>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="header">
             <h1>🔍 Code Analysis Dashboard</h1>
