@@ -850,7 +850,7 @@ function analyzePRDiff(diff, repoName, prNumber) {
     const lineNumber = match.fileLineNumber || match.line;
 
     // Extract context around the issue (50 lines before and after for scrollable view)
-    const diffContext = extractDiffContext(lines, match.line, 50);
+    const diffContext = extractDiffContext(lines, match.line, fileName, lineNumber, 10);
 
     // Create GitHub URLs for both PR diff view and direct file view
     const prFilesUrl = `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`;
@@ -881,14 +881,94 @@ function analyzePRDiff(diff, repoName, prNumber) {
   });
 
   // Helper function to extract diff context around an issue
-  function extractDiffContext(diffLines, targetLine, contextSize) {
-    const start = Math.max(0, targetLine - contextSize - 1);
-    const end = Math.min(diffLines.length, targetLine + contextSize);
+  function extractDiffContext(diffLines, targetDiffLine, fileName, targetFileLineNumber, contextSize) {
+    if (!fileName) {
+      // Fallback to old behavior if no filename
+      const start = Math.max(0, targetDiffLine - contextSize - 1);
+      const end = Math.min(diffLines.length, targetDiffLine + contextSize);
+      return diffLines.slice(start, end).map((line, index) => ({
+        lineNumber: start + index + 1,
+        content: line,
+        isTarget: (start + index + 1) === targetDiffLine,
+        type: line.startsWith('+') ? 'added' : line.startsWith('-') ? 'removed' : 'context'
+      }));
+    }
 
-    return diffLines.slice(start, end).map((line, index) => ({
-      lineNumber: start + index + 1,
+    // Find the file section in the diff
+    let fileStartIndex = -1;
+    let fileEndIndex = diffLines.length;
+
+    for (let i = 0; i < diffLines.length; i++) {
+      const line = diffLines[i];
+      if (line.startsWith('diff --git') && line.includes(fileName)) {
+        fileStartIndex = i;
+      } else if (fileStartIndex !== -1 && line.startsWith('diff --git') && !line.includes(fileName)) {
+        fileEndIndex = i;
+        break;
+      }
+    }
+
+    if (fileStartIndex === -1) {
+      // File not found, fallback
+      return [{
+        lineNumber: 1,
+        content: `File ${fileName} not found in diff`,
+        isTarget: true,
+        type: 'context'
+      }];
+    }
+
+    // Extract context from the specific file section
+    const fileSection = diffLines.slice(fileStartIndex, fileEndIndex);
+    let currentFileLineNumber = 0;
+    let targetFound = false;
+    let targetIndex = -1;
+
+    // Find the target line within the file section
+    for (let i = 0; i < fileSection.length; i++) {
+      const line = fileSection[i];
+
+      if (line.startsWith('@@')) {
+        const match = line.match(/@@\s*-\d+(?:,\d+)?\s*\+(\d+)(?:,\d+)?\s*@@/);
+        if (match) {
+          currentFileLineNumber = parseInt(match[1]) - 1;
+        }
+        continue;
+      }
+
+      if (line.startsWith('+') || line.startsWith('-') || line.startsWith(' ')) {
+        if (line.startsWith('+') || line.startsWith(' ')) {
+          currentFileLineNumber++;
+        }
+
+        if (currentFileLineNumber === targetFileLineNumber) {
+          targetIndex = i;
+          targetFound = true;
+          break;
+        }
+      }
+    }
+
+    if (!targetFound) {
+      // Target line not found, show around the detected diff line instead
+      const start = Math.max(fileStartIndex, targetDiffLine - contextSize);
+      const end = Math.min(fileEndIndex, targetDiffLine + contextSize);
+      return diffLines.slice(start, end).map((line, index) => ({
+        lineNumber: start + index + 1,
+        content: line,
+        isTarget: (start + index + 1) === targetDiffLine,
+        type: line.startsWith('+') ? 'added' : line.startsWith('-') ? 'removed' : 'context'
+      }));
+    }
+
+    // Extract context around the target line within the file section
+    const contextStart = Math.max(0, targetIndex - contextSize);
+    const contextEnd = Math.min(fileSection.length, targetIndex + contextSize + 1);
+
+    return fileSection.slice(contextStart, contextEnd).map((line, index) => ({
+      lineNumber: fileStartIndex + contextStart + index + 1,
       content: line,
-      isTarget: (start + index + 1) === targetLine,
+      isTarget: (contextStart + index) === targetIndex,
       type: line.startsWith('+') ? 'added' : line.startsWith('-') ? 'removed' : 'context'
     }));
   }
