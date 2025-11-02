@@ -532,8 +532,15 @@
         let currentAnalysis = null;
 
         async function analyzePR(forceRefresh = false) {
-            const repoInput = document.getElementById('repoInput').value.trim();
-            const prInput = document.getElementById('prInput').value.trim();
+            let repoInput = document.getElementById('repoInput').value.trim();
+            let prInput = document.getElementById('prInput').value.trim();
+
+            // Fallback to URL parameters if input fields are empty
+            if (!repoInput || !prInput) {
+                const params = new URLSearchParams(window.location.search);
+                repoInput = repoInput || params.get('repo') || '';
+                prInput = prInput || params.get('pr') || '';
+            }
 
             if (!repoInput || !prInput) {
                 alert('Please enter both repository and PR number');

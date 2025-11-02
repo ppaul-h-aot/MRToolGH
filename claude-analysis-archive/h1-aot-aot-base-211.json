@@ -1,0 +1,1223 @@
+{
+  "owner": "h1-aot",
+  "repo": "aot-base",
+  "prNumber": "211",
+  "analysis": [
+    {
+      "line": 347,
+      "fileName": "tests/agentic/tools/test_nmap.py",
+      "fileLineNumber": 1,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/tools/test_nmap.py:1 - from unittest.mock import MagicMock, patch",
+      "diffContext": [
+        {
+          "lineNumber": 341,
+          "content": "diff --git a/tests/agentic/tools/test_nmap.py b/tests/agentic/tools/test_nmap.py",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 342,
+          "content": "index 3aafb72..8f91d80 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 343,
+          "content": "--- a/tests/agentic/tools/test_nmap.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 344,
+          "content": "+++ b/tests/agentic/tools/test_nmap.py",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 345,
+          "content": "@@ -1,39 +1,47 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 346,
+          "content": "-from pytest_subprocess import FakeProcess",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 347,
+          "content": "+from unittest.mock import MagicMock, patch",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 348,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 349,
+          "content": " from agentic.tools.nmap import Nmap",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 350,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 351,
+          "content": "-from .conftest import Helpers",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 352,
+          "content": "-",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 353,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 354,
+          "content": " class TestNmap:",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R1",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/tools/test_nmap.py\nLine: 1\n\nCode:\nfrom unittest.mock import MagicMock, patch",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 488,
+      "fileName": "tests/agentic/tools/test_python.py",
+      "fileLineNumber": 1,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/tools/test_python.py:1 - import tempfile",
+      "diffContext": [
+        {
+          "lineNumber": 482,
+          "content": "diff --git a/tests/agentic/tools/test_python.py b/tests/agentic/tools/test_python.py",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 483,
+          "content": "index 5dcefa6..87c4804 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 484,
+          "content": "--- a/tests/agentic/tools/test_python.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 485,
+          "content": "+++ b/tests/agentic/tools/test_python.py",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 486,
+          "content": "@@ -1,56 +1,69 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 487,
+          "content": "-from pytest_subprocess import FakeProcess",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+import tempfile",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from unittest.mock import MagicMock, patch",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 490,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 491,
+          "content": "-from agentic.tools.python import PythonScript",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 492,
+          "content": "-",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 493,
+          "content": "-from .conftest import Helpers",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 494,
+          "content": "+from agentic.tools.python import OUTPUT_LIMIT, PythonScript",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 495,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R1",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/tools/test_python.py\nLine: 1\n\nCode:\nimport tempfile",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 489,
+      "fileName": "tests/agentic/tools/test_python.py",
+      "fileLineNumber": 2,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/tools/test_python.py:2 - from unittest.mock import MagicMock, patch",
+      "diffContext": [
+        {
+          "lineNumber": 482,
+          "content": "diff --git a/tests/agentic/tools/test_python.py b/tests/agentic/tools/test_python.py",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 483,
+          "content": "index 5dcefa6..87c4804 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 484,
+          "content": "--- a/tests/agentic/tools/test_python.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 485,
+          "content": "+++ b/tests/agentic/tools/test_python.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 486,
+          "content": "@@ -1,56 +1,69 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 487,
+          "content": "-from pytest_subprocess import FakeProcess",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+import tempfile",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from unittest.mock import MagicMock, patch",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 490,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 491,
+          "content": "-from agentic.tools.python import PythonScript",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 492,
+          "content": "-",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 493,
+          "content": "-from .conftest import Helpers",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 494,
+          "content": "+from agentic.tools.python import OUTPUT_LIMIT, PythonScript",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 495,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 496,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 497,
+          "content": " class TestPython:",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 498,
+          "content": "-    def test_run_with_empty_code(self, fp: FakeProcess, helpers: type[Helpers]):",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 499,
+          "content": "-        helpers.enable_fakenv(fp)",
+          "isTarget": false,
+          "type": "removed"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R2",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/tools/test_python.py\nLine: 2\n\nCode:\nfrom unittest.mock import MagicMock, patch",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 494,
+      "fileName": "tests/agentic/tools/test_python.py",
+      "fileLineNumber": 4,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/tools/test_python.py:4 - from agentic.tools.python import OUTPUT_LIMIT, PythonScript",
+      "diffContext": [
+        {
+          "lineNumber": 484,
+          "content": "--- a/tests/agentic/tools/test_python.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 485,
+          "content": "+++ b/tests/agentic/tools/test_python.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 486,
+          "content": "@@ -1,56 +1,69 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 487,
+          "content": "-from pytest_subprocess import FakeProcess",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+import tempfile",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from unittest.mock import MagicMock, patch",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 490,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 491,
+          "content": "-from agentic.tools.python import PythonScript",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 492,
+          "content": "-",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 493,
+          "content": "-from .conftest import Helpers",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 494,
+          "content": "+from agentic.tools.python import OUTPUT_LIMIT, PythonScript",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 495,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 496,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 497,
+          "content": " class TestPython:",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 498,
+          "content": "-    def test_run_with_empty_code(self, fp: FakeProcess, helpers: type[Helpers]):",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 499,
+          "content": "-        helpers.enable_fakenv(fp)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 500,
+          "content": "-        # If no code is provided, it should run `python --version`",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 501,
+          "content": "-        fp.register([\"python\", \"--version\"], stdout=\"python run\", returncode=0)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 502,
+          "content": "-",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 503,
+          "content": "-        result = PythonScript.run(\"\")",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 504,
+          "content": "-",
+          "isTarget": false,
+          "type": "removed"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R4",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/tools/test_python.py\nLine: 4\n\nCode:\nfrom agentic.tools.python import OUTPUT_LIMIT, PythonScript",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 558,
+      "fileName": "tests/agentic/tools/test_python.py",
+      "fileLineNumber": 20,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Print statement found. Consider using proper logging instead of print for debugging.",
+      "codeSnippet": "tests/agentic/tools/test_python.py:20 - PythonScript.run(\"  print('hi')  \")",
+      "diffContext": [
+        {
+          "lineNumber": 548,
+          "content": "+    def test_run_strips_code_and_builds_command(self):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 549,
+          "content": "+        mock_result = MagicMock()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 550,
+          "content": "+        mock_result.stdout = \"output\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 551,
+          "content": "+        mock_result.stderr = \"error\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 552,
+          "content": "+        mock_result.returncode = 0",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 553,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 554,
+          "content": "+        with (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 555,
+          "content": "+            patch(\"agentic.tools.python.raw_zsh_command\", return_value=mock_result) as mock_cmd,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 556,
+          "content": "+            patch(\"agentic.tools.python.session_cwd_path\", return_value=TestPython.tmp_file),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 557,
+          "content": "+        ):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 558,
+          "content": "+            PythonScript.run(\"  print('hi')  \")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 559,
+          "content": "+            mock_cmd.assert_called_once_with([\"python\", \"-c\", \"print('hi')\"], cwd=TestPython.tmp_file)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 560,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 561,
+          "content": "+    def test_run_with_empty_code_runs_version(self):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 562,
+          "content": "+        mock_result = MagicMock()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 563,
+          "content": "+        mock_result.stdout = \"Python 3.10.0\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 564,
+          "content": "+        mock_result.stderr = \"\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 565,
+          "content": "+        mock_result.returncode = 0",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 566,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 567,
+          "content": "+        with (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 568,
+          "content": "+            patch(\"agentic.tools.python.raw_zsh_command\", return_value=mock_result) as mock_cmd,",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R20",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Print statement found. Consider using proper logging instead of print for debugging.\n\nFile: tests/agentic/tools/test_python.py\nLine: 20\n\nCode:\nPythonScript.run(\"  print('hi')  \")",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 559,
+      "fileName": "tests/agentic/tools/test_python.py",
+      "fileLineNumber": 21,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Print statement found. Consider using proper logging instead of print for debugging.",
+      "codeSnippet": "tests/agentic/tools/test_python.py:21 - mock_cmd.assert_called_once_with([\"python\", \"-c\", \"print('hi')\"], cwd=TestPython.tmp_file)",
+      "diffContext": [
+        {
+          "lineNumber": 549,
+          "content": "+        mock_result = MagicMock()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 550,
+          "content": "+        mock_result.stdout = \"output\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 551,
+          "content": "+        mock_result.stderr = \"error\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 552,
+          "content": "+        mock_result.returncode = 0",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 553,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 554,
+          "content": "+        with (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 555,
+          "content": "+            patch(\"agentic.tools.python.raw_zsh_command\", return_value=mock_result) as mock_cmd,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 556,
+          "content": "+            patch(\"agentic.tools.python.session_cwd_path\", return_value=TestPython.tmp_file),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 557,
+          "content": "+        ):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 558,
+          "content": "+            PythonScript.run(\"  print('hi')  \")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 559,
+          "content": "+            mock_cmd.assert_called_once_with([\"python\", \"-c\", \"print('hi')\"], cwd=TestPython.tmp_file)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 560,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 561,
+          "content": "+    def test_run_with_empty_code_runs_version(self):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 562,
+          "content": "+        mock_result = MagicMock()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 563,
+          "content": "+        mock_result.stdout = \"Python 3.10.0\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 564,
+          "content": "+        mock_result.stderr = \"\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 565,
+          "content": "+        mock_result.returncode = 0",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 566,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 567,
+          "content": "+        with (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 568,
+          "content": "+            patch(\"agentic.tools.python.raw_zsh_command\", return_value=mock_result) as mock_cmd,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 569,
+          "content": "+            patch(\"agentic.tools.python.session_cwd_path\", return_value=TestPython.tmp_file),",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R21",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Print statement found. Consider using proper logging instead of print for debugging.\n\nFile: tests/agentic/tools/test_python.py\nLine: 21\n\nCode:\nmock_cmd.assert_called_once_with([\"python\", \"-c\", \"print('hi')\"], cwd=TestPython.tmp_file)",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 587,
+      "fileName": "tests/agentic/tools/test_python.py",
+      "fileLineNumber": 49,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Print statement found. Consider using proper logging instead of print for debugging.",
+      "codeSnippet": "tests/agentic/tools/test_python.py:49 - result = PythonScript.run(\"print('hi')\")",
+      "diffContext": [
+        {
+          "lineNumber": 577,
+          "content": "+        mock_result = MagicMock()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 578,
+          "content": "+        mock_result.stdout = long_output",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 579,
+          "content": "+        mock_result.stderr = long_output",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 580,
+          "content": "+        mock_result.returncode = 0",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 581,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 582,
+          "content": "+        with (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 583,
+          "content": "+            patch(\"agentic.tools.python.raw_zsh_command\", return_value=mock_result),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 584,
+          "content": "+            patch(\"agentic.tools.python.session_cwd_path\", return_value=TestPython.tmp_file),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 585,
+          "content": "+            patch(\"agentic.tools.python.should_truncate_output\", return_value=True),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 586,
+          "content": "+        ):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 587,
+          "content": "+            result = PythonScript.run(\"print('hi')\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 588,
+          "content": "+            # Ellipses added during truncate_text()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 589,
+          "content": "+            ellipses_length = 3",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 590,
+          "content": "+            assert len(result.stdout) == OUTPUT_LIMIT + ellipses_length",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 591,
+          "content": "+            assert len(result.stderr) == OUTPUT_LIMIT + ellipses_length",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 592,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 593,
+          "content": "+    def test_run_does_not_truncate_output_when_verbose(self):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 594,
+          "content": "+        long_output = \"a\" * (OUTPUT_LIMIT + 100)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 595,
+          "content": "+        mock_result = MagicMock()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 596,
+          "content": "+        mock_result.stdout = long_output",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 597,
+          "content": "+        mock_result.stderr = long_output",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R49",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Print statement found. Consider using proper logging instead of print for debugging.\n\nFile: tests/agentic/tools/test_python.py\nLine: 49\n\nCode:\nresult = PythonScript.run(\"print('hi')\")",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 605,
+      "fileName": "tests/agentic/tools/test_python.py",
+      "fileLineNumber": 67,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Print statement found. Consider using proper logging instead of print for debugging.",
+      "codeSnippet": "tests/agentic/tools/test_python.py:67 - result = PythonScript.run(\"print('hi')\")",
+      "diffContext": [
+        {
+          "lineNumber": 595,
+          "content": "+        mock_result = MagicMock()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 596,
+          "content": "+        mock_result.stdout = long_output",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 597,
+          "content": "+        mock_result.stderr = long_output",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 598,
+          "content": "+        mock_result.returncode = 0",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 599,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 600,
+          "content": "+        with (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 601,
+          "content": "+            patch(\"agentic.tools.python.raw_zsh_command\", return_value=mock_result),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 602,
+          "content": "+            patch(\"agentic.tools.python.session_cwd_path\", return_value=TestPython.tmp_file),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 603,
+          "content": "+            patch(\"agentic.tools.python.should_truncate_output\", return_value=False),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 604,
+          "content": "+        ):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 605,
+          "content": "+            result = PythonScript.run(\"print('hi')\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 606,
+          "content": "+            assert result.stdout == long_output",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 607,
+          "content": "+            assert result.stderr == long_output",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R67",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Print statement found. Consider using proper logging instead of print for debugging.\n\nFile: tests/agentic/tools/test_python.py\nLine: 67\n\nCode:\nresult = PythonScript.run(\"print('hi')\")",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 614,
+      "fileName": "tests/agentic/tools/test_sqlmap.py",
+      "fileLineNumber": 1,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/tools/test_sqlmap.py:1 - from unittest.mock import MagicMock, patch",
+      "diffContext": [
+        {
+          "lineNumber": 608,
+          "content": "diff --git a/tests/agentic/tools/test_sqlmap.py b/tests/agentic/tools/test_sqlmap.py",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 609,
+          "content": "index 3b22def..541253a 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 610,
+          "content": "--- a/tests/agentic/tools/test_sqlmap.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 611,
+          "content": "+++ b/tests/agentic/tools/test_sqlmap.py",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 612,
+          "content": "@@ -1,39 +1,49 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 613,
+          "content": "-from pytest_subprocess import FakeProcess",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 614,
+          "content": "+from unittest.mock import MagicMock, patch",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 615,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 616,
+          "content": " from agentic.tools.sqlmap import Sqlmap",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 617,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 618,
+          "content": "-from .conftest import Helpers",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 619,
+          "content": "-",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 620,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 621,
+          "content": " class TestSqlmap:",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R1",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/tools/test_sqlmap.py\nLine: 1\n\nCode:\nfrom unittest.mock import MagicMock, patch",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    },
+    {
+      "line": 745,
+      "fileName": "tests/agentic/utils/test_path.py",
+      "fileLineNumber": 2,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/utils/test_path.py:2 - from unittest.mock import patch",
+      "diffContext": [
+        {
+          "lineNumber": 739,
+          "content": "diff --git a/tests/agentic/utils/test_path.py b/tests/agentic/utils/test_path.py",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 740,
+          "content": "index 61213c2..0e21015 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 741,
+          "content": "--- a/tests/agentic/utils/test_path.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 742,
+          "content": "+++ b/tests/agentic/utils/test_path.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 743,
+          "content": "@@ -1,4 +1,5 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 744,
+          "content": " import tempfile",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 745,
+          "content": "+from unittest.mock import patch",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 746,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 747,
+          "content": " from agentic.utils.path import session_cwd_path",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 748,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 749,
+          "content": "@@ -7,8 +8,16 @@ def test_session_cwd_path():",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 750,
+          "content": "     \"\"\"Test the session_cwd_path function to ensure it returns the correct path.\"\"\"",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 751,
+          "content": "     session_id = \"test_session\"",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 752,
+          "content": "     scope = \"test_scope\"",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 753,
+          "content": "-    expected_path = session_cwd_path(session_id, scope)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 754,
+          "content": "+    fake_tmp = tempfile.gettempdir()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 755,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/211/files#diff-74657374732f6167R2",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/211/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/utils/test_path.py\nLine: 2\n\nCode:\nfrom unittest.mock import patch",
+      "timestamp": "2025-11-02T16:55:15.472Z"
+    }
+  ],
+  "timestamp": "2025-11-02T16:55:15.473Z",
+  "version": "1.0"
+}
