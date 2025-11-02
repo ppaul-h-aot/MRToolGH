@@ -646,15 +646,46 @@ app.get('/api/analysis/pr/:owner/:repo/:number', async (req, res) => {
       `gh pr diff ${number} --repo ${owner}/${repo}`
     );
 
-    // Analyze the diff for new issues
-    const claudeAnalysis = analyzePRDiff(prDiff, repo, number);
+    // Check for archived Claude analysis first
+    const archivePath = path.join(__dirname, 'claude-analysis-archive', `${owner}-${repo}-${number}.json`);
+    let claudeAnalysis = [];
+    let isFromArchive = false;
+
+    if (fs.existsSync(archivePath)) {
+      try {
+        const archived = JSON.parse(fs.readFileSync(archivePath, 'utf8'));
+        claudeAnalysis = archived.analysis || [];
+        isFromArchive = true;
+        console.log(`📦 Loaded ${claudeAnalysis.length} archived Claude comments for PR #${number}`);
+      } catch (error) {
+        console.error('Error loading archived analysis:', error.message);
+      }
+    }
+
+    // If no archive or user requests fresh analysis, analyze the diff
+    if (!isFromArchive || req.query.refresh === 'true') {
+      console.log(`🧠 Running fresh Claude analysis for PR #${number}`);
+      const freshAnalysis = analyzePRDiff(prDiff, repo, number);
+
+      if (isFromArchive) {
+        // Smart merge: add new issues, remove outdated ones
+        claudeAnalysis = smartMergeAnalysis(claudeAnalysis, freshAnalysis, prDiff);
+      } else {
+        claudeAnalysis = freshAnalysis;
+      }
+
+      // Save updated analysis to archive
+      saveClaudeAnalysis(owner, repo, number, claudeAnalysis);
+    }
 
     res.json({
       success: true,
       pr: prDetails,
       existingComments: prDetails.comments || [],
       claudeAnalysis: claudeAnalysis,
-      diff: prDiff
+      isFromArchive: isFromArchive,
+      diff: prDiff,
+      lastAnalyzed: isFromArchive ? fs.statSync(archivePath).mtime : new Date()
     });
 
   } catch (error) {
@@ -818,13 +849,17 @@ function analyzePRDiff(diff, repoName, prNumber) {
     const fileName = match.fileName || '';
     const lineNumber = match.fileLineNumber || match.line;
 
+    // Extract context around the issue (20 lines before and after)
+    const diffContext = extractDiffContext(lines, match.line, 20);
+
     // Create GitHub URLs for both PR diff view and direct file view
     const prFilesUrl = `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`;
     let fileViewUrl = prFilesUrl;
 
     if (fileName) {
-      // Direct link to the file with line number (works reliably)
-      fileViewUrl = `https://github.com/h1-aot/${repoName}/blob/main/${fileName}#L${lineNumber}`;
+      // Use PR context instead of main branch - more accurate for code review
+      // This shows the file as it appears in the PR at the specific commit
+      fileViewUrl = `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files#diff-${Buffer.from(fileName).toString('hex').substring(0, 16)}R${lineNumber}`;
     }
 
     issues.push({
@@ -835,13 +870,28 @@ function analyzePRDiff(diff, repoName, prNumber) {
       type: match.type,
       message: match.message,
       codeSnippet: `${fileName}:${lineNumber} - ${match.codeSnippet}`,
+      diffContext: diffContext, // Add surrounding diff context
       githubUrl: fileViewUrl,
       prFilesUrl: prFilesUrl,
       source: 'claude-analysis',
       occurrenceCount: 1,
-      copyableComment: `${match.message}\n\nFile: ${fileName}\nLine: ${lineNumber}\n\nCode:\n${match.codeSnippet}`
+      copyableComment: `${match.message}\n\nFile: ${fileName}\nLine: ${lineNumber}\n\nCode:\n${match.codeSnippet}`,
+      timestamp: new Date().toISOString()
     });
   });
+
+  // Helper function to extract diff context around an issue
+  function extractDiffContext(diffLines, targetLine, contextSize) {
+    const start = Math.max(0, targetLine - contextSize - 1);
+    const end = Math.min(diffLines.length, targetLine + contextSize);
+
+    return diffLines.slice(start, end).map((line, index) => ({
+      lineNumber: start + index + 1,
+      content: line,
+      isTarget: (start + index + 1) === targetLine,
+      type: line.startsWith('+') ? 'added' : line.startsWith('-') ? 'removed' : 'context'
+    }));
+  }
 
   // Sort by severity and occurrence count
   const severityOrder = { high: 3, medium: 2, low: 1 };
@@ -853,6 +903,124 @@ function analyzePRDiff(diff, repoName, prNumber) {
   });
 
   return issues;
+}
+
+// Save Claude analysis to archive
+function saveClaudeAnalysis(owner, repo, prNumber, analysis) {
+  try {
+    const archiveDir = path.join(__dirname, 'claude-analysis-archive');
+    if (!fs.existsSync(archiveDir)) {
+      fs.mkdirSync(archiveDir, { recursive: true });
+    }
+
+    const archiveData = {
+      owner,
+      repo,
+      prNumber,
+      analysis,
+      timestamp: new Date().toISOString(),
+      version: '1.0'
+    };
+
+    const archivePath = path.join(archiveDir, `${owner}-${repo}-${prNumber}.json`);
+    fs.writeFileSync(archivePath, JSON.stringify(archiveData, null, 2));
+    console.log(`💾 Saved ${analysis.length} Claude comments to archive for PR #${prNumber}`);
+  } catch (error) {
+    console.error('Error saving Claude analysis:', error.message);
+  }
+}
+
+// Smart merge existing analysis with fresh analysis
+function smartMergeAnalysis(existingAnalysis, freshAnalysis, currentDiff) {
+  const merged = [];
+  const freshIssueHashes = new Set();
+
+  // Create hashes for fresh issues to detect duplicates
+  freshAnalysis.forEach(issue => {
+    const hash = `${issue.fileName}:${issue.fileLineNumber}:${issue.type}:${issue.message.substring(0, 50)}`;
+    freshIssueHashes.add(hash);
+  });
+
+  // Check which existing issues are still relevant
+  existingAnalysis.forEach(existingIssue => {
+    const hash = `${existingIssue.fileName}:${existingIssue.fileLineNumber}:${existingIssue.type}:${existingIssue.message.substring(0, 50)}`;
+
+    // Keep existing issue if it's still found in fresh analysis or if the line still exists in diff
+    if (freshIssueHashes.has(hash) || isLineStillInDiff(existingIssue, currentDiff)) {
+      merged.push({
+        ...existingIssue,
+        status: 'existing',
+        lastSeen: new Date().toISOString()
+      });
+    } else {
+      console.log(`🗑️  Removing outdated issue: ${existingIssue.fileName}:${existingIssue.fileLineNumber}`);
+    }
+  });
+
+  // Add genuinely new issues
+  freshAnalysis.forEach(freshIssue => {
+    const hash = `${freshIssue.fileName}:${freshIssue.fileLineNumber}:${freshIssue.type}:${freshIssue.message.substring(0, 50)}`;
+    const existingIssue = merged.find(existing => {
+      const existingHash = `${existing.fileName}:${existing.fileLineNumber}:${existing.type}:${existing.message.substring(0, 50)}`;
+      return existingHash === hash;
+    });
+
+    if (!existingIssue) {
+      merged.push({
+        ...freshIssue,
+        status: 'new',
+        firstSeen: new Date().toISOString()
+      });
+      console.log(`✨ Adding new issue: ${freshIssue.fileName}:${freshIssue.fileLineNumber}`);
+    }
+  });
+
+  return merged.sort((a, b) => {
+    const severityOrder = { high: 3, medium: 2, low: 1 };
+    if (a.severity !== b.severity) {
+      return severityOrder[b.severity] - severityOrder[a.severity];
+    }
+    return a.status === 'new' ? -1 : 1; // New issues first
+  });
+}
+
+// Check if a line from an issue still exists in the current diff
+function isLineStillInDiff(issue, currentDiff) {
+  const lines = currentDiff.split('\n');
+  let currentFile = null;
+  let currentFileLineNumber = 0;
+
+  for (const line of lines) {
+    if (line.startsWith('diff --git')) {
+      const match = line.match(/diff --git a\/(.+?) b\/(.+)/);
+      if (match) {
+        currentFile = match[2];
+        currentFileLineNumber = 0;
+      }
+      continue;
+    }
+
+    if (line.startsWith('@@')) {
+      const match = line.match(/@@\s*-\d+(?:,\d+)?\s*\+(\d+)(?:,\d+)?\s*@@/);
+      if (match) {
+        currentFileLineNumber = parseInt(match[1]) - 1;
+      }
+      continue;
+    }
+
+    if (line.startsWith('+') || line.startsWith('-') || line.startsWith(' ')) {
+      if (line.startsWith('+') || line.startsWith(' ')) {
+        currentFileLineNumber++;
+      }
+
+      // Check if this matches our issue
+      if (currentFile === issue.fileName && currentFileLineNumber === issue.fileLineNumber) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 // Get analysis history

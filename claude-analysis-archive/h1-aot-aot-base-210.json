@@ -1,0 +1,3313 @@
+{
+  "owner": "h1-aot",
+  "repo": "aot-base",
+  "prNumber": "210",
+  "analysis": [
+    {
+      "line": 188,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 825,
+      "severity": "medium",
+      "type": "improvement_needed",
+      "message": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.",
+      "codeSnippet": "src/agentic/__init__.py:825 - sys.exit(1)",
+      "diffContext": [
+        {
+          "lineNumber": 185,
+          "content": "-        logger.error(\"Unknown checkpointer backend: %s. Defaulting to in_memory\", args.checkpointer_backend)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 186,
+          "content": "-        raise ValueError(f\"Unknown checkpointer backend: {args.checkpointer_backend}\")",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 187,
+          "content": "+        logger.error(\"Unknown checkpointing backend provided: %s\", checkpointer_backend)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 188,
+          "content": "+        sys.exit(1)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 189,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 190,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 191,
+          "content": " def _build_initial_state(args: Namespace) -> dict[str, Any]:",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR825",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.\n\nFile: src/agentic/__init__.py\nLine: 825\n\nCode:\nsys.exit(1)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 235,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 870,
+      "severity": "medium",
+      "type": "improvement_needed",
+      "message": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.",
+      "codeSnippet": "src/agentic/__init__.py:870 - sys.exit(1)",
+      "diffContext": [
+        {
+          "lineNumber": 232,
+          "content": "+            environment_str,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 233,
+          "content": "+            \"|\".join([e.value for e in Environment]),",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 234,
+          "content": "+        )",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 235,
+          "content": "+        sys.exit(1)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 236,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 237,
+          "content": "-    if args.allow_auth_failure:",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 238,
+          "content": "-        config.allow_auth_failure = True",
+          "isTarget": false,
+          "type": "removed"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR870",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.\n\nFile: src/agentic/__init__.py\nLine: 870\n\nCode:\nsys.exit(1)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 252,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 883,
+      "severity": "medium",
+      "type": "improvement_needed",
+      "message": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.",
+      "codeSnippet": "src/agentic/__init__.py:883 - sys.exit(1)",
+      "diffContext": [
+        {
+          "lineNumber": 249,
+          "content": "+        postgres_dsn = args.postgres_dsn or os.environ.get(\"POSTGRES_DSN\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 250,
+          "content": "+        if not postgres_dsn:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 251,
+          "content": "+            logger.error(\"Postgres DSN must be provided when using postgres checkpointer backend.\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 252,
+          "content": "+            sys.exit(1)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 253,
+          "content": "+    elif args.checkpointer_backend == \"memory\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"memory\":",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 254,
+          "content": "+        checkpointer_backend = CheckpointingType.MEMORY",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 255,
+          "content": "+    elif (",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR883",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.\n\nFile: src/agentic/__init__.py\nLine: 883\n\nCode:\nsys.exit(1)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 262,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 893,
+      "severity": "medium",
+      "type": "improvement_needed",
+      "message": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.",
+      "codeSnippet": "src/agentic/__init__.py:893 - sys.exit(1)",
+      "diffContext": [
+        {
+          "lineNumber": 259,
+          "content": "+        checkpointer_backend = CheckpointingType.PERSISTENT_MEMORY",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 260,
+          "content": "+    else:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 261,
+          "content": "+        logger.error(\"Unknown checkpointer backend: %s.\", args.checkpointer_backend)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 262,
+          "content": "+        sys.exit(1)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 263,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 264,
+          "content": "-    logger.info(\"Running agent: %s with initial state: %s\", args.agent_name, initial_state)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 265,
+          "content": "-    resume: bool = initial_state.get(\"resume\", False)",
+          "isTarget": false,
+          "type": "removed"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR893",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.\n\nFile: src/agentic/__init__.py\nLine: 893\n\nCode:\nsys.exit(1)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 283,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 912,
+      "severity": "medium",
+      "type": "improvement_needed",
+      "message": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.",
+      "codeSnippet": "src/agentic/__init__.py:912 - sys.exit(1)",
+      "diffContext": [
+        {
+          "lineNumber": 280,
+          "content": "+        creds = initial_agent_state.get(\"target_credentials\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 281,
+          "content": "+        if creds is None or (len(creds.get(\"username\")) == 0 or len(creds.get(\"password\")) == 0):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 282,
+          "content": "+            logger.error(colored(\"target_credentials must be specified in initial state if auth is enabled.\", \"red\"))",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 283,
+          "content": "+            sys.exit(1)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 284,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 285,
+          "content": "+        auth_config = AuthConfig(",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 286,
+          "content": "+            allow_auth_failure=False,",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR912",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.\n\nFile: src/agentic/__init__.py\nLine: 912\n\nCode:\nsys.exit(1)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 301,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 930,
+      "severity": "medium",
+      "type": "improvement_needed",
+      "message": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.",
+      "codeSnippet": "src/agentic/__init__.py:930 - sys.exit(1)",
+      "diffContext": [
+        {
+          "lineNumber": 298,
+          "content": "+        resume_response: str = initial_agent_state.get(\"resume_response\", \"\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 299,
+          "content": "+        if not resume_response:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 300,
+          "content": "+            logger.error(colored(\"resume_response is required when resume is True\", \"red\"))",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 301,
+          "content": "+            sys.exit(1)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 302,
+          "content": "+        resume_config = ResumeWithResponseConfig(resume_response=resume_response)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 303,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 304,
+          "content": "+    # Create time travel config if provided",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR930",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.\n\nFile: src/agentic/__init__.py\nLine: 930\n\nCode:\nsys.exit(1)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 356,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 985,
+      "severity": "medium",
+      "type": "improvement_needed",
+      "message": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.",
+      "codeSnippet": "src/agentic/__init__.py:985 - sys.exit(1)",
+      "diffContext": [
+        {
+          "lineNumber": 353,
+          "content": "+            _initialize_langfuse(startup_config.langfuse_config, startup_config.environment)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 354,
+          "content": "+        except (UnauthorizedError, ConnectError):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 355,
+          "content": "+            logger.error(\"Failed to initialize Langfuse client\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 356,
+          "content": "+            sys.exit(1)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 357,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 358,
+          "content": "+    agent_registry = AgentRegistry()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 359,
+          "content": "+    workflow_registry = WorkflowRegistry()",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR985",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.\n\nFile: src/agentic/__init__.py\nLine: 985\n\nCode:\nsys.exit(1)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 503,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 20,
+      "severity": "medium",
+      "type": "suggestion",
+      "message": "New config class detected. Consider validating all required fields in constructor.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:20 - class LangfuseConfig:",
+      "diffContext": [
+        {
+          "lineNumber": 500,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 501,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 502,
+          "content": "+@dataclass",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 503,
+          "content": "+class LangfuseConfig:",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 504,
+          "content": "+    host: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 505,
+          "content": "+    secret_key: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 506,
+          "content": "+    public_key: str",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR20",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "New config class detected. Consider validating all required fields in constructor.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 20\n\nCode:\nclass LangfuseConfig:",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 512,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 29,
+      "severity": "medium",
+      "type": "suggestion",
+      "message": "New config class detected. Consider validating all required fields in constructor.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:29 - class TimeTravelConfig:",
+      "diffContext": [
+        {
+          "lineNumber": 509,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 510,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 511,
+          "content": "+@dataclass",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 512,
+          "content": "+class TimeTravelConfig:",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 513,
+          "content": "+    checkpoint_id: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 514,
+          "content": "+    state_updates: dict[str, Any] | None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 515,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR29",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "New config class detected. Consider validating all required fields in constructor.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 29\n\nCode:\nclass TimeTravelConfig:",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 518,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 35,
+      "severity": "medium",
+      "type": "suggestion",
+      "message": "New config class detected. Consider validating all required fields in constructor.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:35 - class ResumeWithResponseConfig:",
+      "diffContext": [
+        {
+          "lineNumber": 515,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 516,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 517,
+          "content": "+@dataclass",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 518,
+          "content": "+class ResumeWithResponseConfig:",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 519,
+          "content": "+    resume_response: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 520,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 521,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR35",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "New config class detected. Consider validating all required fields in constructor.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 35\n\nCode:\nclass ResumeWithResponseConfig:",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 532,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 49,
+      "severity": "medium",
+      "type": "suggestion",
+      "message": "New config class detected. Consider validating all required fields in constructor.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:49 - class AuthConfig:",
+      "diffContext": [
+        {
+          "lineNumber": 529,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 530,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 531,
+          "content": "+@dataclass",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 532,
+          "content": "+class AuthConfig:",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 533,
+          "content": "+    allow_auth_failure: bool",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 534,
+          "content": "+    target_credentials: TargetCredentials",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 535,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR49",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "New config class detected. Consider validating all required fields in constructor.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 49\n\nCode:\nclass AuthConfig:",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 538,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 55,
+      "severity": "medium",
+      "type": "suggestion",
+      "message": "New config class detected. Consider validating all required fields in constructor.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:55 - class AotStartupConfig:",
+      "diffContext": [
+        {
+          "lineNumber": 535,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 536,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 537,
+          "content": "+@dataclass",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 538,
+          "content": "+class AotStartupConfig:",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 539,
+          "content": "+    session_id: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 540,
+          "content": "+    user: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 541,
+          "content": "+    agent_name: str  # TODO: This should be an enum",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR55",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "New config class detected. Consider validating all required fields in constructor.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 55\n\nCode:\nclass AotStartupConfig:",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 593,
+      "fileName": "src/agentic/utils/config.py",
+      "fileLineNumber": 265,
+      "severity": "medium",
+      "type": "suggestion",
+      "message": "New config class detected. Consider validating all required fields in constructor.",
+      "codeSnippet": "src/agentic/utils/config.py:265 - class ApplicationConfig:",
+      "diffContext": [
+        {
+          "lineNumber": 590,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 591,
+          "content": " @dataclass",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 592,
+          "content": "-class Config:",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 593,
+          "content": "+class ApplicationConfig:",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 594,
+          "content": "     database: DatabaseConfig",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 595,
+          "content": "     limits: LimitConfig",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 596,
+          "content": "     target: TargetConfig",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR265",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "New config class detected. Consider validating all required fields in constructor.\n\nFile: src/agentic/utils/config.py\nLine: 265\n\nCode:\nclass ApplicationConfig:",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 9,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 50,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/__init__.py:50 - from agentic.app.aot_startup_config import (",
+      "diffContext": [
+        {
+          "lineNumber": 6,
+          "content": "     XssL2Verify,",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 7,
+          "content": " )",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 8,
+          "content": " from agentic.agents.registry import Registry as AgentRegistry",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 9,
+          "content": "+from agentic.app.aot_startup_config import (",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 10,
+          "content": "+    AotStartupConfig,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 11,
+          "content": "+    AuthConfig,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 12,
+          "content": "+    Environment,",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR50",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/__init__.py\nLine: 50\n\nCode:\nfrom agentic.app.aot_startup_config import (",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 20,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 61,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/__init__.py:61 - from agentic.models.checkpointing_type import CheckpointingType",
+      "diffContext": [
+        {
+          "lineNumber": 17,
+          "content": "+)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 18,
+          "content": " from agentic.models.agent import Context as AgentContext",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 19,
+          "content": " from agentic.models.agent import OrchestratorState as AgentState",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 20,
+          "content": "+from agentic.models.checkpointing_type import CheckpointingType",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 21,
+          "content": " from agentic.observers.agent_runs import RunCallback, RunRepository",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 22,
+          "content": " from agentic.observers.logging.colored_logging_callback import ColoredLoggingCallback",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 23,
+          "content": " from agentic.observers.logging.logging_callback import LoggingCallback",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR61",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/__init__.py\nLine: 61\n\nCode:\nfrom agentic.models.checkpointing_type import CheckpointingType",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 29,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 70,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/__init__.py:70 - from agentic.utils import ApplicationConfig",
+      "diffContext": [
+        {
+          "lineNumber": 26,
+          "content": " from agentic.stores.redis_storage import RedisStorageService",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 27,
+          "content": " from agentic.stores.storage_service import StorageServiceSession",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 28,
+          "content": "-from agentic.utils import Config",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 29,
+          "content": "+from agentic.utils import ApplicationConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 30,
+          "content": " from agentic.utils.config import RetryPolicyConfig, read_agent_config",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 31,
+          "content": " from agentic.utils.tcp_dial import tcp_dial",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 32,
+          "content": " from agentic.workflows import (",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR70",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/__init__.py\nLine: 70\n\nCode:\nfrom agentic.utils import ApplicationConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 43,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 114,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Private method with None return type. Consider if this should return a result for testing.",
+      "codeSnippet": "src/agentic/__init__.py:114 - def _initialize_langfuse(langfuse_config: LangfuseConfig, env: Environment) -> None:",
+      "diffContext": [
+        {
+          "lineNumber": 40,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 41,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 42,
+          "content": "-def _initialize_langfuse(args: Namespace) -> None:",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 43,
+          "content": "+def _initialize_langfuse(langfuse_config: LangfuseConfig, env: Environment) -> None:",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 44,
+          "content": "     \"\"\"Initialize Langfuse client\"\"\"",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 45,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 46,
+          "content": "-    host = args.langfuse_host if args.langfuse_host else os.environ.get(\"LANGFUSE_HOST\")",
+          "isTarget": false,
+          "type": "removed"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR114",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Private method with None return type. Consider if this should return a result for testing.\n\nFile: src/agentic/__init__.py\nLine: 114\n\nCode:\ndef _initialize_langfuse(langfuse_config: LangfuseConfig, env: Environment) -> None:",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 203,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 852,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.",
+      "codeSnippet": "src/agentic/__init__.py:852 - # TODO: We might want to move this validation to the AotStartupConfig",
+      "diffContext": [
+        {
+          "lineNumber": 200,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 201,
+          "content": "-    agent_registry = AgentRegistry()",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 202,
+          "content": "-    workflow_registry = WorkflowRegistry()",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 203,
+          "content": "+    # TODO: We might want to move this validation to the AotStartupConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 204,
+          "content": "+    _validate_environment_or_exit()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 205,
+          "content": "     args = _parse_args()",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 206,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR852",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.\n\nFile: src/agentic/__init__.py\nLine: 852\n\nCode:\n# TODO: We might want to move this validation to the AotStartupConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 207,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 856,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.",
+      "codeSnippet": "src/agentic/__init__.py:856 - # TODO: We might want to move this validation to the AotStartupConfig",
+      "diffContext": [
+        {
+          "lineNumber": 204,
+          "content": "+    _validate_environment_or_exit()",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 205,
+          "content": "     args = _parse_args()",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 206,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 207,
+          "content": "+    # TODO: We might want to move this validation to the AotStartupConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 208,
+          "content": "     _validate_args_or_exit(args)",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 209,
+          "content": "-    initial_state = _build_initial_state(args)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 210,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR856",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.\n\nFile: src/agentic/__init__.py\nLine: 856\n\nCode:\n# TODO: We might want to move this validation to the AotStartupConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 220,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 859,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:859 - environment_str = args.environment if args.environment else os.environ.get(\"ENVIRONMENT\", \"development\")",
+      "diffContext": [
+        {
+          "lineNumber": 217,
+          "content": "-        except (UnauthorizedError, ConnectError):",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 218,
+          "content": "-            logger.error(\"Failed to initialize Langfuse client\")",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 219,
+          "content": "-            sys.exit(1)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 220,
+          "content": "+    environment_str = args.environment if args.environment else os.environ.get(\"ENVIRONMENT\", \"development\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 221,
+          "content": "+    environment = Environment.DEVELOPMENT",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 222,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 223,
+          "content": "-    # Override config with CLI flags",
+          "isTarget": false,
+          "type": "removed"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR859",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 859\n\nCode:\nenvironment_str = args.environment if args.environment else os.environ.get(\"ENVIRONMENT\", \"development\")",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 240,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 872,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:872 - session_id = args.session_id or os.environ.get(\"SESSION_ID\", uuid.uuid4().hex)",
+      "diffContext": [
+        {
+          "lineNumber": 237,
+          "content": "-    if args.allow_auth_failure:",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 238,
+          "content": "-        config.allow_auth_failure = True",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 239,
+          "content": "-        logger.info(\"Auth failure tolerance enabled via CLI flag\")",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 240,
+          "content": "+    session_id = args.session_id or os.environ.get(\"SESSION_ID\", uuid.uuid4().hex)",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 241,
+          "content": "+    user = args.user or os.environ.get(\"USER\", \"unknown\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 242,
+          "content": "+    asset_id = args.asset_id",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 243,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR872",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 872\n\nCode:\nsession_id = args.session_id or os.environ.get(\"SESSION_ID\", uuid.uuid4().hex)",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 241,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 873,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:873 - user = args.user or os.environ.get(\"USER\", \"unknown\")",
+      "diffContext": [
+        {
+          "lineNumber": 238,
+          "content": "-        config.allow_auth_failure = True",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 239,
+          "content": "-        logger.info(\"Auth failure tolerance enabled via CLI flag\")",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 240,
+          "content": "+    session_id = args.session_id or os.environ.get(\"SESSION_ID\", uuid.uuid4().hex)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 241,
+          "content": "+    user = args.user or os.environ.get(\"USER\", \"unknown\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 242,
+          "content": "+    asset_id = args.asset_id",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 243,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 244,
+          "content": "-    logger.info(\"Initializing agents...\")",
+          "isTarget": false,
+          "type": "removed"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR873",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 873\n\nCode:\nuser = args.user or os.environ.get(\"USER\", \"unknown\")",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 247,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 878,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:878 - if args.checkpointer_backend == \"postgres\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"postgres\":",
+      "diffContext": [
+        {
+          "lineNumber": 244,
+          "content": "-    logger.info(\"Initializing agents...\")",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 245,
+          "content": "+    checkpointer_backend: CheckpointingType",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 246,
+          "content": "+    postgres_dsn = None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 247,
+          "content": "+    if args.checkpointer_backend == \"postgres\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"postgres\":",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 248,
+          "content": "+        checkpointer_backend = CheckpointingType.POSTGRES",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 249,
+          "content": "+        postgres_dsn = args.postgres_dsn or os.environ.get(\"POSTGRES_DSN\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 250,
+          "content": "+        if not postgres_dsn:",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR878",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 878\n\nCode:\nif args.checkpointer_backend == \"postgres\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"postgres\":",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 249,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 880,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:880 - postgres_dsn = args.postgres_dsn or os.environ.get(\"POSTGRES_DSN\")",
+      "diffContext": [
+        {
+          "lineNumber": 246,
+          "content": "+    postgres_dsn = None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 247,
+          "content": "+    if args.checkpointer_backend == \"postgres\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"postgres\":",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 248,
+          "content": "+        checkpointer_backend = CheckpointingType.POSTGRES",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 249,
+          "content": "+        postgres_dsn = args.postgres_dsn or os.environ.get(\"POSTGRES_DSN\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 250,
+          "content": "+        if not postgres_dsn:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 251,
+          "content": "+            logger.error(\"Postgres DSN must be provided when using postgres checkpointer backend.\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 252,
+          "content": "+            sys.exit(1)",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR880",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 880\n\nCode:\npostgres_dsn = args.postgres_dsn or os.environ.get(\"POSTGRES_DSN\")",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 253,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 884,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:884 - elif args.checkpointer_backend == \"memory\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"memory\":",
+      "diffContext": [
+        {
+          "lineNumber": 250,
+          "content": "+        if not postgres_dsn:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 251,
+          "content": "+            logger.error(\"Postgres DSN must be provided when using postgres checkpointer backend.\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 252,
+          "content": "+            sys.exit(1)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 253,
+          "content": "+    elif args.checkpointer_backend == \"memory\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"memory\":",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 254,
+          "content": "+        checkpointer_backend = CheckpointingType.MEMORY",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 255,
+          "content": "+    elif (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 256,
+          "content": "+        args.checkpointer_backend == \"persistent_memory\"",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR884",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 884\n\nCode:\nelif args.checkpointer_backend == \"memory\" or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"memory\":",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 257,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 888,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:888 - or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"persistent_memory\"",
+      "diffContext": [
+        {
+          "lineNumber": 254,
+          "content": "+        checkpointer_backend = CheckpointingType.MEMORY",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 255,
+          "content": "+    elif (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 256,
+          "content": "+        args.checkpointer_backend == \"persistent_memory\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 257,
+          "content": "+        or os.environ.get(\"CHECKPOINTER_BACKEND\") == \"persistent_memory\"",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 258,
+          "content": "+    ):",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 259,
+          "content": "+        checkpointer_backend = CheckpointingType.PERSISTENT_MEMORY",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 260,
+          "content": "+    else:",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR888",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 888\n\nCode:\nor os.environ.get(\"CHECKPOINTER_BACKEND\") == \"persistent_memory\"",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 315,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 944,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:944 - host = args.langfuse_host if args.langfuse_host else os.environ.get(\"LANGFUSE_HOST\")",
+      "diffContext": [
+        {
+          "lineNumber": 312,
+          "content": "+    no_langfuse = args.no_langfuse",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 313,
+          "content": "+    langfuse_config: LangfuseConfig | None = None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 314,
+          "content": "+    if not no_langfuse:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 315,
+          "content": "+        host = args.langfuse_host if args.langfuse_host else os.environ.get(\"LANGFUSE_HOST\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 316,
+          "content": "+        secret_key = args.langfuse_secret_key if args.langfuse_secret_key else os.environ.get(\"LANGFUSE_SECRET_KEY\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 317,
+          "content": "+        public_key = args.langfuse_public_key if args.langfuse_public_key else os.environ.get(\"LANGFUSE_PUBLIC_KEY\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 318,
+          "content": "+        debug = (",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR944",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 944\n\nCode:\nhost = args.langfuse_host if args.langfuse_host else os.environ.get(\"LANGFUSE_HOST\")",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 316,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 945,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:945 - secret_key = args.langfuse_secret_key if args.langfuse_secret_key else os.environ.get(\"LANGFUSE_SECRET_KEY\")",
+      "diffContext": [
+        {
+          "lineNumber": 313,
+          "content": "+    langfuse_config: LangfuseConfig | None = None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 314,
+          "content": "+    if not no_langfuse:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 315,
+          "content": "+        host = args.langfuse_host if args.langfuse_host else os.environ.get(\"LANGFUSE_HOST\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 316,
+          "content": "+        secret_key = args.langfuse_secret_key if args.langfuse_secret_key else os.environ.get(\"LANGFUSE_SECRET_KEY\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 317,
+          "content": "+        public_key = args.langfuse_public_key if args.langfuse_public_key else os.environ.get(\"LANGFUSE_PUBLIC_KEY\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 318,
+          "content": "+        debug = (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 319,
+          "content": "+            args.langfuse_debug if args.langfuse_debug else os.environ.get(\"LANGFUSE_DEBUG\", \"false\").lower() == \"true\"",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR945",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 945\n\nCode:\nsecret_key = args.langfuse_secret_key if args.langfuse_secret_key else os.environ.get(\"LANGFUSE_SECRET_KEY\")",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 317,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 946,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:946 - public_key = args.langfuse_public_key if args.langfuse_public_key else os.environ.get(\"LANGFUSE_PUBLIC_KEY\")",
+      "diffContext": [
+        {
+          "lineNumber": 314,
+          "content": "+    if not no_langfuse:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 315,
+          "content": "+        host = args.langfuse_host if args.langfuse_host else os.environ.get(\"LANGFUSE_HOST\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 316,
+          "content": "+        secret_key = args.langfuse_secret_key if args.langfuse_secret_key else os.environ.get(\"LANGFUSE_SECRET_KEY\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 317,
+          "content": "+        public_key = args.langfuse_public_key if args.langfuse_public_key else os.environ.get(\"LANGFUSE_PUBLIC_KEY\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 318,
+          "content": "+        debug = (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 319,
+          "content": "+            args.langfuse_debug if args.langfuse_debug else os.environ.get(\"LANGFUSE_DEBUG\", \"false\").lower() == \"true\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 320,
+          "content": "+        )",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR946",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 946\n\nCode:\npublic_key = args.langfuse_public_key if args.langfuse_public_key else os.environ.get(\"LANGFUSE_PUBLIC_KEY\")",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 319,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 948,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:948 - args.langfuse_debug if args.langfuse_debug else os.environ.get(\"LANGFUSE_DEBUG\", \"false\").lower() == \"true\"",
+      "diffContext": [
+        {
+          "lineNumber": 316,
+          "content": "+        secret_key = args.langfuse_secret_key if args.langfuse_secret_key else os.environ.get(\"LANGFUSE_SECRET_KEY\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 317,
+          "content": "+        public_key = args.langfuse_public_key if args.langfuse_public_key else os.environ.get(\"LANGFUSE_PUBLIC_KEY\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 318,
+          "content": "+        debug = (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 319,
+          "content": "+            args.langfuse_debug if args.langfuse_debug else os.environ.get(\"LANGFUSE_DEBUG\", \"false\").lower() == \"true\"",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 320,
+          "content": "+        )",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 321,
+          "content": "+        release = args.release if args.release else os.environ.get(\"RELEASE\", \"unknown\")",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 322,
+          "content": "+        langfuse_config = LangfuseConfig(",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR948",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 948\n\nCode:\nargs.langfuse_debug if args.langfuse_debug else os.environ.get(\"LANGFUSE_DEBUG\", \"false\").lower() == \"true\"",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 321,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 950,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:950 - release = args.release if args.release else os.environ.get(\"RELEASE\", \"unknown\")",
+      "diffContext": [
+        {
+          "lineNumber": 318,
+          "content": "+        debug = (",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 319,
+          "content": "+            args.langfuse_debug if args.langfuse_debug else os.environ.get(\"LANGFUSE_DEBUG\", \"false\").lower() == \"true\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 320,
+          "content": "+        )",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 321,
+          "content": "+        release = args.release if args.release else os.environ.get(\"RELEASE\", \"unknown\")",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 322,
+          "content": "+        langfuse_config = LangfuseConfig(",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 323,
+          "content": "+            host=host or \"\",",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 324,
+          "content": "+            secret_key=secret_key or \"\",",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR950",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 950\n\nCode:\nrelease = args.release if args.release else os.environ.get(\"RELEASE\", \"unknown\")",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 413,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 1033,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.",
+      "codeSnippet": "src/agentic/__init__.py:1033 - # TODO: How to best do entry point for non-orchestrator agents?",
+      "diffContext": [
+        {
+          "lineNumber": 410,
+          "content": "                 logger.info(\"Final Agent State: %s\", json.dumps(result, indent=4))",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 411,
+          "content": "             else:",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 412,
+          "content": "-                result = agent.run(initial_agent_state)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 413,
+          "content": "+                # TODO: How to best do entry point for non-orchestrator agents?",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 414,
+          "content": "+                result = agent.run(startup_config.initial_state)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 415,
+          "content": "                 logger.info(\"Final Agent State: %s\", json.dumps(result, indent=4))",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 416,
+          "content": "         except (ConnectError, ValueError, KeyError, TypeError, AttributeError, RuntimeError) as e:",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR1033",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.\n\nFile: src/agentic/__init__.py\nLine: 1033\n\nCode:\n# TODO: How to best do entry point for non-orchestrator agents?",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 440,
+      "fileName": "src/agentic/agents/base_agent.py",
+      "fileLineNumber": 14,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/agents/base_agent.py:14 - from agentic.utils.config import AgentConfig, ApplicationConfig",
+      "diffContext": [
+        {
+          "lineNumber": 437,
+          "content": " from agentic.models.agent.orchestrator import OrchestratorState, PartialOrchestratorState",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 438,
+          "content": " from agentic.shared.storage_aware_agent import StorageAwareAgent",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 439,
+          "content": "-from agentic.utils.config import AgentConfig, Config",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 440,
+          "content": "+from agentic.utils.config import AgentConfig, ApplicationConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 441,
+          "content": " from agentic.utils.model_tools import bind_tools_safe",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 442,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 443,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR14",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/agents/base_agent.py\nLine: 14\n\nCode:\nfrom agentic.utils.config import AgentConfig, ApplicationConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 462,
+      "fileName": "src/agentic/agents/methodical/methodical_agent.py",
+      "fileLineNumber": 14,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/agents/methodical/methodical_agent.py:14 - from agentic.utils.config import AgentConfig, ApplicationConfig",
+      "diffContext": [
+        {
+          "lineNumber": 459,
+          "content": " from agentic.models.agent import Context as AgentContext",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 460,
+          "content": " from agentic.models.agent.methodical_state import MethodicalState",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 461,
+          "content": "-from agentic.utils.config import AgentConfig, Config",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 462,
+          "content": "+from agentic.utils.config import AgentConfig, ApplicationConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 463,
+          "content": " from agentic.utils.strike import strike",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 464,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 465,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR14",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/agents/methodical/methodical_agent.py\nLine: 14\n\nCode:\nfrom agentic.utils.config import AgentConfig, ApplicationConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 484,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 1,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:1 - from dataclasses import dataclass",
+      "diffContext": [
+        {
+          "lineNumber": 481,
+          "content": "--- /dev/null",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 482,
+          "content": "+++ b/src/agentic/app/aot_startup_config.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 483,
+          "content": "@@ -0,0 +1,71 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 484,
+          "content": "+from dataclasses import dataclass",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 485,
+          "content": "+from enum import Enum",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 486,
+          "content": "+from typing import Any",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 487,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR1",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 1\n\nCode:\nfrom dataclasses import dataclass",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 485,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 2,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:2 - from enum import Enum",
+      "diffContext": [
+        {
+          "lineNumber": 482,
+          "content": "+++ b/src/agentic/app/aot_startup_config.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 483,
+          "content": "@@ -0,0 +1,71 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 484,
+          "content": "+from dataclasses import dataclass",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 485,
+          "content": "+from enum import Enum",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 486,
+          "content": "+from typing import Any",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 487,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+from agentic.models.agent.context import Context as AgentContext",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR2",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 2\n\nCode:\nfrom enum import Enum",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 486,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 3,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:3 - from typing import Any",
+      "diffContext": [
+        {
+          "lineNumber": 483,
+          "content": "@@ -0,0 +1,71 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 484,
+          "content": "+from dataclasses import dataclass",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 485,
+          "content": "+from enum import Enum",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 486,
+          "content": "+from typing import Any",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 487,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+from agentic.models.agent.context import Context as AgentContext",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from agentic.models.agent.orchestrator import OrchestratorState",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR3",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 3\n\nCode:\nfrom typing import Any",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 488,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 5,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:5 - from agentic.models.agent.context import Context as AgentContext",
+      "diffContext": [
+        {
+          "lineNumber": 485,
+          "content": "+from enum import Enum",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 486,
+          "content": "+from typing import Any",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 487,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+from agentic.models.agent.context import Context as AgentContext",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from agentic.models.agent.orchestrator import OrchestratorState",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 490,
+          "content": "+from agentic.models.checkpointing_type import CheckpointingType",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 491,
+          "content": "+from agentic.models.target_credentials import TargetCredentials as StateTargetCredentials",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR5",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 5\n\nCode:\nfrom agentic.models.agent.context import Context as AgentContext",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 489,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 6,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:6 - from agentic.models.agent.orchestrator import OrchestratorState",
+      "diffContext": [
+        {
+          "lineNumber": 486,
+          "content": "+from typing import Any",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 487,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+from agentic.models.agent.context import Context as AgentContext",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from agentic.models.agent.orchestrator import OrchestratorState",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 490,
+          "content": "+from agentic.models.checkpointing_type import CheckpointingType",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 491,
+          "content": "+from agentic.models.target_credentials import TargetCredentials as StateTargetCredentials",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 492,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR6",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 6\n\nCode:\nfrom agentic.models.agent.orchestrator import OrchestratorState",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 490,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 7,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:7 - from agentic.models.checkpointing_type import CheckpointingType",
+      "diffContext": [
+        {
+          "lineNumber": 487,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 488,
+          "content": "+from agentic.models.agent.context import Context as AgentContext",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from agentic.models.agent.orchestrator import OrchestratorState",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 490,
+          "content": "+from agentic.models.checkpointing_type import CheckpointingType",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 491,
+          "content": "+from agentic.models.target_credentials import TargetCredentials as StateTargetCredentials",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 492,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 493,
+          "content": "+# TODO: Need to add centralized validation for this config",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR7",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 7\n\nCode:\nfrom agentic.models.checkpointing_type import CheckpointingType",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 491,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 8,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:8 - from agentic.models.target_credentials import TargetCredentials as StateTargetCredentials",
+      "diffContext": [
+        {
+          "lineNumber": 488,
+          "content": "+from agentic.models.agent.context import Context as AgentContext",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 489,
+          "content": "+from agentic.models.agent.orchestrator import OrchestratorState",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 490,
+          "content": "+from agentic.models.checkpointing_type import CheckpointingType",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 491,
+          "content": "+from agentic.models.target_credentials import TargetCredentials as StateTargetCredentials",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 492,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 493,
+          "content": "+# TODO: Need to add centralized validation for this config",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 494,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR8",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 8\n\nCode:\nfrom agentic.models.target_credentials import TargetCredentials as StateTargetCredentials",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 493,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 10,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:10 - # TODO: Need to add centralized validation for this config",
+      "diffContext": [
+        {
+          "lineNumber": 490,
+          "content": "+from agentic.models.checkpointing_type import CheckpointingType",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 491,
+          "content": "+from agentic.models.target_credentials import TargetCredentials as StateTargetCredentials",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 492,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 493,
+          "content": "+# TODO: Need to add centralized validation for this config",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 494,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 495,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 496,
+          "content": "+class Environment(Enum):",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR10",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 10\n\nCode:\n# TODO: Need to add centralized validation for this config",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 502,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 19,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Dataclass detected. Consider adding field validation using field() or __post_init__.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:19 - @dataclass",
+      "diffContext": [
+        {
+          "lineNumber": 499,
+          "content": "+    PRODUCTION = \"production\"",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 500,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 501,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 502,
+          "content": "+@dataclass",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 503,
+          "content": "+class LangfuseConfig:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 504,
+          "content": "+    host: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 505,
+          "content": "+    secret_key: str",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR19",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Dataclass detected. Consider adding field validation using field() or __post_init__.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 19\n\nCode:\n@dataclass",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 511,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 28,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Dataclass detected. Consider adding field validation using field() or __post_init__.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:28 - @dataclass",
+      "diffContext": [
+        {
+          "lineNumber": 508,
+          "content": "+    debug: bool = False",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 509,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 510,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 511,
+          "content": "+@dataclass",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 512,
+          "content": "+class TimeTravelConfig:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 513,
+          "content": "+    checkpoint_id: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 514,
+          "content": "+    state_updates: dict[str, Any] | None",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR28",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Dataclass detected. Consider adding field validation using field() or __post_init__.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 28\n\nCode:\n@dataclass",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 517,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 34,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Dataclass detected. Consider adding field validation using field() or __post_init__.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:34 - @dataclass",
+      "diffContext": [
+        {
+          "lineNumber": 514,
+          "content": "+    state_updates: dict[str, Any] | None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 515,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 516,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 517,
+          "content": "+@dataclass",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 518,
+          "content": "+class ResumeWithResponseConfig:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 519,
+          "content": "+    resume_response: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 520,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR34",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Dataclass detected. Consider adding field validation using field() or __post_init__.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 34\n\nCode:\n@dataclass",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 522,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 39,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Dataclass detected. Consider adding field validation using field() or __post_init__.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:39 - @dataclass",
+      "diffContext": [
+        {
+          "lineNumber": 519,
+          "content": "+    resume_response: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 520,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 521,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 522,
+          "content": "+@dataclass",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 523,
+          "content": "+class TargetCredentials:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 524,
+          "content": "+    username: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 525,
+          "content": "+    password: str",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR39",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Dataclass detected. Consider adding field validation using field() or __post_init__.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 39\n\nCode:\n@dataclass",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 531,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 48,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Dataclass detected. Consider adding field validation using field() or __post_init__.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:48 - @dataclass",
+      "diffContext": [
+        {
+          "lineNumber": 528,
+          "content": "+        return StateTargetCredentials(username=self.username, password=self.password)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 529,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 530,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 531,
+          "content": "+@dataclass",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 532,
+          "content": "+class AuthConfig:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 533,
+          "content": "+    allow_auth_failure: bool",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 534,
+          "content": "+    target_credentials: TargetCredentials",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR48",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Dataclass detected. Consider adding field validation using field() or __post_init__.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 48\n\nCode:\n@dataclass",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 537,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 54,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Dataclass detected. Consider adding field validation using field() or __post_init__.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:54 - @dataclass",
+      "diffContext": [
+        {
+          "lineNumber": 534,
+          "content": "+    target_credentials: TargetCredentials",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 535,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 536,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 537,
+          "content": "+@dataclass",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 538,
+          "content": "+class AotStartupConfig:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 539,
+          "content": "+    session_id: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 540,
+          "content": "+    user: str",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR54",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Dataclass detected. Consider adding field validation using field() or __post_init__.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 54\n\nCode:\n@dataclass",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 541,
+      "fileName": "src/agentic/app/aot_startup_config.py",
+      "fileLineNumber": 58,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.",
+      "codeSnippet": "src/agentic/app/aot_startup_config.py:58 - agent_name: str  # TODO: This should be an enum",
+      "diffContext": [
+        {
+          "lineNumber": 538,
+          "content": "+class AotStartupConfig:",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 539,
+          "content": "+    session_id: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 540,
+          "content": "+    user: str",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 541,
+          "content": "+    agent_name: str  # TODO: This should be an enum",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 542,
+          "content": "+    postgres_dsn: str | None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 543,
+          "content": "+    asset_id: str | None",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 544,
+          "content": "+    initial_state: OrchestratorState",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR58",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.\n\nFile: src/agentic/app/aot_startup_config.py\nLine: 58\n\nCode:\nagent_name: str  # TODO: This should be an enum",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 561,
+      "fileName": "src/agentic/models/checkpointing_type.py",
+      "fileLineNumber": 1,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/models/checkpointing_type.py:1 - from enum import Enum",
+      "diffContext": [
+        {
+          "lineNumber": 558,
+          "content": "--- /dev/null",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 559,
+          "content": "+++ b/src/agentic/models/checkpointing_type.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 560,
+          "content": "@@ -0,0 +1,7 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 561,
+          "content": "+from enum import Enum",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 562,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 563,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 564,
+          "content": "+class CheckpointingType(Enum):",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR1",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/models/checkpointing_type.py\nLine: 1\n\nCode:\nfrom enum import Enum",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 574,
+      "fileName": "src/agentic/utils/__init__.py",
+      "fileLineNumber": 1,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/utils/__init__.py:1 - from agentic.utils.config import ApplicationConfig",
+      "diffContext": [
+        {
+          "lineNumber": 571,
+          "content": "+++ b/src/agentic/utils/__init__.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 572,
+          "content": "@@ -1,9 +1,9 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 573,
+          "content": "-from agentic.utils.config import Config",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 574,
+          "content": "+from agentic.utils.config import ApplicationConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 575,
+          "content": " from agentic.utils.metrics import accumulate_tokens",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 576,
+          "content": " from agentic.utils.session import current_session",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 577,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR1",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/utils/__init__.py\nLine: 1\n\nCode:\nfrom agentic.utils.config import ApplicationConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 635,
+      "fileName": "src/agentic/workflows/orchestrator.py",
+      "fileLineNumber": 7,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/workflows/orchestrator.py:7 - from typing import TYPE_CHECKING, Any, Literal",
+      "diffContext": [
+        {
+          "lineNumber": 632,
+          "content": " from pathlib import Path",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 633,
+          "content": " from textwrap import dedent",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 634,
+          "content": "-from typing import TYPE_CHECKING, Any",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 635,
+          "content": "+from typing import TYPE_CHECKING, Any, Literal",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 636,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 637,
+          "content": " import boto3",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 638,
+          "content": " import openai",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR7",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/workflows/orchestrator.py\nLine: 7\n\nCode:\nfrom typing import TYPE_CHECKING, Any, Literal",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 643,
+      "fileName": "src/agentic/workflows/orchestrator.py",
+      "fileLineNumber": 15,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/workflows/orchestrator.py:15 - from agentic.app.aot_startup_config import AotStartupConfig",
+      "diffContext": [
+        {
+          "lineNumber": 640,
+          "content": " from langgraph.graph import END, START, StateGraph",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 641,
+          "content": " from langgraph.types import RetryPolicy, Send",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 642,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 643,
+          "content": "+from agentic.app.aot_startup_config import AotStartupConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 644,
+          "content": " from agentic.models.agent import OrchestratorState, PartialOrchestratorState",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 645,
+          "content": " from agentic.models.exploit_agent import ExploitAgent",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 646,
+          "content": " from agentic.models.session import SessionData",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR15",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/workflows/orchestrator.py\nLine: 15\n\nCode:\nfrom agentic.app.aot_startup_config import AotStartupConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 649,
+      "fileName": "src/agentic/workflows/orchestrator.py",
+      "fileLineNumber": 20,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "src/agentic/workflows/orchestrator.py:20 - from agentic.utils.config import ApplicationConfig, RetryPolicyConfig",
+      "diffContext": [
+        {
+          "lineNumber": 646,
+          "content": " from agentic.models.session import SessionData",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 647,
+          "content": " from agentic.shared.storage_aware_agent import get_runnable_config",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 648,
+          "content": "-from agentic.utils.config import RetryPolicyConfig",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 649,
+          "content": "+from agentic.utils.config import ApplicationConfig, RetryPolicyConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 650,
+          "content": " from agentic.utils.indicator import convert_indicators_to_markdown",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 651,
+          "content": " from agentic.utils.recon_metrics import generate_metrics_from_state, save_metrics_to_file",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 652,
+          "content": " from agentic.workflows.base_workflow import Workflow",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-7372632f6167656eR20",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: src/agentic/workflows/orchestrator.py\nLine: 20\n\nCode:\nfrom agentic.utils.config import ApplicationConfig, RetryPolicyConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 755,
+      "fileName": "tests/agentic/workflows/test_orchestrator.py",
+      "fileLineNumber": 11,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/workflows/test_orchestrator.py:11 - from agentic.app.aot_startup_config import AotStartupConfig",
+      "diffContext": [
+        {
+          "lineNumber": 752,
+          "content": " from langgraph.types import Send",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 753,
+          "content": " from pytest_mock import MockerFixture",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 754,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 755,
+          "content": "+from agentic.app.aot_startup_config import AotStartupConfig",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 756,
+          "content": " from agentic.models.agent import OrchestratorState",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 757,
+          "content": "-from agentic.utils.config import Config, RetryPolicyConfig, S3Config",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 758,
+          "content": "+from agentic.utils.config import ApplicationConfig, RetryPolicyConfig, S3Config",
+          "isTarget": false,
+          "type": "added"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-74657374732f6167R11",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/workflows/test_orchestrator.py\nLine: 11\n\nCode:\nfrom agentic.app.aot_startup_config import AotStartupConfig",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    },
+    {
+      "line": 758,
+      "fileName": "tests/agentic/workflows/test_orchestrator.py",
+      "fileLineNumber": 13,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/workflows/test_orchestrator.py:13 - from agentic.utils.config import ApplicationConfig, RetryPolicyConfig, S3Config",
+      "diffContext": [
+        {
+          "lineNumber": 755,
+          "content": "+from agentic.app.aot_startup_config import AotStartupConfig",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 756,
+          "content": " from agentic.models.agent import OrchestratorState",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 757,
+          "content": "-from agentic.utils.config import Config, RetryPolicyConfig, S3Config",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 758,
+          "content": "+from agentic.utils.config import ApplicationConfig, RetryPolicyConfig, S3Config",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 759,
+          "content": " from agentic.workflows.orchestrator import OrchestratorWorkflow",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 760,
+          "content": " from agentic.workflows.registry import Registry as WorkflowRegistry",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 761,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/210/files#diff-74657374732f6167R13",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/210/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/workflows/test_orchestrator.py\nLine: 13\n\nCode:\nfrom agentic.utils.config import ApplicationConfig, RetryPolicyConfig, S3Config",
+      "timestamp": "2025-11-02T15:01:45.049Z"
+    }
+  ],
+  "timestamp": "2025-11-02T15:01:45.049Z",
+  "version": "1.0"
+}

@@ -295,6 +295,61 @@
             margin-top: 10px;
             align-items: center;
         }
+
+        .diff-context {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .diff-context-header {
+            background: #e9ecef;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .diff-line {
+            padding: 2px 12px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            border-left: 3px solid transparent;
+        }
+
+        .diff-line.added {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .diff-line.removed {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .diff-line.context {
+            background: #fff;
+            color: #6c757d;
+        }
+
+        .diff-line.target {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            font-weight: 600;
+        }
+
+        .diff-line-number {
+            display: inline-block;
+            width: 40px;
+            text-align: right;
+            margin-right: 10px;
+            color: #6c757d;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -307,7 +362,9 @@
                 <span>#</span>
                 <input type="number" id="prInput" class="input-field" placeholder="210" style="width: 100px;">
                 <button class="analyze-btn" onclick="analyzePR()">🔍 Analyze</button>
+                <button class="analyze-btn" onclick="analyzePR(true)" style="background: #28a745;">🔄 Fresh Analysis</button>
             </div>
+            <div id="analysisStatus" style="margin-top: 10px; font-size: 14px; color: #6c757d;"></div>
         </div>
 
         <div id="content" class="loading">
@@ -318,7 +375,7 @@
     <script>
         let currentAnalysis = null;
 
-        async function analyzePR() {
+        async function analyzePR(forceRefresh = false) {
             const repoInput = document.getElementById('repoInput').value.trim();
             const prInput = document.getElementById('prInput').value.trim();
 
@@ -333,17 +390,32 @@
                 return;
             }
 
-            const btn = document.querySelector('.analyze-btn');
-            btn.textContent = '🔄 Analyzing...';
-            btn.disabled = true;
+            const btns = document.querySelectorAll('.analyze-btn');
+            btns.forEach(btn => btn.disabled = true);
+
+            if (forceRefresh) {
+                btns[1].textContent = '🔄 Analyzing...';
+            } else {
+                btns[0].textContent = '🔄 Analyzing...';
+            }
 
             try {
-                const response = await fetch(`/api/analysis/pr/${owner}/${repo}/${prInput}`);
+                const url = `/api/analysis/pr/${owner}/${repo}/${prInput}${forceRefresh ? '?refresh=true' : ''}`;
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (data.success) {
                     currentAnalysis = data;
                     renderAnalysis();
+
+                    // Show analysis status
+                    const statusDiv = document.getElementById('analysisStatus');
+                    const lastAnalyzed = new Date(data.lastAnalyzed).toLocaleString();
+                    if (data.isFromArchive && !forceRefresh) {
+                        statusDiv.innerHTML = `📦 Loaded from archive • Last analyzed: ${lastAnalyzed}`;
+                    } else {
+                        statusDiv.innerHTML = `🧠 Fresh analysis completed • ${lastAnalyzed}`;
+                    }
                 } else {
                     document.getElementById('content').innerHTML = `
                         <div class="section">
@@ -363,8 +435,9 @@
                     </div>
                 `;
             } finally {
-                btn.textContent = '🔍 Analyze';
-                btn.disabled = false;
+                btns[0].textContent = '🔍 Analyze';
+                btns[1].textContent = '🔄 Fresh Analysis';
+                btns.forEach(btn => btn.disabled = false);
             }
         }
 
@@ -487,7 +560,18 @@
                                             📍 <strong>Line:</strong> ${issue.fileLineNumber}
                                         </div>
                                     ` : ''}
-                                    ${issue.codeSnippet ? `
+                                    ${issue.diffContext ? `
+                                        <div class="diff-context">
+                                            <div class="diff-context-header">
+                                                📄 Diff Context (${issue.fileName})
+                                            </div>
+                                            ${issue.diffContext.map(line => `
+                                                <div class="diff-line ${line.type} ${line.isTarget ? 'target' : ''}">
+                                                    <span class="diff-line-number">${line.lineNumber}</span>${escapeHtml(line.content)}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    ` : issue.codeSnippet ? `
                                         <div class="code-snippet">
                                             <strong>Code:</strong><br>${escapeHtml(issue.codeSnippet)}
                                         </div>
