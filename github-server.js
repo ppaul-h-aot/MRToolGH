@@ -664,18 +664,20 @@ app.get('/api/analysis/pr/:owner/:repo/:number', async (req, res) => {
 
     // If no archive or user requests fresh analysis, analyze the diff
     if (!isFromArchive || req.query.refresh === 'true') {
-      console.log(`🧠 Running fresh Claude analysis for PR #${number}`);
+      console.log(`🧠 Running fresh Claude analysis for PR #${number} (refresh: ${req.query.refresh})`);
       const freshAnalysis = analyzePRDiff(prDiff, repo, number);
 
-      if (isFromArchive) {
-        // Smart merge: add new issues, remove outdated ones
+      if (isFromArchive && req.query.refresh !== 'true') {
+        // Smart merge: add new issues, remove outdated ones (only if not forcing refresh)
         claudeAnalysis = smartMergeAnalysis(claudeAnalysis, freshAnalysis, prDiff);
       } else {
+        // Use completely fresh analysis (either no archive exists or user forced refresh)
         claudeAnalysis = freshAnalysis;
       }
 
       // Save updated analysis to archive
       saveClaudeAnalysis(owner, repo, number, claudeAnalysis);
+      isFromArchive = false; // Mark as fresh for response
     }
 
     res.json({
