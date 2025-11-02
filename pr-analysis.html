@@ -75,6 +75,27 @@
             background: rgba(255,255,255,0.3);
         }
 
+        .column-stats {
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 8px;
+            color: #6c757d;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+
+        .stat-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .stat-count {
+            font-weight: 600;
+            color: #495057;
+        }
+
         .header {
             background: white;
             padding: 20px;
@@ -397,8 +418,10 @@
         .diff-line-content {
             flex: 1;
             padding-left: 4px;
-            white-space: pre;
-            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            min-width: 0;
         }
 
         .diff-line.added {
@@ -550,7 +573,10 @@
                             <span>💬 Existing Comments (${existingComments.length})</span>
                             <button class="expand-btn" onclick="toggleExpand('existing')">⬌</button>
                         </div>
-                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
+                        <div class="column-stats">
+                            ${generateCommentStats(existingComments)}
+                        </div>
+                        <div style="padding: 6px; max-height: 80vh; overflow-y: auto;">
                             ${renderExistingComments(existingComments)}
                         </div>
                     </div>
@@ -560,7 +586,10 @@
                             <span>🚨 High Priority (${bySeverity.high.length})</span>
                             <button class="expand-btn" onclick="toggleExpand('high')">⬌</button>
                         </div>
-                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
+                        <div class="column-stats">
+                            ${generateIssueStats(bySeverity.high)}
+                        </div>
+                        <div style="padding: 6px; max-height: 80vh; overflow-y: auto;">
                             ${renderClaudeIssues(bySeverity.high, 'high')}
                         </div>
                     </div>
@@ -570,7 +599,10 @@
                             <span>⚠️ Medium Priority (${bySeverity.medium.length})</span>
                             <button class="expand-btn" onclick="toggleExpand('medium')">⬌</button>
                         </div>
-                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
+                        <div class="column-stats">
+                            ${generateIssueStats(bySeverity.medium)}
+                        </div>
+                        <div style="padding: 6px; max-height: 80vh; overflow-y: auto;">
                             ${renderClaudeIssues(bySeverity.medium, 'medium')}
                         </div>
                     </div>
@@ -580,7 +612,10 @@
                             <span>ℹ️ Low Priority (${bySeverity.low.length})</span>
                             <button class="expand-btn" onclick="toggleExpand('low')">⬌</button>
                         </div>
-                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
+                        <div class="column-stats">
+                            ${generateIssueStats(bySeverity.low)}
+                        </div>
+                        <div style="padding: 6px; max-height: 80vh; overflow-y: auto;">
                             ${renderClaudeIssues(bySeverity.low, 'low')}
                         </div>
                     </div>
@@ -588,6 +623,47 @@
             `;
 
             document.getElementById('content').innerHTML = html;
+        }
+
+        function generateCommentStats(comments) {
+            if (comments.length === 0) return '<div style="text-align: center;">No comments</div>';
+
+            const stats = {};
+            comments.forEach(comment => {
+                const isBot = comment.author.login.includes('bot') || comment.author.login.includes('copilot');
+                const type = isBot ? '🤖 Bot/Copilot' : '👤 Human';
+                stats[type] = (stats[type] || 0) + 1;
+            });
+
+            return Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => `
+                    <div class="stat-group">
+                        <span>${type}</span>
+                        <span class="stat-count">${count}</span>
+                    </div>
+                `).join('');
+        }
+
+        function generateIssueStats(issues) {
+            if (issues.length === 0) return '<div style="text-align: center;">No issues</div>';
+
+            // Group by message pattern to identify common issues
+            const stats = {};
+            issues.forEach(issue => {
+                const title = getIssueTitle(issue);
+                stats[title] = (stats[title] || 0) + 1;
+            });
+
+            return Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5) // Show top 5 most common
+                .map(([title, count]) => `
+                    <div class="stat-group">
+                        <span style="font-size: 7px;">${title}</span>
+                        <span class="stat-count">${count}</span>
+                    </div>
+                `).join('');
         }
 
         function renderExistingComments(comments) {
