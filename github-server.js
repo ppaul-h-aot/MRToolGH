@@ -723,7 +723,7 @@ function analyzePRDiff(diff, repoName, prNumber) {
     },
     {
       id: 'import_grouping',
-      pattern: /^import\s+\w+|^from\s+\w+/,
+      pattern: /^(import\s+\w+|from\s+\w+.*import)/,
       severity: 'low',
       type: 'suggestion',
       message: 'Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.'
@@ -803,7 +803,8 @@ function analyzePRDiff(diff, repoName, prNumber) {
       const match = line.match(/diff --git a\/(.+?) b\/(.+)/);
       if (match) {
         currentFile = match[2]; // Use the "b/" version (new file)
-        currentFileLineNumber = 0;
+        currentFileLineNumber = 0; // Reset line number for new file
+        console.log(`📁 Starting analysis of file: ${currentFile}`);
       }
       return;
     }
@@ -813,6 +814,7 @@ function analyzePRDiff(diff, repoName, prNumber) {
       const match = line.match(/@@\s*-\d+(?:,\d+)?\s*\+(\d+)(?:,\d+)?\s*@@/);
       if (match) {
         currentFileLineNumber = parseInt(match[1]) - 1; // Start from the line before
+        console.log(`📍 Hunk starting at line ${currentFileLineNumber + 1} in ${currentFile}`);
       }
       return;
     }
@@ -832,6 +834,7 @@ function analyzePRDiff(diff, repoName, prNumber) {
 
     refactoringPatterns.forEach(pattern => {
       if (pattern.pattern.test(cleanLine)) {
+        console.log(`🔍 Found ${pattern.id} at ${currentFile}:${currentFileLineNumber} - "${cleanLine}"`);
         foundPatterns.push({
           ...pattern,
           line: index + 1, // Line in diff
