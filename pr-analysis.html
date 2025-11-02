@@ -15,42 +15,65 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background-color: #f6f8fa;
             color: #24292f;
-            line-height: 1.4;
-            font-size: 12px;
+            line-height: 1.3;
+            font-size: 10px;
         }
 
         .container {
-            max-width: 95vw;
+            max-width: 98vw;
             margin: 0 auto;
-            padding: 10px;
+            padding: 5px;
         }
 
         .columns-layout {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 8px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
         }
+
+        .columns-layout.expand-existing { grid-template-columns: 3fr 1fr 1fr 1fr; }
+        .columns-layout.expand-high { grid-template-columns: 1fr 3fr 1fr 1fr; }
+        .columns-layout.expand-medium { grid-template-columns: 1fr 1fr 3fr 1fr; }
+        .columns-layout.expand-low { grid-template-columns: 1fr 1fr 1fr 3fr; }
 
         .column {
             background: white;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         .column-header {
-            padding: 10px 15px;
+            padding: 6px 10px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 11px;
             border-bottom: 1px solid #d0d7de;
             color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .column-header.existing { background: #fb8500; }
         .column-header.high { background: #cf222e; }
         .column-header.medium { background: #fb8500; }
         .column-header.low { background: #137a2b; }
+
+        .expand-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .expand-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
 
         .header {
             background: white;
@@ -330,28 +353,52 @@
         .diff-context {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
-            border-radius: 4px;
-            margin: 6px 0;
+            border-radius: 3px;
+            margin: 4px 0;
             overflow: hidden;
-            max-height: 300px;
+            max-height: 200px;
             overflow-y: auto;
         }
 
         .diff-context-header {
             background: #e9ecef;
-            padding: 4px 8px;
-            font-size: 10px;
+            padding: 2px 6px;
+            font-size: 9px;
             font-weight: 600;
             color: #495057;
             border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .diff-line {
-            padding: 1px 8px;
+            padding: 1px 0px;
             font-family: 'SF Mono', Monaco, monospace;
-            font-size: 10px;
-            line-height: 1.2;
+            font-size: 8px;
+            line-height: 1.1;
             border-left: 2px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .diff-line-number {
+            display: inline-block;
+            width: 35px;
+            text-align: right;
+            margin-right: 8px;
+            color: #6c757d;
+            font-size: 7px;
+            background: #f1f3f4;
+            padding: 1px 4px;
+            flex-shrink: 0;
+        }
+
+        .diff-line-content {
+            flex: 1;
+            padding-left: 4px;
+            white-space: pre;
+            overflow-x: auto;
         }
 
         .diff-line.added {
@@ -497,31 +544,43 @@
                     </div>
                 </div>
 
-                <div class="columns-layout">
+                <div class="columns-layout" id="columnsLayout">
                     <div class="column">
-                        <div class="column-header existing">💬 Existing Comments (${existingComments.length})</div>
-                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                        <div class="column-header existing">
+                            <span>💬 Existing Comments (${existingComments.length})</span>
+                            <button class="expand-btn" onclick="toggleExpand('existing')">⬌</button>
+                        </div>
+                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
                             ${renderExistingComments(existingComments)}
                         </div>
                     </div>
 
                     <div class="column">
-                        <div class="column-header high">🚨 High Priority (${bySeverity.high.length})</div>
-                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                        <div class="column-header high">
+                            <span>🚨 High Priority (${bySeverity.high.length})</span>
+                            <button class="expand-btn" onclick="toggleExpand('high')">⬌</button>
+                        </div>
+                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
                             ${renderClaudeIssues(bySeverity.high, 'high')}
                         </div>
                     </div>
 
                     <div class="column">
-                        <div class="column-header medium">⚠️ Medium Priority (${bySeverity.medium.length})</div>
-                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                        <div class="column-header medium">
+                            <span>⚠️ Medium Priority (${bySeverity.medium.length})</span>
+                            <button class="expand-btn" onclick="toggleExpand('medium')">⬌</button>
+                        </div>
+                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
                             ${renderClaudeIssues(bySeverity.medium, 'medium')}
                         </div>
                     </div>
 
                     <div class="column">
-                        <div class="column-header low">ℹ️ Low Priority (${bySeverity.low.length})</div>
-                        <div style="padding: 8px; max-height: 80vh; overflow-y: auto;">
+                        <div class="column-header low">
+                            <span>ℹ️ Low Priority (${bySeverity.low.length})</span>
+                            <button class="expand-btn" onclick="toggleExpand('low')">⬌</button>
+                        </div>
+                        <div style="padding: 6px; max-height: 85vh; overflow-y: auto;">
                             ${renderClaudeIssues(bySeverity.low, 'low')}
                         </div>
                     </div>
@@ -562,33 +621,48 @@
                 return '<p style="text-align: center; color: #6c757d; margin: 20px 0;">No issues</p>';
             }
 
-            return issues.map(issue => `
+            return issues.map(issue => {
+                // Find target line in diff context for proper centering
+                const targetIndex = issue.diffContext ?
+                    issue.diffContext.findIndex(line => line.isTarget) : -1;
+
+                // Show 10 lines before and after the target by default, but allow scrolling through all
+                let visibleContext = issue.diffContext || [];
+
+                return `
                 <div class="analysis-item ${severity}">
                     <div class="analysis-header">
                         <div style="flex: 1;">
-                            <strong style="font-size: 11px;">${getIssueTitle(issue)}</strong>
-                            <div style="font-size: 9px; color: #656d76; margin-top: 2px;">
+                            <strong style="font-size: 10px;">${getIssueTitle(issue)}</strong>
+                            <div style="font-size: 8px; color: #656d76; margin-top: 2px;">
                                 📁 ${issue.fileName}:${issue.fileLineNumber}
                             </div>
                         </div>
                     </div>
-                    <div style="font-size: 10px; margin: 4px 0;">${issue.message}</div>
-                    ${issue.diffContext ? `
+                    <div style="font-size: 9px; margin: 3px 0;">${issue.message}</div>
+                    ${visibleContext.length > 0 ? `
                         <div class="diff-context">
-                            <div class="diff-context-header">📄 Context</div>
-                            ${issue.diffContext.slice(Math.max(0, issue.diffContext.length - 40)).map(line => `
-                                <div class="diff-line ${line.type} ${line.isTarget ? 'target' : ''}">
-                                    <span class="diff-line-number">${line.lineNumber}</span>${escapeHtml(line.content)}
-                                </div>
-                            `).join('')}
+                            <div class="diff-context-header">
+                                <span>📄 Diff Context (${visibleContext.length} lines)</span>
+                                <span style="font-size: 8px;">Scroll for full view</span>
+                            </div>
+                            <div id="diffScroll-${issue.line}" style="max-height: 200px; overflow-y: auto;">
+                                ${visibleContext.map(line => `
+                                    <div class="diff-line ${line.type} ${line.isTarget ? 'target' : ''}">
+                                        <span class="diff-line-number">${line.lineNumber}</span>
+                                        <span class="diff-line-content">${escapeHtml(line.content)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     ` : ''}
-                    <div style="margin-top: 6px; display: flex; gap: 4px;">
-                        <a href="${issue.githubUrl}" target="_blank" style="font-size: 9px; padding: 2px 6px; background: #0969da; color: white; text-decoration: none; border-radius: 3px;">📂 File</a>
-                        <button onclick="copyToClipboard('${escapeForJs(issue.copyableComment || issue.message)}')" style="font-size: 9px; padding: 2px 6px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">📋 Copy</button>
+                    <div style="margin-top: 4px; display: flex; gap: 3px;">
+                        <a href="${issue.githubUrl}" target="_blank" style="font-size: 8px; padding: 2px 4px; background: #0969da; color: white; text-decoration: none; border-radius: 2px;">📂 File</a>
+                        <button onclick="copyToClipboard('${escapeForJs(issue.copyableComment || issue.message)}')" style="font-size: 8px; padding: 2px 4px; background: #28a745; color: white; border: none; border-radius: 2px; cursor: pointer;">📋 Copy</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function getIssueTitle(issue) {
@@ -644,6 +718,22 @@
                 setTimeout(() => {
                     button.textContent = originalText;
                 }, 2000);
+            }
+        }
+
+        let currentExpanded = null;
+
+        function toggleExpand(columnType) {
+            const layout = document.getElementById('columnsLayout');
+
+            if (currentExpanded === columnType) {
+                // Collapse - return to normal view
+                layout.className = 'columns-layout';
+                currentExpanded = null;
+            } else {
+                // Expand the selected column
+                layout.className = `columns-layout expand-${columnType}`;
+                currentExpanded = columnType;
             }
         }
 

@@ -849,8 +849,8 @@ function analyzePRDiff(diff, repoName, prNumber) {
     const fileName = match.fileName || '';
     const lineNumber = match.fileLineNumber || match.line;
 
-    // Extract context around the issue (20 lines before and after)
-    const diffContext = extractDiffContext(lines, match.line, 20);
+    // Extract context around the issue (50 lines before and after for scrollable view)
+    const diffContext = extractDiffContext(lines, match.line, 50);
 
     // Create GitHub URLs for both PR diff view and direct file view
     const prFilesUrl = `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`;
