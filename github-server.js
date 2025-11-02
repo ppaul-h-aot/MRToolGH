@@ -669,78 +669,172 @@ app.get('/api/analysis/pr/:owner/:repo/:number', async (req, res) => {
 function analyzePRDiff(diff, repoName, prNumber) {
   const issues = [];
   const lines = diff.split('\n');
+  const seenPatterns = new Map(); // Track pattern occurrences for deduplication
 
   // Advanced patterns for refactoring analysis
   const refactoringPatterns = [
     {
+      id: 'config_class',
       pattern: /class\s+\w+Config/,
       severity: 'medium',
       type: 'suggestion',
       message: 'New config class detected. Consider validating all required fields in constructor.'
     },
     {
+      id: 'private_method_none',
       pattern: /def\s+_\w+.*\)\s*->\s*None:/,
       severity: 'low',
       type: 'suggestion',
       message: 'Private method with None return type. Consider if this should return a result for testing.'
     },
     {
-      pattern: /import.*\n.*import/,
+      id: 'import_grouping',
+      pattern: /^import\s+\w+|^from\s+\w+/,
       severity: 'low',
       type: 'suggestion',
       message: 'Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.'
     },
     {
-      pattern: /sys\.exit\(1\)/,
+      id: 'sys_exit',
+      pattern: /sys\.exit\(/,
       severity: 'medium',
       type: 'improvement_needed',
       message: 'Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.'
     },
     {
-      pattern: /os\.environ\.get\(/,
+      id: 'env_access',
+      pattern: /os\.environ\.get\(|os\.getenv\(/,
       severity: 'low',
       type: 'suggestion',
       message: 'Direct environment variable access. Consider centralizing env var handling in config class.'
     },
     {
-      pattern: /logger\.error.*sys\.exit/,
+      id: 'logger_exit',
+      pattern: /logger\.(error|critical).*sys\.exit/,
       severity: 'medium',
       type: 'improvement_needed',
       message: 'Error logging followed by exit. Consider raising custom exceptions for better error handling.'
     },
     {
-      pattern: /@dataclass\s*\nclass.*Config/,
+      id: 'dataclass_config',
+      pattern: /@dataclass\s*$/,
       severity: 'low',
       type: 'suggestion',
-      message: 'Dataclass config detected. Consider adding field validation using field() or __post_init__.'
+      message: 'Dataclass detected. Consider adding field validation using field() or __post_init__.'
     },
     {
-      pattern: /# TODO:/,
+      id: 'todo_comment',
+      pattern: /# TODO:|# FIXME:|# HACK:/,
       severity: 'low',
       type: 'suggestion',
-      message: 'TODO comment found. Consider creating GitHub issues for tracking these tasks.'
+      message: 'TODO/FIXME comment found. Consider creating GitHub issues for tracking these tasks.'
+    },
+    {
+      id: 'bare_except',
+      pattern: /except\s*:/,
+      severity: 'medium',
+      type: 'improvement_needed',
+      message: 'Bare except clause catches all exceptions. Use specific exception types for better error handling.'
+    },
+    {
+      id: 'hardcoded_paths',
+      pattern: /['"]\/.+\/['"]/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'Hardcoded file path detected. Consider using os.path.join() or pathlib for cross-platform compatibility.'
+    },
+    {
+      id: 'magic_numbers',
+      pattern: /\b(?!0|1|2|10|100|1000)\d{3,}\b/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'Magic number detected. Consider defining as a named constant for better maintainability.'
+    },
+    {
+      id: 'print_debug',
+      pattern: /print\s*\(/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'Print statement found. Consider using proper logging instead of print for debugging.'
     }
   ];
 
+  // First pass: collect all matching patterns with their line info
+  const foundPatterns = [];
   lines.forEach((line, index) => {
     // Only analyze added lines (starting with +)
     if (!line.startsWith('+')) return;
 
-    const cleanLine = line.substring(1);
+    const cleanLine = line.substring(1).trim();
+    if (!cleanLine) return; // Skip empty lines
 
     refactoringPatterns.forEach(pattern => {
       if (pattern.pattern.test(cleanLine)) {
-        issues.push({
+        foundPatterns.push({
+          ...pattern,
           line: index + 1,
-          severity: pattern.severity,
-          type: pattern.type,
-          message: pattern.message,
-          codeSnippet: cleanLine.trim(),
-          githubUrl: `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`,
-          source: 'claude-analysis'
+          codeSnippet: cleanLine,
+          originalLine: line
         });
       }
     });
+  });
+
+  // Second pass: deduplicate and group similar issues
+  const issueGroups = new Map();
+
+  foundPatterns.forEach(match => {
+    const key = match.id;
+
+    if (!issueGroups.has(key)) {
+      issueGroups.set(key, {
+        pattern: match,
+        occurrences: [],
+        firstLine: match.line
+      });
+    }
+
+    issueGroups.get(key).occurrences.push({
+      line: match.line,
+      code: match.codeSnippet
+    });
+  });
+
+  // Create consolidated issues
+  issueGroups.forEach((group, patternId) => {
+    const occurrenceCount = group.occurrences.length;
+    let message = group.pattern.message;
+
+    // Enhance message for multiple occurrences
+    if (occurrenceCount > 1) {
+      message += ` (Found ${occurrenceCount} occurrences in this PR)`;
+    }
+
+    // Show up to 3 code examples
+    const codeExamples = group.occurrences.slice(0, 3);
+    const codeSnippet = codeExamples.map(occ =>
+      `Line ${occ.line}: ${occ.code}`
+    ).join('\n');
+
+    issues.push({
+      line: group.firstLine,
+      severity: group.pattern.severity,
+      type: group.pattern.type,
+      message: message,
+      codeSnippet: codeSnippet,
+      githubUrl: `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`,
+      source: 'claude-analysis',
+      occurrenceCount: occurrenceCount
+    });
+  });
+
+  // Sort by severity and occurrence count
+  const severityOrder = { high: 3, medium: 2, low: 1 };
+  issues.sort((a, b) => {
+    if (a.severity !== b.severity) {
+      return severityOrder[b.severity] - severityOrder[a.severity];
+    }
+    return b.occurrenceCount - a.occurrenceCount;
   });
 
   return issues;
