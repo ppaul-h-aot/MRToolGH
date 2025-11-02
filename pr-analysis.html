@@ -258,6 +258,43 @@
             background: #8c959f;
             cursor: not-allowed;
         }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .copy-btn:active {
+            background: #1e7e34;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            color: #495057;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -438,18 +475,27 @@
                                         <div style="flex: 1;">
                                             <strong>${getIssueTitle(issue)}</strong>
                                             <div style="font-size: 12px; color: #656d76; margin-top: 5px;">
-                                                Line ${issue.line} • Type: ${issue.type.replace('_', ' ')}
+                                                ${issue.fileName ? `📁 ${issue.fileName}:${issue.fileLineNumber}` : `Line ${issue.line}`} • Type: ${issue.type.replace('_', ' ')}
                                             </div>
                                         </div>
                                         <span class="severity-badge severity-${severity}">${severity}</span>
                                     </div>
                                     <div class="comment-body">${issue.message}</div>
-                                    ${issue.codeSnippet ? `
-                                        <div class="code-snippet">
-                                            <strong>Code:</strong> ${escapeHtml(issue.codeSnippet)}
+                                    ${issue.fileName ? `
+                                        <div class="file-info">
+                                            📁 <strong>File:</strong> ${issue.fileName}<br>
+                                            📍 <strong>Line:</strong> ${issue.fileLineNumber}
                                         </div>
                                     ` : ''}
-                                    <a href="${issue.githubUrl}" target="_blank" class="github-link">🔗 View on GitHub</a>
+                                    ${issue.codeSnippet ? `
+                                        <div class="code-snippet">
+                                            <strong>Code:</strong><br>${escapeHtml(issue.codeSnippet)}
+                                        </div>
+                                    ` : ''}
+                                    <div class="action-buttons">
+                                        <a href="${issue.githubUrl}" target="_blank" class="github-link">🔗 View File:Line on GitHub</a>
+                                        <button class="copy-btn" onclick="copyToClipboard('${escapeForJs(issue.copyableComment || issue.message)}')">📋 Copy Comment</button>
+                                    </div>
                                 </div>
                             `;
                         });
@@ -481,6 +527,44 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function escapeForJs(text) {
+            if (!text) return '';
+            return text.replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+
+                // Show temporary success feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.style.background = '#28a745';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#28a745';
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                // Show feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }
         }
 
         // Auto-populate if URL has parameters

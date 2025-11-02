@@ -671,6 +671,9 @@ function analyzePRDiff(diff, repoName, prNumber) {
   const lines = diff.split('\n');
   const seenPatterns = new Map(); // Track pattern occurrences for deduplication
 
+  // Track current file being processed
+  let currentFile = null;
+
   // Advanced patterns for refactoring analysis
   const refactoringPatterns = [
     {
@@ -761,7 +764,35 @@ function analyzePRDiff(diff, repoName, prNumber) {
 
   // First pass: collect all matching patterns with their line info
   const foundPatterns = [];
+  let currentFileLineNumber = 0;
+
   lines.forEach((line, index) => {
+    // Track file headers (diff --git a/file.py b/file.py)
+    if (line.startsWith('diff --git')) {
+      const match = line.match(/diff --git a\/(.+?) b\/(.+)/);
+      if (match) {
+        currentFile = match[2]; // Use the "b/" version (new file)
+        currentFileLineNumber = 0;
+      }
+      return;
+    }
+
+    // Track line numbers within the file (@@ -old_start,old_count +new_start,new_count @@)
+    if (line.startsWith('@@')) {
+      const match = line.match(/@@\s*-\d+(?:,\d+)?\s*\+(\d+)(?:,\d+)?\s*@@/);
+      if (match) {
+        currentFileLineNumber = parseInt(match[1]) - 1; // Start from the line before
+      }
+      return;
+    }
+
+    // Track actual file line numbers
+    if (line.startsWith('+') || line.startsWith('-') || line.startsWith(' ')) {
+      if (line.startsWith('+') || line.startsWith(' ')) {
+        currentFileLineNumber++; // Only increment for new/context lines
+      }
+    }
+
     // Only analyze added lines (starting with +)
     if (!line.startsWith('+')) return;
 
@@ -772,7 +803,9 @@ function analyzePRDiff(diff, repoName, prNumber) {
       if (pattern.pattern.test(cleanLine)) {
         foundPatterns.push({
           ...pattern,
-          line: index + 1,
+          line: index + 1, // Line in diff
+          fileLineNumber: currentFileLineNumber, // Line in actual file
+          fileName: currentFile,
           codeSnippet: cleanLine,
           originalLine: line
         });
@@ -796,6 +829,8 @@ function analyzePRDiff(diff, repoName, prNumber) {
 
     issueGroups.get(key).occurrences.push({
       line: match.line,
+      fileLineNumber: match.fileLineNumber,
+      fileName: match.fileName,
       code: match.codeSnippet
     });
   });
@@ -810,21 +845,39 @@ function analyzePRDiff(diff, repoName, prNumber) {
       message += ` (Found ${occurrenceCount} occurrences in this PR)`;
     }
 
-    // Show up to 3 code examples
+    // Show up to 3 code examples with file and line info
     const codeExamples = group.occurrences.slice(0, 3);
-    const codeSnippet = codeExamples.map(occ =>
-      `Line ${occ.line}: ${occ.code}`
-    ).join('\n');
+    const codeSnippet = codeExamples.map(occ => {
+      const fileName = occ.fileName || 'unknown';
+      const lineNum = occ.fileLineNumber || occ.line;
+      return `${fileName}:${lineNum} - ${occ.code}`;
+    }).join('\n');
+
+    // Get the primary file and line for the GitHub URL
+    const primaryOccurrence = group.occurrences[0];
+    const fileName = primaryOccurrence.fileName || '';
+    const lineNumber = primaryOccurrence.fileLineNumber || group.firstLine;
+
+    // Create GitHub URL that goes directly to the file and line
+    let githubUrl = `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`;
+    if (fileName) {
+      // Create a hash for the specific file and line in the PR diff view
+      const fileHash = Buffer.from(fileName).toString('hex');
+      githubUrl += `#diff-${fileHash}R${lineNumber}`;
+    }
 
     issues.push({
       line: group.firstLine,
+      fileName: fileName,
+      fileLineNumber: lineNumber,
       severity: group.pattern.severity,
       type: group.pattern.type,
       message: message,
       codeSnippet: codeSnippet,
-      githubUrl: `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`,
+      githubUrl: githubUrl,
       source: 'claude-analysis',
-      occurrenceCount: occurrenceCount
+      occurrenceCount: occurrenceCount,
+      copyableComment: `${group.pattern.message}\n\nFile: ${fileName}\nLine: ${lineNumber}\n\nCode:\n${codeExamples[0]?.code || ''}`
     });
   });
 
