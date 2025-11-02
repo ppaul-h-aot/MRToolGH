@@ -28,7 +28,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Utility function to execute gh CLI commands
+// Utility function to execute gh CLI commands (expects JSON response)
 function executeGhCommand(command) {
   try {
     const result = execSync(command, {
@@ -37,6 +37,21 @@ function executeGhCommand(command) {
       maxBuffer: 10 * 1024 * 1024 // 10MB buffer
     });
     return JSON.parse(result);
+  } catch (error) {
+    console.error(`Error executing gh command: ${command}`, error.message);
+    throw new Error(`GitHub CLI error: ${error.message}`);
+  }
+}
+
+// Utility function to execute gh CLI commands (returns raw text)
+function executeGhCommandRaw(command) {
+  try {
+    const result = execSync(command, {
+      encoding: 'utf8',
+      timeout: 30000,
+      maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+    });
+    return result;
   } catch (error) {
     console.error(`Error executing gh command: ${command}`, error.message);
     throw new Error(`GitHub CLI error: ${error.message}`);
@@ -621,13 +636,13 @@ app.get('/api/analysis/pr/:owner/:repo/:number', async (req, res) => {
   const { owner, repo, number } = req.params;
 
   try {
-    // Get existing comments from GitHub
+    // Get existing comments from GitHub (JSON format)
     const prDetails = executeGhCommand(
       `gh pr view ${number} --repo ${owner}/${repo} --json title,body,comments,author,createdAt,url`
     );
 
-    // Get PR diff for Claude analysis
-    const prDiff = executeGhCommand(
+    // Get PR diff for Claude analysis (plain text format)
+    const prDiff = executeGhCommandRaw(
       `gh pr diff ${number} --repo ${owner}/${repo}`
     );
 
