@@ -616,6 +616,121 @@ app.get('/api/analysis/latest', (req, res) => {
   }
 });
 
+// Get specific PR analysis with existing comments
+app.get('/api/analysis/pr/:owner/:repo/:number', async (req, res) => {
+  const { owner, repo, number } = req.params;
+
+  try {
+    // Get existing comments from GitHub
+    const prDetails = executeGhCommand(
+      `gh pr view ${number} --repo ${owner}/${repo} --json title,body,comments,author,createdAt,url`
+    );
+
+    // Get PR diff for Claude analysis
+    const prDiff = executeGhCommand(
+      `gh pr diff ${number} --repo ${owner}/${repo}`
+    );
+
+    // Analyze the diff for new issues
+    const claudeAnalysis = analyzePRDiff(prDiff, repo, number);
+
+    res.json({
+      success: true,
+      pr: prDetails,
+      existingComments: prDetails.comments || [],
+      claudeAnalysis: claudeAnalysis,
+      diff: prDiff
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Analyze PR diff for Claude-specific issues
+function analyzePRDiff(diff, repoName, prNumber) {
+  const issues = [];
+  const lines = diff.split('\n');
+
+  // Advanced patterns for refactoring analysis
+  const refactoringPatterns = [
+    {
+      pattern: /class\s+\w+Config/,
+      severity: 'medium',
+      type: 'suggestion',
+      message: 'New config class detected. Consider validating all required fields in constructor.'
+    },
+    {
+      pattern: /def\s+_\w+.*\)\s*->\s*None:/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'Private method with None return type. Consider if this should return a result for testing.'
+    },
+    {
+      pattern: /import.*\n.*import/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.'
+    },
+    {
+      pattern: /sys\.exit\(1\)/,
+      severity: 'medium',
+      type: 'improvement_needed',
+      message: 'Direct sys.exit() calls make testing difficult. Consider raising exceptions that can be caught.'
+    },
+    {
+      pattern: /os\.environ\.get\(/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'Direct environment variable access. Consider centralizing env var handling in config class.'
+    },
+    {
+      pattern: /logger\.error.*sys\.exit/,
+      severity: 'medium',
+      type: 'improvement_needed',
+      message: 'Error logging followed by exit. Consider raising custom exceptions for better error handling.'
+    },
+    {
+      pattern: /@dataclass\s*\nclass.*Config/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'Dataclass config detected. Consider adding field validation using field() or __post_init__.'
+    },
+    {
+      pattern: /# TODO:/,
+      severity: 'low',
+      type: 'suggestion',
+      message: 'TODO comment found. Consider creating GitHub issues for tracking these tasks.'
+    }
+  ];
+
+  lines.forEach((line, index) => {
+    // Only analyze added lines (starting with +)
+    if (!line.startsWith('+')) return;
+
+    const cleanLine = line.substring(1);
+
+    refactoringPatterns.forEach(pattern => {
+      if (pattern.pattern.test(cleanLine)) {
+        issues.push({
+          line: index + 1,
+          severity: pattern.severity,
+          type: pattern.type,
+          message: pattern.message,
+          codeSnippet: cleanLine.trim(),
+          githubUrl: `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`,
+          source: 'claude-analysis'
+        });
+      }
+    });
+  });
+
+  return issues;
+}
+
 // Get analysis history
 app.get('/api/analysis/history', (req, res) => {
   try {
