@@ -813,71 +813,33 @@ function analyzePRDiff(diff, repoName, prNumber) {
     });
   });
 
-  // Second pass: deduplicate and group similar issues
-  const issueGroups = new Map();
-
+  // Create individual issues for each occurrence (no grouping/merging)
   foundPatterns.forEach(match => {
-    const key = match.id;
+    const fileName = match.fileName || '';
+    const lineNumber = match.fileLineNumber || match.line;
 
-    if (!issueGroups.has(key)) {
-      issueGroups.set(key, {
-        pattern: match,
-        occurrences: [],
-        firstLine: match.line
-      });
-    }
+    // Create GitHub URLs for both PR diff view and direct file view
+    const prFilesUrl = `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`;
+    let fileViewUrl = prFilesUrl;
 
-    issueGroups.get(key).occurrences.push({
-      line: match.line,
-      fileLineNumber: match.fileLineNumber,
-      fileName: match.fileName,
-      code: match.codeSnippet
-    });
-  });
-
-  // Create consolidated issues
-  issueGroups.forEach((group, patternId) => {
-    const occurrenceCount = group.occurrences.length;
-    let message = group.pattern.message;
-
-    // Enhance message for multiple occurrences
-    if (occurrenceCount > 1) {
-      message += ` (Found ${occurrenceCount} occurrences in this PR)`;
-    }
-
-    // Show up to 3 code examples with file and line info
-    const codeExamples = group.occurrences.slice(0, 3);
-    const codeSnippet = codeExamples.map(occ => {
-      const fileName = occ.fileName || 'unknown';
-      const lineNum = occ.fileLineNumber || occ.line;
-      return `${fileName}:${lineNum} - ${occ.code}`;
-    }).join('\n');
-
-    // Get the primary file and line for the GitHub URL
-    const primaryOccurrence = group.occurrences[0];
-    const fileName = primaryOccurrence.fileName || '';
-    const lineNumber = primaryOccurrence.fileLineNumber || group.firstLine;
-
-    // Create GitHub URL that goes directly to the file and line
-    let githubUrl = `https://github.com/h1-aot/${repoName}/pull/${prNumber}/files`;
     if (fileName) {
-      // Create a hash for the specific file and line in the PR diff view
-      const fileHash = Buffer.from(fileName).toString('hex');
-      githubUrl += `#diff-${fileHash}R${lineNumber}`;
+      // Direct link to the file with line number (works reliably)
+      fileViewUrl = `https://github.com/h1-aot/${repoName}/blob/main/${fileName}#L${lineNumber}`;
     }
 
     issues.push({
-      line: group.firstLine,
+      line: match.line,
       fileName: fileName,
       fileLineNumber: lineNumber,
-      severity: group.pattern.severity,
-      type: group.pattern.type,
-      message: message,
-      codeSnippet: codeSnippet,
-      githubUrl: githubUrl,
+      severity: match.severity,
+      type: match.type,
+      message: match.message,
+      codeSnippet: `${fileName}:${lineNumber} - ${match.codeSnippet}`,
+      githubUrl: fileViewUrl,
+      prFilesUrl: prFilesUrl,
       source: 'claude-analysis',
-      occurrenceCount: occurrenceCount,
-      copyableComment: `${group.pattern.message}\n\nFile: ${fileName}\nLine: ${lineNumber}\n\nCode:\n${codeExamples[0]?.code || ''}`
+      occurrenceCount: 1,
+      copyableComment: `${match.message}\n\nFile: ${fileName}\nLine: ${lineNumber}\n\nCode:\n${match.codeSnippet}`
     });
   });
 

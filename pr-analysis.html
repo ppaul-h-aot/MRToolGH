@@ -493,7 +493,8 @@
                                         </div>
                                     ` : ''}
                                     <div class="action-buttons">
-                                        <a href="${issue.githubUrl}" target="_blank" class="github-link">🔗 View File:Line on GitHub</a>
+                                        <a href="${issue.githubUrl}" target="_blank" class="github-link">📂 View File:${issue.fileLineNumber}</a>
+                                        <a href="${issue.prFilesUrl}" target="_blank" class="github-link" style="background: #6f42c1;">📋 View PR Diff</a>
                                         <button class="copy-btn" onclick="copyToClipboard('${escapeForJs(issue.copyableComment || issue.message)}')">📋 Copy Comment</button>
                                     </div>
                                 </div>
