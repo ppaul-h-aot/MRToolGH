@@ -634,6 +634,7 @@ app.get('/api/analysis/latest', (req, res) => {
 // Get specific PR analysis with existing comments
 app.get('/api/analysis/pr/:owner/:repo/:number', async (req, res) => {
   const { owner, repo, number } = req.params;
+  console.log(`🔍 PR Analysis request: ${owner}/${repo}/${number} - Query params:`, req.query);
 
   try {
     // Get existing comments from GitHub (JSON format)
@@ -650,6 +651,8 @@ app.get('/api/analysis/pr/:owner/:repo/:number', async (req, res) => {
     const archivePath = path.join(__dirname, 'claude-analysis-archive', `${owner}-${repo}-${number}.json`);
     let claudeAnalysis = [];
     let isFromArchive = false;
+
+    console.log(`🔍 Checking archive: ${archivePath} - exists: ${fs.existsSync(archivePath)} - refresh param: ${req.query.refresh}`);
 
     if (fs.existsSync(archivePath)) {
       try {
