@@ -1,0 +1,308 @@
+{
+  "owner": "h1-aot",
+  "repo": "aot-base",
+  "prNumber": "205",
+  "analysis": [
+    {
+      "line": 23,
+      "fileName": "src/agentic/__init__.py",
+      "fileLineNumber": 80,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Direct environment variable access. Consider centralizing env var handling in config class.",
+      "codeSnippet": "src/agentic/__init__.py:80 - LOG_LEVEL = os.getenv(\"LOG_LEVEL\", \"INFO\").upper()",
+      "diffContext": [
+        {
+          "lineNumber": 1,
+          "content": "diff --git a/.env.template b/.env.template",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 2,
+          "content": "index 079b4e9..fd2d024 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 3,
+          "content": "--- a/.env.template",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 4,
+          "content": "+++ b/.env.template",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 5,
+          "content": "@@ -179,3 +179,8 @@ S3_BUCKET=aot-artifacts-dev-790338063405",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 6,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 7,
+          "content": " # - AWS_PROFILE is passed from your shell environment if not overridden here",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 8,
+          "content": " AWS_PROFILE=627031163350_AotDeveloper",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 9,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 10,
+          "content": "+#------------------------",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 11,
+          "content": "+# Log level configuration",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 12,
+          "content": "+#------------------------",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 13,
+          "content": "+LOG_LEVEL=INFO",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 14,
+          "content": "diff --git a/src/agentic/__init__.py b/src/agentic/__init__.py",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 15,
+          "content": "index 35b0810..f514427 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 16,
+          "content": "--- a/src/agentic/__init__.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 17,
+          "content": "+++ b/src/agentic/__init__.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 18,
+          "content": "@@ -76,21 +76,25 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 19,
+          "content": " LOG_DIR.mkdir(parents=True, exist_ok=True)",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 20,
+          "content": " LOG_FILE = LOG_DIR / \"agentic.log\"",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 21,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 22,
+          "content": "+# Get log level from environment variable, default to INFO",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 23,
+          "content": "+LOG_LEVEL = os.getenv(\"LOG_LEVEL\", \"INFO\").upper()",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 24,
+          "content": "+log_level = getattr(logging, LOG_LEVEL, logging.INFO)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 25,
+          "content": "+",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 26,
+          "content": " formatter = logging.Formatter(",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 27,
+          "content": "     fmt=\"%(asctime)s %(levelname)s %(name)s: %(message)s\",",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 28,
+          "content": "     datefmt=\"%Y-%m-%d %H:%M:%S\",",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 29,
+          "content": " )",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 30,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 31,
+          "content": " file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=3)",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 32,
+          "content": "-file_handler.setLevel(logging.INFO)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 33,
+          "content": "+file_handler.setLevel(log_level)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 34,
+          "content": " file_handler.setFormatter(formatter)",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 35,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 36,
+          "content": " console_handler = logging.StreamHandler()",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 37,
+          "content": "-console_handler.setLevel(logging.INFO)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 38,
+          "content": "+console_handler.setLevel(log_level)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 39,
+          "content": " console_handler.setFormatter(formatter)",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 40,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 41,
+          "content": " root_logger = logging.getLogger()",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 42,
+          "content": "-root_logger.setLevel(logging.INFO)",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 43,
+          "content": "+root_logger.setLevel(log_level)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 44,
+          "content": " root_logger.handlers.clear()",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 45,
+          "content": " root_logger.addHandler(file_handler)",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 46,
+          "content": " root_logger.addHandler(console_handler)",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 47,
+          "content": "",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/205/files#diff-7372632f6167656eR80",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/205/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Direct environment variable access. Consider centralizing env var handling in config class.\n\nFile: src/agentic/__init__.py\nLine: 80\n\nCode:\nLOG_LEVEL = os.getenv(\"LOG_LEVEL\", \"INFO\").upper()",
+      "timestamp": "2025-11-02T15:31:58.536Z"
+    }
+  ],
+  "timestamp": "2025-11-02T15:31:58.536Z",
+  "version": "1.0"
+}

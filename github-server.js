@@ -198,7 +198,7 @@ app.get('/api/repos/:owner/:repo/prs', async (req, res) => {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const prs = executeGhCommand(
-      `gh pr list --repo ${owner}/${repo} --state ${state} --json number,title,author,createdAt,updatedAt,url,reviewDecision,isDraft --limit 100`
+      `gh pr list --repo ${owner}/${repo} --state open --json number,title,author,createdAt,updatedAt,url,reviewDecision,isDraft --limit 100`
     );
 
     // Filter PRs to last 30 days
