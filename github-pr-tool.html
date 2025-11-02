@@ -1060,41 +1060,11 @@
         }
 
         function selectPullRequestFromTree(prNumber, owner, repoName) {
-            console.log('🎯 Selecting PR from tree:', prNumber, owner, repoName);
+            console.log('🎯 Navigating to PR analysis page:', prNumber, owner, repoName);
 
-            // Set current context
-            currentRepo = { owner, name: repoName };
-            currentPR = prNumber;
-
-            // Update UI states - highlight selected PR
-            document.querySelectorAll('.pr-tree-item').forEach(item => item.classList.remove('active'));
-
-            // Find the clicked PR item and highlight it
-            const allPRItems = document.querySelectorAll('.pr-tree-item');
-            allPRItems.forEach(item => {
-                const prNumberSpan = item.querySelector('.pr-number');
-                if (prNumberSpan && prNumberSpan.textContent === `#${prNumber}`) {
-                    item.classList.add('active');
-                    console.log('✅ Highlighted PR item:', prNumber);
-                }
-            });
-
-            // Update breadcrumb and enable refresh
-            document.getElementById('refreshBtn').disabled = false;
-            document.getElementById('breadcrumb').textContent = `${owner}/${repoName} - PR #${prNumber} - Loading comments...`;
-
-            // Show loading state with more detail
-            document.getElementById('mainContent').innerHTML = `
-                <div class="loading">
-                    <h3>🔄 Loading actionable comments for PR #${prNumber}</h3>
-                    <p>Repository: ${owner}/${repoName}</p>
-                    <p>Please wait...</p>
-                </div>
-            `;
-
-            // Load comments
-            console.log('📡 Starting to load PR comments...');
-            loadPRComments();
+            // Navigate to the PR analysis page with Claude comments
+            const analysisUrl = `/pr-analysis?repo=${owner}/${repoName}&pr=${prNumber}`;
+            window.location.href = analysisUrl;
         }
 
         function showRepositoryOverview(owner, repoName) {
