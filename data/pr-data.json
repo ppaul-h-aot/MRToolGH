@@ -1,11 +1,11 @@
 {
-  "lastUpdate": "2025-11-01T17:46:06.135Z",
+  "lastUpdate": "2025-11-03T16:15:43.169Z",
   "repositories": [
     {
       "owner": "h1-aot",
       "name": "agent_manager",
       "url": "https://github.com/h1-aot/agent_manager",
-      "lastPush": "2025-11-01T05:33:18Z",
+      "lastPush": "2025-11-03T07:50:07Z",
       "pullRequests": [
         {
           "author": {
@@ -48,8 +48,113 @@
       "owner": "h1-aot",
       "name": "aot-base",
       "url": "https://github.com/h1-aot/aot-base",
-      "lastPush": "2025-10-31T23:18:12Z",
+      "lastPush": "2025-11-03T16:15:16Z",
       "pullRequests": [
+        {
+          "author": {
+            "id": "U_kgDOB7NDfw",
+            "is_bot": false,
+            "login": "cmoh1",
+            "name": "Colin Monroe"
+          },
+          "createdAt": "2025-11-03T12:40:34Z",
+          "isDraft": false,
+          "number": 236,
+          "reviewDecision": "",
+          "title": "Add rate limiter to base and methodical agents",
+          "updatedAt": "2025-11-03T16:04:03Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/236",
+          "actionableComments": [
+            {
+              "id": 2486363909,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The comment references 'langsmith/rate-limiting' but the feature being configured is `InMemoryRateLimiter` from `langchain_core.rate_limiters`, not LangSmith-specific. Consider updating to reference the correct documentation URL or clarifying that this is general LangChain rate limiting.\n```suggestion\n# See LangChain rate limiting: https://docs.langchain.com/docs/integrations/rate-limiting\n```",
+              "createdAt": "2025-11-03T12:42:39Z",
+              "path": "config/agentic.toml",
+              "line": 14,
+              "url": "https://github.com/h1-aot/aot-base/pull/236#discussion_r2486363909",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2487018826,
+              "type": "review_comment",
+              "author": "NicholasBusby",
+              "body": "Any chance these can be pulled from our env files somewhere down the line as an override? Just so our setup is in a consistent (ish) place?",
+              "createdAt": "2025-11-03T16:03:28Z",
+              "path": "config/agentic.toml",
+              "line": 17,
+              "url": "https://github.com/h1-aot/aot-base/pull/236#discussion_r2487018826",
+              "actionType": "question",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 2,
+          "severityCounts": {
+            "high": 0,
+            "medium": 2,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "MDQ6VXNlcjUwMjQ0MTc=",
+            "is_bot": false,
+            "login": "NicholasBusby",
+            "name": "Nicholas Busby"
+          },
+          "createdAt": "2025-11-01T19:46:07Z",
+          "isDraft": false,
+          "number": 235,
+          "reviewDecision": "APPROVED",
+          "title": "Fixintg the path to postgres",
+          "updatedAt": "2025-11-03T16:07:36Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/235",
+          "actionableComments": [
+            {
+              "id": 2483889568,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The PostgreSQL volume mount path should be `/var/lib/postgresql/data`, not `/var/lib/postgresql`. The official PostgreSQL Docker image expects the data directory to be mounted at `/var/lib/postgresql/data` (the PGDATA location). Mounting at the parent directory `/var/lib/postgresql` can cause permission issues and conflicts with PostgreSQL's internal directory structure, as the container needs to manage the `data` subdirectory and other metadata files separately.\n```suggestion\n      - langfuse_postgres_data:/var/lib/postgresql/data\n```",
+              "createdAt": "2025-11-01T19:47:25Z",
+              "path": "docker-compose.yml",
+              "line": 240,
+              "url": "https://github.com/h1-aot/aot-base/pull/235#discussion_r2483889568",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2484981222,
+              "type": "review_comment",
+              "author": "pembroke-davis",
+              "body": "I can confirm.  The error we saw was very verbose wrt to the latest version of postgres.  We may want to consider locking versions to avoid errors like this in the future.",
+              "createdAt": "2025-11-02T20:04:40Z",
+              "path": "docker-compose.yml",
+              "line": 240,
+              "url": "https://github.com/h1-aot/aot-base/pull/235#discussion_r2484981222",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 3408949198,
+              "type": "review",
+              "author": "pembroke-davis",
+              "body": "this was due to postgres containers being \"latest\" and a breaking feature being released across a major version.  We may want to consider locking down datastores to specific versions in the future to avoid this",
+              "createdAt": "2025-11-02T20:06:34Z",
+              "state": "APPROVED",
+              "url": "https://github.com/h1-aot/aot-base/pull/235#pullrequestreview-3408949198",
+              "actionType": "suggestion",
+              "severity": "low"
+            }
+          ],
+          "actionableCount": 3,
+          "severityCounts": {
+            "high": 1,
+            "medium": 1,
+            "low": 1
+          }
+        },
         {
           "author": {
             "id": "MDQ6VXNlcjMwMDQ2Mzc=",
@@ -60,9 +165,9 @@
           "createdAt": "2025-10-31T20:35:21Z",
           "isDraft": true,
           "number": 224,
-          "reviewDecision": "REVIEW_REQUIRED",
+          "reviewDecision": "APPROVED",
           "title": "Update ci workflow",
-          "updatedAt": "2025-10-31T23:02:52Z",
+          "updatedAt": "2025-11-03T16:15:19Z",
           "url": "https://github.com/h1-aot/aot-base/pull/224",
           "actionableComments": [
             {
@@ -140,7 +245,7 @@
           "number": 213,
           "reviewDecision": "REVIEW_REQUIRED",
           "title": "Change cookies -> auth tokens, add new sources for auth tokens",
-          "updatedAt": "2025-10-30T21:09:51Z",
+          "updatedAt": "2025-11-03T12:45:38Z",
           "url": "https://github.com/h1-aot/aot-base/pull/213",
           "actionableComments": [
             {
@@ -316,9 +421,9 @@
           "createdAt": "2025-10-30T00:19:55Z",
           "isDraft": false,
           "number": 210,
-          "reviewDecision": "",
+          "reviewDecision": "APPROVED",
           "title": "Refactor config and application entrypoint",
-          "updatedAt": "2025-10-30T22:52:49Z",
+          "updatedAt": "2025-11-03T16:03:14Z",
           "url": "https://github.com/h1-aot/aot-base/pull/210",
           "actionableComments": [
             {
@@ -388,7 +493,7 @@
               "body": "Agreed, I haven't dug into this config a ton yet, but I think this would be a good candidate for it. I need to come up with a clean config approach that separates config that is expected to change/be injected at runtime vs. config that we specify in source and is not expected to change at runtime.",
               "createdAt": "2025-10-30T18:04:28Z",
               "path": "src/agentic/utils/config.py",
-              "line": 321,
+              "line": 320,
               "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479040627",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -400,7 +505,7 @@
               "body": "@bwillis added target creds handling here. The pattern is a little wonky in current state (it will read from \"initial_state\" to populate this config and then inside the orchestrator run() function will overwrite the state's target_credentials with what's in this config) but I think it will be super helpful for decoupling config population (now we can populate target_credentials however we want) with graph execution. Good idea!",
               "createdAt": "2025-10-30T19:10:17Z",
               "path": "src/agentic/__init__.py",
-              "line": 914,
+              "line": 918,
               "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479234868",
               "actionType": "question",
               "severity": "medium"
@@ -424,7 +529,7 @@
               "body": "The `callback_handlers` is initialized twice (line 282 and line 312), causing the first initialization to be overwritten. Remove the duplicate assignment on line 312.\n```suggestion\n\n```",
               "createdAt": "2025-10-30T20:27:35Z",
               "path": "src/agentic/utils/config.py",
-              "line": 312,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479432068",
               "actionType": "request",
               "severity": "medium"
@@ -436,7 +541,7 @@
               "body": "If `creds` is `None`, calling `creds.get()` will raise an `AttributeError`. The condition should be `if creds is None or not creds.get(\\\"username\\\") or not creds.get(\\\"password\\\"):` to safely handle the None case and empty strings.\n```suggestion\n        if creds is None or not creds.get(\"username\") or not creds.get(\"password\"):\n```",
               "createdAt": "2025-10-30T20:27:36Z",
               "path": "src/agentic/__init__.py",
-              "line": 910,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479432092",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -448,7 +553,7 @@
               "body": "If `creds.get(\\\"username\\\")` or `creds.get(\\\"password\\\")` returns `None`, the `TargetCredentials` dataclass will be initialized with `None` values. Add default empty strings: `username=creds.get(\\\"username\\\", \\\"\\\")` and `password=creds.get(\\\"password\\\", \\\"\\\")` or validate that these values are not None.\n```suggestion\n        username = creds.get(\"username\", \"\") if creds else \"\"\n        password = creds.get(\"password\", \"\") if creds else \"\"\n        if not username or not password:\n            logger.error(colored(\"target_credentials must be specified in initial state if auth is enabled.\", \"red\"))\n            sys.exit(1)\n\n        auth_config = AuthConfig(\n            allow_auth_failure=False,\n            target_credentials=TargetCredentials(username=username, password=password),\n```",
               "createdAt": "2025-10-30T20:27:36Z",
               "path": "src/agentic/__init__.py",
-              "line": 916,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/210#discussion_r2479432106",
               "actionType": "fix_required",
               "severity": "high"
@@ -547,7 +652,7 @@
           "number": 205,
           "reviewDecision": "APPROVED",
           "title": "83634 logging",
-          "updatedAt": "2025-10-31T23:18:14Z",
+          "updatedAt": "2025-11-03T15:59:14Z",
           "url": "https://github.com/h1-aot/aot-base/pull/205",
           "actionableComments": [
             {
@@ -1080,7 +1185,7 @@
       "owner": "h1-aot",
       "name": "aot-frontend-api",
       "url": "https://github.com/h1-aot/aot-frontend-api",
-      "lastPush": "2025-10-31T21:36:06Z",
+      "lastPush": "2025-11-03T15:58:27Z",
       "pullRequests": [
         {
           "author": {
@@ -1094,7 +1199,7 @@
           "number": 8,
           "reviewDecision": "",
           "title": "Integrate DynamoDB",
-          "updatedAt": "2025-10-31T19:27:05Z",
+          "updatedAt": "2025-11-03T16:02:24Z",
           "url": "https://github.com/h1-aot/aot-frontend-api/pull/8",
           "actionableComments": [
             {
@@ -1104,7 +1209,7 @@
               "body": "Missing comment prefix '#' before 'For production:'. This line should be commented out.\n```suggestion\n# For production:\n```",
               "createdAt": "2025-10-31T18:24:25Z",
               "path": ".env.template",
-              "line": 147,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482330269",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1116,7 +1221,7 @@
               "body": "The error message on line 86 is misleading. If 'Item' is not in the response, it means the run does not exist, not that it exists but couldn't be retrieved. Should return None (matching the Optional return type) or raise a more appropriate exception like KeyError or return None with appropriate logging.\n```suggestion\n            logger.info(f\"Run {run_id} not found in DynamoDB\")\n            return None\n```",
               "createdAt": "2025-10-31T18:24:25Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 86,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482330285",
               "actionType": "fix_required",
               "severity": "high"
@@ -1128,7 +1233,7 @@
               "body": "Using 'created_at' as a HASH key in the GSI is inefficient because ISO timestamps are unique per record, preventing effective data distribution across partitions. Consider using a constant partition key (e.g., 'ALL') with 'created_at' as a RANGE key, or use date-only values as the HASH key with 'created_at' as RANGE key for better query performance.",
               "createdAt": "2025-10-31T18:24:25Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 237,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482330291",
               "actionType": "fix_required",
               "severity": "high"
@@ -1140,7 +1245,7 @@
               "body": "Consider wrapping in custom exception with more context:\r\n  ```\r\nexcept ClientError as e:\r\n      logger.error(f\"Error creating run {run.run_id}: {e}\", exc_info=True)\r\n      raise DynamoDBStorageError(f\"Failed to create run {run.run_id}\") from e\r\n```",
               "createdAt": "2025-10-31T18:56:31Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 72,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482408417",
               "actionType": "fix_required",
               "severity": "high"
@@ -1152,7 +1257,7 @@
               "body": "```\r\nlogger.error(f\"Error creating run: {e}\")\r\n  raise  # ❌ Loses context\r\n```",
               "createdAt": "2025-10-31T18:56:43Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 72,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482408806",
               "actionType": "fix_required",
               "severity": "high"
@@ -1164,7 +1269,7 @@
               "body": "  If no item exists, the message says \"exists but could not be retrieved\" which is misleading. Should either:\r\n  - Return None (matches return type Optional[AgentRun])\r\n  - Raise a more appropriate exception like KeyError or custom RunNotFoundError",
               "createdAt": "2025-10-31T18:59:08Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 86,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482413683",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1176,7 +1281,7 @@
               "body": "This doesn't work as intended. Limit parameter limits scanned items, not returned items. This approach fetches all items, sorts in memory, then paginates. \r\n\r\nDynamodb provides baked in pagination with ExclusiveStartKey. \r\n\r\nFeel free to create a separate task since this may take a bit more time.",
               "createdAt": "2025-10-31T19:01:09Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 95,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482417428",
               "actionType": "request",
               "severity": "medium"
@@ -1188,7 +1293,7 @@
               "body": "Ideally we should always use Query instead of Scan if possible with DDB",
               "createdAt": "2025-10-31T19:01:46Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 95,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482418556",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1200,7 +1305,7 @@
               "body": "What's the intention here? For AWS, this table will be created by IaC - is this for local only? Ideally this should be part of a separate script for creating locally",
               "createdAt": "2025-10-31T19:05:40Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 199,
+              "line": 383,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482425662",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1212,7 +1317,7 @@
               "body": "```\r\nProvisionedThroughput={\r\n      'ReadCapacityUnits': 5,\r\n      'WriteCapacityUnits': 5\r\n  }\r\n```\r\n\r\n  This creates provisioned tables, but modern best practice is to use on-demand billing for most use cases. Consider:\r\n  - Making this configurable\r\n  - Defaulting to on-demand mode (BillingMode='PAY_PER_REQUEST')\r\n  - Documenting the throughput strategy\r\n\r\n(ofc the table will be created by IaC - terraform)",
               "createdAt": "2025-10-31T19:06:55Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 231,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482428171",
               "actionType": "suggestion",
               "severity": "low"
@@ -1224,7 +1329,7 @@
               "body": "Good logging throughout, but consider:\r\n  - Add request IDs to log context for debugging\r\n  - Log timing metrics for DynamoDB operations\r\n  - Include run_id in all relevant log messages for correlation",
               "createdAt": "2025-10-31T19:09:18Z",
               "path": "app/storage/dynamo_storage.py",
-              "line": 25,
+              "line": 47,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482433255",
               "actionType": "suggestion",
               "severity": "low"
@@ -1236,7 +1341,7 @@
               "body": "is this intentional? I'd assume this would be a local service. `test_dynamo.py` connects to real AWS DynamoDB seems like.\r\n```\r\nself._dynamodb = boto3.client(\r\n      'dynamodb',\r\n      region_name=self.config.region  # Only region specified\r\n  )\r\n```\r\n\r\n  Missing: endpoint_url parameter needed for local DynamoDB:\r\nWhat it should look like for local testing:\r\n ```\r\n boto3.client(\r\n      'dynamodb',\r\n      region_name='us-west-2',\r\n      endpoint_url='http://localhost:8000'  # ← This is missing!\r\n  )\r\n```",
               "createdAt": "2025-10-31T19:14:10Z",
               "path": "tests/test_dynamo.py",
-              "line": 1,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482444222",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1248,17 +1353,41 @@
               "body": "you can also consider using moto which helps writing mock tests for aws services\r\n\r\nhttps://docs.getmoto.org/en/latest/docs/getting_started.html\r\n\r\n",
               "createdAt": "2025-10-31T19:21:15Z",
               "path": "tests/test_dynamo.py",
-              "line": 1,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2482458225",
               "actionType": "improvement_needed",
               "severity": "medium"
+            },
+            {
+              "id": 2487005025,
+              "type": "review_comment",
+              "author": "github-code-quality[bot]",
+              "body": "## Unused import\n\nImport of 'DynamoDBStorageError' is not used.\n\n---\n\nTo fix this problem, we should remove the <code>DynamoDBStorageError</code> symbol from the import statement on line 9. This will leave only the import of <code>RunNotFoundError</code>, which is (presumably) used later in the code. No other changes are needed, since no code functionality depends on <code>DynamoDBStorageError</code> in this test module.",
+              "createdAt": "2025-11-03T15:59:48Z",
+              "path": "tests/test_dynamo_storage.py",
+              "line": 9,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2487005025",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2487015194,
+              "type": "review_comment",
+              "author": "mesamhaider",
+              "body": "yeah this was mainly for local, but I agree this can be better written out",
+              "createdAt": "2025-11-03T16:02:24Z",
+              "path": "app/storage/dynamo_storage.py",
+              "line": 383,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/8#discussion_r2487015194",
+              "actionType": "suggestion",
+              "severity": "low"
             }
           ],
-          "actionableCount": 13,
+          "actionableCount": 15,
           "severityCounts": {
-            "high": 4,
+            "high": 5,
             "medium": 7,
-            "low": 2
+            "low": 3
           }
         },
         {

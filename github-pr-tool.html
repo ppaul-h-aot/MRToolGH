@@ -826,7 +826,7 @@
             loadRepositories();
         });
 
-        async function loadRepositories() {
+        async function loadRepositories(forceRefresh = false) {
             try {
                 console.log('📡 Fetching repositories from /api/repos...');
                 const response = await fetch('/api/repos');
@@ -836,7 +836,7 @@
                 if (data.success) {
                     repos = data.repos;
                     console.log('✅ Found repositories:', repos.length, 'with hot reload working!');
-                    renderRepositories();
+                    renderRepositories(forceRefresh);
                 } else {
                     console.error('❌ Failed to load repositories:', data.error);
                     showError('Failed to load repositories: ' + data.error);
@@ -847,7 +847,7 @@
             }
         }
 
-        function renderRepositories() {
+        function renderRepositories(forceRefresh = false) {
             const repoList = document.getElementById('repoList');
 
             if (repos.length === 0) {
@@ -1230,10 +1230,11 @@
             await loadPullRequests(owner, repoName);
         }
 
-        async function loadPullRequests(owner, repoName) {
+        async function loadPullRequests(owner, repoName, forceRefresh = false) {
             try {
-                console.log('Loading PRs for:', owner, repoName);
-                const response = await fetch(`/api/repos/${owner}/${repoName}/prs`);
+                console.log('Loading PRs for:', owner, repoName, forceRefresh ? '(force refresh)' : '(cached ok)');
+                const url = `/api/repos/${owner}/${repoName}/prs${forceRefresh ? '?use_cache=false' : ''}`;
+                const response = await fetch(url);
                 const data = await response.json();
 
                 console.log('PR data received:', data);
@@ -1672,8 +1673,8 @@
                         method: 'POST'
                     });
 
-                    // Reload repositories
-                    await loadRepositories();
+                    // Reload repositories with fresh data
+                    await loadRepositories(true);
 
                     document.getElementById('mainContent').innerHTML = `
                         <div class="empty-state">
