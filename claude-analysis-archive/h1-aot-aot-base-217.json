@@ -1,0 +1,146 @@
+{
+  "owner": "h1-aot",
+  "repo": "aot-base",
+  "prNumber": "217",
+  "analysis": [
+    {
+      "line": 97,
+      "fileName": "tests/agentic/utils/test_test_plan.py",
+      "fileLineNumber": 5,
+      "severity": "low",
+      "type": "suggestion",
+      "message": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.",
+      "codeSnippet": "tests/agentic/utils/test_test_plan.py:5 - from agentic.utils.indicator import (",
+      "diffContext": [
+        {
+          "lineNumber": 88,
+          "content": "diff --git a/tests/agentic/utils/test_test_plan.py b/tests/agentic/utils/test_test_plan.py",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 89,
+          "content": "index 9bbeaaf..bd66152 100644",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 90,
+          "content": "--- a/tests/agentic/utils/test_test_plan.py",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 91,
+          "content": "+++ b/tests/agentic/utils/test_test_plan.py",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 92,
+          "content": "@@ -2,7 +2,12 @@",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 93,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 94,
+          "content": " from agentic.models.exploit_agent import ExploitAgent",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 95,
+          "content": " from agentic.models.priority import Priority",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 96,
+          "content": "-from agentic.utils.indicator import convert_indicators_to_markdown, string_or_enum_value",
+          "isTarget": false,
+          "type": "removed"
+        },
+        {
+          "lineNumber": 97,
+          "content": "+from agentic.utils.indicator import (",
+          "isTarget": true,
+          "type": "added"
+        },
+        {
+          "lineNumber": 98,
+          "content": "+    convert_indicators_to_markdown,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 99,
+          "content": "+    format_agent_name,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 100,
+          "content": "+    format_priority_value,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 101,
+          "content": "+    string_or_enum_value,",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 102,
+          "content": "+)",
+          "isTarget": false,
+          "type": "added"
+        },
+        {
+          "lineNumber": 103,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 104,
+          "content": " ",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 105,
+          "content": " # Test enum for testing string_or_enum_value function",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 106,
+          "content": "@@ -53,6 +58,109 @@ def test_string_or_enum_value_with_empty_string(self):",
+          "isTarget": false,
+          "type": "context"
+        },
+        {
+          "lineNumber": 107,
+          "content": "         assert result == \"\"",
+          "isTarget": false,
+          "type": "context"
+        }
+      ],
+      "githubUrl": "https://github.com/h1-aot/aot-base/pull/217/files#diff-74657374732f6167R5",
+      "prFilesUrl": "https://github.com/h1-aot/aot-base/pull/217/files",
+      "source": "claude-analysis",
+      "occurrenceCount": 1,
+      "copyableComment": "Consider grouping imports by source (stdlib, third-party, local) with blank lines between groups.\n\nFile: tests/agentic/utils/test_test_plan.py\nLine: 5\n\nCode:\nfrom agentic.utils.indicator import (",
+      "timestamp": "2025-11-03T18:01:46.585Z"
+    }
+  ],
+  "timestamp": "2025-11-03T18:01:46.587Z",
+  "version": "1.0"
+}
