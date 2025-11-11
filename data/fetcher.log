@@ -63,3 +63,71 @@
   📝 Processing PR #262: Remove redundant __main__.py in favor of existing cli() entry point
   📝 Processing PR #261: Conditionally create boto3 bedrock client based on model_provider
   📝 Processing PR #260: Make boto3 Bedrock client creation conditional on model_provider
+  📝 Processing PR #257: Add token-based truncation logic for messages in state
+  📝 Processing PR #255: Migrate from sync model calls to streaming API and connect to Bedrock directly
+  📝 Processing PR #254: Feature/cm/testing updates
+  📝 Processing PR #253: [AOT-Base] fix issues while copying app files to ecr
+  📝 Processing PR #252: Upgrade pre-commit hook version of uv to match pyproject.toml
+  📝 Processing PR #251: Upgrade Langfuse SDK to latest v3.9 for improved streaming handling
+  📝 Processing PR #250: fix(ci): Handle lint/type errors that snuck into codebase
+  📝 Processing PR #249: Improve Recon endpoint storing flow
+  📝 Processing PR #247: Add S3-backed checkpoint storage with file-based uploads
+  📝 Processing PR #246: fix(ci): Add more-robust changed-file handling
+  📝 Processing PR #245: Use session_id for S3 results upload structure
+  📝 Processing PR #242: Improve test plan output readability with formatted priorities and agent names
+  📝 Processing PR #240: Update Claude model and default AOT LiteLLM url
+  📝 Processing PR #237: Add session data to initial state load
+  📝 Processing PR #236: Add rate limiter to base and methodical agents
+  📝 Processing PR #235: Fixintg the path to postgres
+  📝 Processing PR #224: ci: Enhance convenience features for builds
+  📝 Processing PR #221: Phase1/tool registry base 
+  📝 Processing PR #220: fix langfuse docker-compose host issue for logging
+  📝 Processing PR #219: Dynamic Tool Discovery and SQLMap Sidecar
+  ✅ Found 40 PRs with actionable comments
+📊 Processing h1-aot/aot-frontend-api...
+  📝 Processing PR #26: gh action to build and push to ecr in aot-dev
+  📝 Processing PR #25: fix: preserve updated_at timestamp in Redis update_run method
+  📝 Processing PR #24: fix: make Redis port configurable and remove duplicate config sections
+  📝 Processing PR #23: feat(docker): allow interactive debugging
+  📝 Processing PR #22: fix(docker): change host port for Redis to prevent conflict with `core`
+  📝 Processing PR #21: feat(docker): enable hot reloading
+  📝 Processing PR #20: feat: add ability to initiate `bin/run` detached
+  📝 Processing PR #19: Bump typer from 0.19.2 to 0.20.0
+  📝 Processing PR #18: Bump sentry-sdk from 2.41.0 to 2.43.0
+  📝 Processing PR #17: Bump boto3 from 1.40.59 to 1.40.69
+  📝 Processing PR #16: Bump fastapi from 0.121.0 to 0.121.1
+  📝 Processing PR #15: Bump redis from 7.0.0 to 7.0.1
+  📝 Processing PR #11: Bump fastapi from 0.119.0 to 0.121.0
+  📝 Processing PR #10: Bump starlette from 0.48.0 to 0.49.1 in the pip group across 1 directory
+  📝 Processing PR #9: chore: enhance .gitignore with OS-specific, Docker, and Python toolin…
+  📝 Processing PR #8: Integrate DynamoDB
+  📝 Processing PR #7: Am/pull aws credentials
+  📝 Processing PR #6: refactor: rename run_id to agent_run_request_id across API
+  📝 Processing PR #5: fix docker unable to refresh creds
+  📝 Processing PR #4: Fix/refresh sso creds issue with docker compose
+  📝 Processing PR #2: feat: implement complete run_request.v1 contract for Step Functions
+  📝 Processing PR #1: refactor: rename run_id to agent_run_request_id across API
+  ✅ Found 7 PRs with actionable comments
+📊 Processing h1-aot/aot-user-ui...
+  📝 Processing PR #6: Bump vuetify from 3.10.5 to 3.10.8
+  📝 Processing PR #5: Bump eventsource-parser from 0.1.0 to 3.0.6
+  📝 Processing PR #4: Bump tailwindcss from 3.2.6 to 4.1.16
+  📝 Processing PR #3: Bump glob from 9.3.5 to 11.0.3
+  📝 Processing PR #2: Bump @types/node from 20.19.21 to 24.10.0
+  📝 Processing PR #1: Bump tar from 7.5.1 to 7.5.2 in the npm_and_yarn group across 1 directory
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/masp...
+  📝 Processing PR #5: Bump jest from 29.7.0 to 30.2.0 in /agent-solver
+  📝 Processing PR #4: Bump uuid from 9.0.1 to 13.0.0 in /agent-solver
+  📝 Processing PR #3: Bump supertest from 6.3.4 to 7.1.4 in /agent-solver
+  📝 Processing PR #2: Bump express from 4.21.2 to 5.1.0 in /agent-solver
+  📝 Processing PR #1: Bump @types/node from 20.19.24 to 24.10.0 in /agent-solver
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/offsec-benchmarks...
+  📝 Processing PR #1: Update cveats submodule to main
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/aot-terraform...
+  ℹ️  No actionable comments found
+📊 Processing ppaul-h-aot/MRToolGH...
+  ℹ️  No actionable comments found
+✅ Data fetch complete! Found actionable comments in 3 repositories
