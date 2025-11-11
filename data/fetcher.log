@@ -43,3 +43,23 @@
   📝 Processing PR #318: Feature/NBusby/71/sqli improve performance
   📝 Processing PR #317: Fix serialization error
   📝 Processing PR #316: Use copy.deepcopy() to prevent mutation of nested config structures
+  📝 Processing PR #315: Remove thread ID compounding for child processes
+  📝 Processing PR #306: [do not merge] Add Proper Exit Code Handling for Runtime Workflow Failures
+  📝 Processing PR #305: Bump actions/checkout from 4 to 5
+  📝 Processing PR #304: Bump aws-actions/configure-aws-credentials from 4 to 5
+  📝 Processing PR #303: Remove STS Auth check
+  📝 Processing PR #298: Refactor base/methodical_agent to use same setup steps for model, rate limiter and metadata construction
+  📝 Processing PR #297: Improve readability of test plan output
+  📝 Processing PR #295: Use AWS credentials in environment variables
+  📝 Processing PR #290: Remove aws credentials and use environment variables.
+  📝 Processing PR #289: Add batch processing for indicators
+  📝 Processing PR #286: [WIP] Fix test result output based on feedback
+  📝 Processing PR #285: Add better test result output
+  📝 Processing PR #284: Add User Flow Agent to Recon 
+  📝 Processing PR #283: Add LiteLLM proxy support via base_url and api_key parameters
+  📝 Processing PR #278: Add exit code handling to CLI entry point with distinct codes for error types
+  📝 Processing PR #273: Rename env variables to more generic versions
+  📝 Processing PR #265: github action to build and push ecr from aot-base 
+  📝 Processing PR #262: Remove redundant __main__.py in favor of existing cli() entry point
+  📝 Processing PR #261: Conditionally create boto3 bedrock client based on model_provider
+  📝 Processing PR #260: Make boto3 Bedrock client creation conditional on model_provider
