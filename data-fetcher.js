@@ -269,11 +269,11 @@ class GitHubDataFetcher {
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
         const prs = this.executeGhCommand(
-          `gh pr list --repo ${repo.owner.login}/${repo.name} --state all --json number,title,author,createdAt,updatedAt,url,reviewDecision,isDraft --limit 50`
+          `gh pr list --repo ${repo.owner.login}/${repo.name} --state open --json number,title,author,createdAt,updatedAt,url,reviewDecision,isDraft --limit 100`
         );
 
-        // Filter PRs to last 30 days
-        const recentPrs = prs.filter(pr => new Date(pr.createdAt) >= new Date(thirtyDaysAgo));
+        // No need to filter by date since we're only getting open PRs
+        const recentPrs = prs;
 
         const repoData = {
           owner: repo.owner.login,

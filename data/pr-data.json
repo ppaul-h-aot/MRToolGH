@@ -1,11 +1,11 @@
 {
-  "lastUpdate": "2025-11-11T21:25:40.568Z",
+  "lastUpdate": "2025-11-12T23:00:10.873Z",
   "repositories": [
     {
       "owner": "h1-aot",
       "name": "agent_manager",
       "url": "https://github.com/h1-aot/agent_manager",
-      "lastPush": "2025-11-11T19:56:18Z",
+      "lastPush": "2025-11-12T20:00:17Z",
       "pullRequests": [
         {
           "author": {
@@ -342,8 +342,481 @@
       "owner": "h1-aot",
       "name": "aot-base",
       "url": "https://github.com/h1-aot/aot-base",
-      "lastPush": "2025-11-11T21:14:45Z",
+      "lastPush": "2025-11-12T22:45:54Z",
       "pullRequests": [
+        {
+          "author": {
+            "id": "MDQ6VXNlcjI0NTA5Ng==",
+            "is_bot": false,
+            "login": "bwillis",
+            "name": "Ben"
+          },
+          "createdAt": "2025-11-12T21:20:31Z",
+          "isDraft": false,
+          "number": 337,
+          "reviewDecision": "",
+          "title": "#332 Testing",
+          "updatedAt": "2025-11-12T21:24:50Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/337",
+          "actionableComments": [
+            {
+              "id": 2519855267,
+              "type": "review_comment",
+              "author": "github-advanced-security[bot]",
+              "body": "## invalid-argument-type: Argument to function `_run_app_v1` is incorrect\n\ninvalid-argument-type: Argument to function `_run_app_v1` is incorrect\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/432)",
+              "createdAt": "2025-11-12T21:21:03Z",
+              "path": "src/agentic/__init__.py",
+              "line": 1133,
+              "url": "https://github.com/h1-aot/aot-base/pull/337#discussion_r2519855267",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2519861204,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "This change passes an empty dictionary instead of the expected `ApplicationConfig` object. The `_run_app_v1` function signature expects `config: ApplicationConfig`, and this config is used in:\n1. Line 1065: `_validate_model_connectivity(config, ...)` - which calls `builder.with_app_config(config)` \n2. Line 1093: Passed to `_create_and_register_agents(..., config, ...)` - which uses it to instantiate agents\n\nPassing an empty dict `{}` instead of the `__config` object (which is an `ApplicationConfig` instance) will cause type errors and likely runtime failures. The original code correctly passed `__config` which is initialized at line 119 as `__config: ApplicationConfig = ApplicationConfig()`.\n\nThis should be reverted to: `await _run_app_v1(startup_config=startup_config, config=__config)`\n```suggestion\n    await _run_app_v1(startup_config=startup_config, config=__config)\n```",
+              "createdAt": "2025-11-12T21:23:39Z",
+              "path": "src/agentic/__init__.py",
+              "line": 1133,
+              "url": "https://github.com/h1-aot/aot-base/pull/337#discussion_r2519861204",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519861224,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The `ty check` command with `--error-on-warning` flag will fail the step if there are any type errors or warnings, preventing the output from being written to `ty-check.json` and causing subsequent SARIF conversion steps to be skipped. The step should include `continue-on-error: true` to ensure the JSON output is captured even when type issues are found, or the command should use `|| true` to prevent failure:\n\n```yaml\n- name: Type check\n  id: type-check\n  continue-on-error: true\n  if: steps.changed-files.outputs.diffFiles != ''\n  run: |\n    mapfile -t paths <<< \"${{ steps.changed-files.outputs.diffFiles }}\"\n    echo \"ty_version=$(uv run ty --version | cut -d ' ' -f 2)\" >> \"${GITHUB_OUTPUT}\"\n    uv run ty check --error-on-warning --output-format gitlab \"${paths[@]}\" > ty-check.json\n```",
+              "createdAt": "2025-11-12T21:23:40Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 95,
+              "url": "https://github.com/h1-aot/aot-base/pull/337#discussion_r2519861224",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7SC65L",
+              "type": "general_comment",
+              "author": "github-actions",
+              "body": "## pytest Results\n520 tests  ±0   520 ✅ ±0   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 07ba5268. ± Comparison against base commit ae149196.\n\n[test-results]:data:application/gzip;base64,H4sIAEv6FGkC/13MSw7CIBSF4a00jB1Q5IK4GQOUJje2xfAYNe5dqKa0Dr//JGclI04uknvXXzoSM6YdQw46oV8qaXFZUt2A7XrEbO1/euKrpBZGjdMpuBB8+JWQl/ZZcb78lva4+XC4+fhn/TxjKiBUGg1M3Axo3UvKuWMSuL1ywUDBIJlQDIzi5P0BwqY9lAQBAAA=\n",
+              "createdAt": "2025-11-12T21:21:18Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/337#issuecomment-IC_kwDOQHWW8M7SC65L",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 4,
+          "severityCounts": {
+            "high": 2,
+            "medium": 2,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "MDQ6VXNlcjI0NTA5Ng==",
+            "is_bot": false,
+            "login": "bwillis",
+            "name": "Ben"
+          },
+          "createdAt": "2025-11-12T20:26:54Z",
+          "isDraft": false,
+          "number": 336,
+          "reviewDecision": "APPROVED",
+          "title": "Refactor Agent constructors to be very explicit for better autocompletion and type checking support",
+          "updatedAt": "2025-11-12T22:45:54Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/336",
+          "actionableComments": [
+            {
+              "id": 2519727539,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:03Z",
+              "path": "src/agentic/agents/generic.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727539",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727563,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:03Z",
+              "path": "src/agentic/agents/auth.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727563",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727578,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR (e.g., `XssL2Verify`, `XssL2Planner`, `StoredXssSetup`).\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:03Z",
+              "path": "src/agentic/agents/xss_l2/xss_l2_setup.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727578",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727588,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:04Z",
+              "path": "src/agentic/agents/summarization.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727588",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727607,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:04Z",
+              "path": "src/agentic/agents/pre_recon_v2.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727607",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727625,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:04Z",
+              "path": "src/agentic/agents/planning.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727625",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727642,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:05Z",
+              "path": "src/agentic/agents/plan_reflection.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727642",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727655,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:05Z",
+              "path": "src/agentic/agents/idor.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727655",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727671,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:05Z",
+              "path": "src/agentic/agents/user_flow.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727671",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727684,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR (e.g., `SqliL2Verify`, `SqliL2Planner`).\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:06Z",
+              "path": "src/agentic/agents/sqli_l2/sqli_l2_setup.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727684",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727697,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:06Z",
+              "path": "src/agentic/agents/recon_v2.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727697",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519727710,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Missing return type annotation. The `__init__` method should have `-> None` return type annotation for consistency with other agent constructors in this PR.\n```suggestion\n    ) -> None:\n```",
+              "createdAt": "2025-11-12T20:31:06Z",
+              "path": "src/agentic/agents/recon.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/336#discussion_r2519727710",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7SCJGb",
+              "type": "general_comment",
+              "author": "github-actions",
+              "body": "## pytest Results\n520 tests  ±0   520 ✅ ±0   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 4bfd13ac. ± Comparison against base commit dcf49da0.\n\n[test-results]:data:application/gzip;base64,H4sIANQJFWkC/13Myw7CIBCF4VdpWLsQiob6MmYYOsnEthguK+O7C9WU1uX3n+S8BPE0RnHr5KkTMXPa4HKAxH6pPBeXJdXtojbdY0b8Tw9+ltQCAU+HMIbgw6+EvLTPiuPlt7TH1bvD1fs/9PPMqUBoS072gFYCKa0cWjREhATKXI0ZSIF2vR7E+wNnzKSrBAEAAA==\n\n:recycle: This comment has been updated with latest results.",
+              "createdAt": "2025-11-12T20:27:40Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/336#issuecomment-IC_kwDOQHWW8M7SCJGb",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 13,
+          "severityCounts": {
+            "high": 0,
+            "medium": 13,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/copilot-swe-agent"
+          },
+          "createdAt": "2025-11-12T18:57:50Z",
+          "isDraft": false,
+          "number": 335,
+          "reviewDecision": "APPROVED",
+          "title": "Fix missing model_builder parameter in agent instantiation",
+          "updatedAt": "2025-11-12T19:51:20Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/335",
+          "actionableComments": [
+            {
+              "id": 2519507182,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "I don't think we want to ignore this?",
+              "createdAt": "2025-11-12T19:19:43Z",
+              "path": ".gitignore",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/335#discussion_r2519507182",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2519517945,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "You're right. The `.venv.lock` is a temporary lock file used by `bin/run` for concurrency control during venv creation and should be cleaned up automatically. Reverted in 28d2f64.",
+              "createdAt": "2025-11-12T19:23:34Z",
+              "path": ".gitignore",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/335#discussion_r2519517945",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7SBT3R",
+              "type": "general_comment",
+              "author": "github-actions",
+              "body": "## pytest Results\n520 tests  ±0   520 ✅ ±0   9s ⏱️ -1s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 444d27db. ± Comparison against base commit 4dbe17ae.\n\n[test-results]:data:application/gzip;base64,H4sIAGPgFGkC/13MyQ6CMBSF4VchXbuwtdBeX8Z0TG4EajqsiO9uwaHg8vtPchbicXSJXDt66kgqmH+wJaqMYa6EyjrkderZ+atbKsb8pzs+amrBKxwPwcUY4qfEMrfPFcfLd2mPm3eHm/d/JkwT5grCObdMWM0A2CAv3gvFOZXaGeoluH6QANRoQZ4vwDwfswMBAAA=\n\n:recycle: This comment has been updated with latest results.",
+              "createdAt": "2025-11-12T19:27:34Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/335#issuecomment-IC_kwDOQHWW8M7SBT3R",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 3,
+          "severityCounts": {
+            "high": 0,
+            "medium": 3,
+            "low": 0
+          }
+        },
+        {
+          "author": {
+            "id": "MDQ6VXNlcjkyODgxMDY=",
+            "is_bot": false,
+            "login": "sherman205",
+            "name": "Sophia Sherman"
+          },
+          "createdAt": "2025-11-12T17:00:24Z",
+          "isDraft": false,
+          "number": 333,
+          "reviewDecision": "APPROVED",
+          "title": "Improve data in Recon metrics files",
+          "updatedAt": "2025-11-12T20:53:42Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/333",
+          "actionableComments": [
+            {
+              "id": 2519119524,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The endpoint counting logic has a potential inconsistency: the `total` count includes all endpoints, but the breakdown counts (`verified`, `unverified`, `invalid`) only count endpoints with those exact status values. If an endpoint has `None` or an unexpected `validation_status`, it will be included in `total` but not in any of the breakdown counts, causing `total != verified + unverified + invalid`.\n\nConsider adding a default handling or validation to ensure all endpoints are counted in one of the categories. For example:\n```python\nverified_count = sum(1 for ep in endpoints if ep.get(\"validation_status\") == \"verified\")\nunverified_count = sum(1 for ep in endpoints if ep.get(\"validation_status\", \"unverified\") == \"unverified\")\ninvalid_count = sum(1 for ep in endpoints if ep.get(\"validation_status\") == \"invalid\")\n```\nThis would ensure endpoints without a `validation_status` field default to \"unverified\" in the count.\n```suggestion\n    verified_count = sum(1 for ep in endpoints if ep.get(\"validation_status\", \"unverified\") == \"verified\")\n    unverified_count = sum(1 for ep in endpoints if ep.get(\"validation_status\", \"unverified\") == \"unverified\")\n    invalid_count = sum(1 for ep in endpoints if ep.get(\"validation_status\", \"unverified\") == \"invalid\")\n```",
+              "createdAt": "2025-11-12T17:04:34Z",
+              "path": "src/agentic/utils/recon_metrics.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/333#discussion_r2519119524",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2519119552,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "[nitpick] The `default_factory` uses a lambda function to create the default dictionary. While this works, it's generally recommended to use a regular function instead of a lambda for `default_factory` to improve readability and avoid potential issues with serialization or pickling.\n\nConsider replacing:\n```python\ndefault_factory=lambda: {\"total\": 0, \"verified\": 0, \"unverified\": 0, \"invalid\": 0}\n```\n\nwith:\n```python\ndefault_factory=dict\n```\nand setting the default value in a validator or using a named function:\n```python\ndef _default_endpoints_count():\n    return {\"total\": 0, \"verified\": 0, \"unverified\": 0, \"invalid\": 0}\n\n# Then use:\ndefault_factory=_default_endpoints_count\n```",
+              "createdAt": "2025-11-12T17:04:35Z",
+              "path": "src/agentic/models/recon_metrics.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/333#discussion_r2519119552",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2519119560,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "[nitpick] The field description \"Breakdown of endpoints by validation status\" could be more specific about the expected dictionary structure and keys. Consider updating to be more explicit:\n\n```python\ndescription=\"Breakdown of endpoints by validation status (keys: 'total', 'verified', 'unverified', 'invalid')\"\n```\n\nThis helps API consumers understand the exact structure of the dictionary without needing to inspect the default_factory.\n```suggestion\n        description=\"Breakdown of endpoints by validation status (keys: 'total', 'verified', 'unverified', 'invalid')\",\n```",
+              "createdAt": "2025-11-12T17:04:35Z",
+              "path": "src/agentic/models/recon_metrics.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/333#discussion_r2519119560",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2519164351,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "Given the reverse is desired, then should we just reverse the `validation_status_order` ?",
+              "createdAt": "2025-11-12T17:19:02Z",
+              "path": "src/agentic/utils/recon_metrics.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/333#discussion_r2519164351",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519171191,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "It's a smell code smell that we use a dictionary here because we can't type-check on the keys, and callers have to use hardcoded strings; typos would result in bugs. Did you consider whether this could be better represented in an object or separate fields?",
+              "createdAt": "2025-11-12T17:21:34Z",
+              "path": "src/agentic/models/recon_metrics.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/333#discussion_r2519171191",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519271223,
+              "type": "review_comment",
+              "author": "sherman205",
+              "body": "That's a great point, I was just being quick about it. I will update it to be an object.",
+              "createdAt": "2025-11-12T17:57:16Z",
+              "path": "src/agentic/models/recon_metrics.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/333#discussion_r2519271223",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7R_DUr",
+              "type": "general_comment",
+              "author": "github-actions",
+              "body": "## pytest Results\n520 tests  ±0   520 ✅ ±0   11s ⏱️ -1s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 24443b2e. ± Comparison against base commit ccf595a5.\n\n[test-results]:data:application/gzip;base64,H4sIAO/yFGkC/13MSw7CIBSF4a00jB3QK1VwMwZuIbmxLYbHyLh3oT5oHX7/Sc6DOZpsZJeuP3QsZko/jDnoRH6prC5LqtsA/KtrzIj/6Ub3klpwmqZdsCH48CkhL+2zYn/5Lu1x9eZw9fYP/TxTKmAghDgasFpJkJI7LU/caIlqcArNKEUPZ0QD7PkCZalfCgQBAAA=\n\n:recycle: This comment has been updated with latest results.",
+              "createdAt": "2025-11-12T17:01:21Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/333#issuecomment-IC_kwDOQHWW8M7R_DUr",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 7,
+          "severityCounts": {
+            "high": 0,
+            "medium": 4,
+            "low": 3
+          }
+        },
+        {
+          "author": {
+            "id": "MDQ6VXNlcjMwMDQ2Mzc=",
+            "is_bot": false,
+            "login": "r6e",
+            "name": "Rob Trame"
+          },
+          "createdAt": "2025-11-12T16:33:01Z",
+          "isDraft": false,
+          "number": 332,
+          "reviewDecision": "APPROVED",
+          "title": "Add SARIF support for ty",
+          "updatedAt": "2025-11-12T21:37:30Z",
+          "url": "https://github.com/h1-aot/aot-base/pull/332",
+          "actionableComments": [
+            {
+              "id": 2519825478,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The `ty check` command on line 94 redirects output to `ty-check.json` but doesn't handle potential command failures. If `ty check` fails with a non-zero exit code (which is likely with `--error-on-warning` when warnings are found), the workflow will stop before the SARIF conversion and upload steps can run. Consider adding `|| true` to allow the step to succeed even when type errors are found, or use `continue-on-error: true` for the step, so the SARIF results can still be uploaded.",
+              "createdAt": "2025-11-12T21:07:48Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 95,
+              "url": "https://github.com/h1-aot/aot-base/pull/332#discussion_r2519825478",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2519825491,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The reference `${{ steps.type-check.outputs.ty_version }}` will be undefined because the \"Type check\" step (lines 89-94) doesn't have an `id` field. Add `id: type-check` to the \"Type check\" step to make this output accessible.",
+              "createdAt": "2025-11-12T21:07:49Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 105,
+              "url": "https://github.com/h1-aot/aot-base/pull/332#discussion_r2519825491",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7R-gAR",
+              "type": "general_comment",
+              "author": "github-actions",
+              "body": "## pytest Results\n520 tests  ±0   520 ✅ ±0   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit e55b7ca0. ± Comparison against base commit ae149196.\n\n[test-results]:data:application/gzip;base64,H4sIADH4FGkC/12NwQ6DIBAFf8Vw7kEpK7U/08ACyaYqDcLJ9N8LthHtceYl81bmaLQLuzfdpWFLoriDSUFF8nPBNnNeYtmA7/RYEuK/etIrqyqcovEkbAg+/ExIc20WOCe/phY3PgQ3PvbQTxPFDMwCaImqHYSGm3RCdtpqkIC6Nz0XV4lmUDx/vT+1p+fLBAEAAA==\n\n:recycle: This comment has been updated with latest results.",
+              "createdAt": "2025-11-12T16:33:48Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/332#issuecomment-IC_kwDOQHWW8M7R-gAR",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": "IC_kwDOQHWW8M7R-_9N",
+              "type": "general_comment",
+              "author": "github-advanced-security",
+              "body": "This pull request sets up GitHub code scanning for this repository. Once the scans have completed and the checks have passed, the analysis results for this pull request branch will appear on [this overview](/h1-aot/aot-base/security/code-scanning?query=pr%3A332+is%3Aopen). Once you merge this pull request, the 'Security' tab will show more code scanning analysis results (for example, for the default branch). Depending on your configuration and choice of analysis tool, future pull requests will be annotated with code scanning analysis results. For more information about GitHub code scanning, check out [the documentation](https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning). ",
+              "createdAt": "2025-11-12T16:58:15Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/332#issuecomment-IC_kwDOQHWW8M7R-_9N",
+              "actionType": "fix_required",
+              "severity": "high"
+            }
+          ],
+          "actionableCount": 4,
+          "severityCounts": {
+            "high": 2,
+            "medium": 2,
+            "low": 0
+          }
+        },
         {
           "author": {
             "id": "U_kgDODh47-A",
@@ -354,9 +827,9 @@
           "createdAt": "2025-11-11T20:45:45Z",
           "isDraft": false,
           "number": 328,
-          "reviewDecision": "REVIEW_REQUIRED",
+          "reviewDecision": "CHANGES_REQUESTED",
           "title": "Add security headers agent with testssl tooling and artifact exports",
-          "updatedAt": "2025-11-11T21:17:43Z",
+          "updatedAt": "2025-11-11T23:17:49Z",
           "url": "https://github.com/h1-aot/aot-base/pull/328",
           "actionableComments": [
             {
@@ -384,21 +857,153 @@
               "severity": "high"
             },
             {
+              "id": 2515896974,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "We already add this dependency above in the katana layer, is it possible to re-use the katana layer to install this tool as well? ",
+              "createdAt": "2025-11-11T21:31:26Z",
+              "path": "Dockerfile",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515896974",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2515903963,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "Could you expand on this? I don't believe we should be using any HTTP endpoints. What issue with HTTPS were you seeing? ",
+              "createdAt": "2025-11-11T21:34:12Z",
+              "path": "README.md",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515903963",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2515905145,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "@bwillis I know you've been testing with LiteLLM as well, have you had any issues with HTTPS?",
+              "createdAt": "2025-11-11T21:34:49Z",
+              "path": "README.md",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515905145",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2515914380,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "Was using langfuse adding non-determinism? That shouldn't be the case so it would be concerning if it is.",
+              "createdAt": "2025-11-11T21:39:29Z",
+              "path": "README.md",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515914380",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2515917908,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "I think all the changes in this file are related to your other PR?",
+              "createdAt": "2025-11-11T21:41:10Z",
+              "path": "bin/agentic",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515917908",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2515923378,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "I'm not sure I totally follow the added logic here. Is this exporting directories from inside the docker container? If so, could we have this logic live inside the application? ",
+              "createdAt": "2025-11-11T21:43:59Z",
+              "path": "bin/run",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515923378",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2515931381,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "You don't need to use `args_schema` here you can just create 1 parameter for this function with a type of `TestsslInput`",
+              "createdAt": "2025-11-11T21:48:06Z",
+              "path": "src/agentic/tools/testssl.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515931381",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2515939823,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "Does the docker container need this mount now?",
+              "createdAt": "2025-11-11T21:52:56Z",
+              "path": "docker-compose.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515939823",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2515962685,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "I did some testing, but not that thoroughly. I can follow-up with some additional testing, but would be useful to get others input. I'll ask the benchmark team and if @simd-h1 is seeing it, then that's something I need to look into further.",
+              "createdAt": "2025-11-11T22:04:39Z",
+              "path": "README.md",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515962685",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2515993139,
+              "type": "review_comment",
+              "author": "simd-h1",
+              "body": "No, that bind mount isn’t needed anymore. The export-and-bundle logic that used /tmp/agent_runs lived in bin/run, and we removed it when you asked to drop the tool sidecar work. Runs now stay inside the container’s filesystem unless you copy artifacts out manually, so keeping the mount would just create an unused host directory.",
+              "createdAt": "2025-11-11T22:19:20Z",
+              "path": "docker-compose.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2515993139",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2516032431,
+              "type": "review_comment",
+              "author": "simd-h1",
+              "body": "I just did End-to-end run ✅\r\nCommand: ./bin/agentic -a security_headers_agent --no-langfuse -sf tmp/security_headers_state_local.json --session-id local-security-headers\r\nAgent completed successfully after VPN came up. LiteLLM connected over HTTP, returned model output, and the security headers workflow finished so it looks good right now to test at this moment. I think there were alot of benchmark runs and testing happening at certain times that could have cause LiteLLM token issues potentially I am still going to keep an eye on it. \r\n\r\n\r\nI also Tested now  and  LiteLLM responded over HTTPS; Playwright captured browser evidence; curl/python checks recorded headers for the main app, static assets, and /xss25.\r\nReported three vulnerabilities:\r\nComplete Absence of HTTP Security Headers (high, CWE-200)\r\nExplicitly Disabled XSS Protection on /xss25 (high, CWE-79)\r\nServer Information Disclosure (medium, CWE-200)\r\n",
+              "createdAt": "2025-11-11T22:37:14Z",
+              "path": "README.md",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2516032431",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
               "id": "IC_kwDOQHWW8M7Ru8B-",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n511 tests  +19   511 ✅ +19   10s ⏱️ ±0s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit 9c0c80c3. ± Comparison against base commit 8cbb3632.\n\n[test-results]:data:application/gzip;base64,H4sIAIenE2kC/12Myw7CIBBFf6Vh7WIoGKk/0+DAJBPbYnisjP8urdqHy3Nu7nkK4sEncW3kqRGpcF7BlWgzh2lGqFyXPG9nKX/Up4L4r+78qGp99GR5OAgfY4hfE8u0NWc4Jj9mKy68Cy6872EYR84VRIeABlApbaiV7kYE1CI42xF5DeoiyXiltXi9ATidWvEEAQAA\n\n:recycle: This comment has been updated with latest results.",
+              "body": "## pytest Results\n511 tests  +19   511 ✅ +19   10s ⏱️ ±0s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit 5e0c433d. ± Comparison against base commit 8cbb3632.\n\n[test-results]:data:application/gzip;base64,H4sIAAe2E2kC/12Myw7CIBBFf6Vh7YIRpog/0yClycS2GB4r478LVftwec7NPU820OgiuzZwaljMlFboczCJ/FyRFy5LqhsC/KiL2dp/dadHUeujGwyNB+FC8OFrQp63ZoVj8mO24sK74ML7nvXTRKkAQ8etFKJvlTISjNQgQGlp0ZwRFdc3lFq79sJeb33n21EEAQAA\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-11T21:12:28Z",
               "url": "https://github.com/h1-aot/aot-base/pull/328#issuecomment-IC_kwDOQHWW8M7Ru8B-",
               "actionType": "improvement_needed",
               "severity": "medium"
             }
           ],
-          "actionableCount": 3,
+          "actionableCount": 14,
           "severityCounts": {
-            "high": 2,
-            "medium": 1,
-            "low": 0
+            "high": 4,
+            "medium": 9,
+            "low": 1
           }
         },
         {
@@ -413,7 +1018,7 @@
           "number": 327,
           "reviewDecision": "",
           "title": "Add indicator + user flow context to exploit prompting",
-          "updatedAt": "2025-11-11T21:12:41Z",
+          "updatedAt": "2025-11-12T21:29:07Z",
           "url": "https://github.com/h1-aot/aot-base/pull/327",
           "actionableComments": [
             {
@@ -501,20 +1106,80 @@
               "severity": "medium"
             },
             {
+              "id": 2516109588,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "I suppose this is what you were hinting at in our conversation this morning about builder pattern conventions 😄. \r\n\r\n### Consistent Build Method Name\r\n\r\nI think one convention would be to ensure that, to get the fully constructed object, the method name is consistent `build()`, which I think is simple and worth keeping.\r\n\r\n### Input Object vs `with_` Style\r\n\r\nI think these are essentially the same; the object requires you to put all state values in the object, whereas `with_` style methods, those are in the method definition:\r\n\r\n```python\r\n# None is optionally accepted if you want to allow resetting the indicator later\r\ndef with_indicator(self, indicator: Indicator | None): Self\r\n  self._indicator = indicator\r\n\r\ndef with_user_flow(self, user_flow: UserFlow | None): Self\r\n  self._user_flow = user_flow\r\n```\r\n\r\nTechnically identical, but a convention in the builder pattern. I think I personally do prefer the more standard builder conventions. WDYT?",
+              "createdAt": "2025-11-11T23:13:28Z",
+              "path": "src/agentic/protocols/exploit_prompt_builder_protocol.py",
+              "line": 37,
+              "url": "https://github.com/h1-aot/aot-base/pull/327#discussion_r2516109588",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2516133028,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "Just wanted to confirm that this was intended to add",
+              "createdAt": "2025-11-11T23:22:47Z",
+              "path": "src/agentic/agents/base_agent.py",
+              "line": 22,
+              "url": "https://github.com/h1-aot/aot-base/pull/327#discussion_r2516133028",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": 2519154524,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "It's hilarious because I wasn't even thinking about this when we were talking earlier but it was 100% what was unconsciously on my mind 😂 . Yep! I agree, the builder convention makes more sense here, especially considering the indicator and user_flow parameters are optional. ",
+              "createdAt": "2025-11-12T17:15:31Z",
+              "path": "src/agentic/protocols/exploit_prompt_builder_protocol.py",
+              "line": 37,
+              "url": "https://github.com/h1-aot/aot-base/pull/327#discussion_r2519154524",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519862774,
+              "type": "review_comment",
+              "author": "sherman205",
+              "body": "do we still need to call this \"auth_plan\" and \"auth_phase_prompt\" if we're not dealing with session data anymore here?",
+              "createdAt": "2025-11-12T21:24:19Z",
+              "path": "src/agentic/agents/stored_xss/stored_xss_setup.py",
+              "line": 104,
+              "url": "https://github.com/h1-aot/aot-base/pull/327#discussion_r2519862774",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2519863814,
+              "type": "review_comment",
+              "author": "sherman205",
+              "body": "same comment here about the auth_* naming ",
+              "createdAt": "2025-11-12T21:24:50Z",
+              "path": "src/agentic/agents/xss_l2/xss_l2_setup.py",
+              "line": 109,
+              "url": "https://github.com/h1-aot/aot-base/pull/327#discussion_r2519863814",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
               "id": "IC_kwDOQHWW8M7RucGQ",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n505 tests  +13   505 ✅ +13   10s ⏱️ ±0s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit f02e481e. ± Comparison against base commit af29bdf1.\n\n[test-results]:data:application/gzip;base64,H4sIAMemE2kC/12MSw7CMAwFr1JlzcIxToS4TJWGWIpoG5TPCnF3kgL9sLJmnjxPwX50SVw7eepEKj6vcCvRZB/mhlC5LrltCtSP+lSs/Vd3/6hq/ejZ+PEgXIwhfk0s89ZscEx+zFZceBdceN+zYZp8riAY0NFFOrAaoR4aSCIraYgcMQ7gNOszoni9AS/w8CwEAQAA\n\n:recycle: This comment has been updated with latest results.",
+              "body": "## pytest Results\n504 tests  +12   504 ✅ +12   9s ⏱️ -1s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit 1b1d38c2. ± Comparison against base commit af29bdf1.\n\n[test-results]:data:application/gzip;base64,H4sIAJmxE2kC/13MSw7CIBSF4a00jB1ACwpuxgAXkhvbYniMjHuX1j4dfv9Jzpt47F0i94ZdGpIK5g1Qos4YxkpVWYc8TYLyVY9UrP1PT3zVRLfgNfan4GIMcSmxjPvnhPPlr+yPsw+Hs49/NgwD5grCDINO2rYTygNlABLMTRljDZXt1SvuuNICgHy+uLJT2wMBAAA=\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-11T20:22:30Z",
               "url": "https://github.com/h1-aot/aot-base/pull/327#issuecomment-IC_kwDOQHWW8M7RucGQ",
               "actionType": "improvement_needed",
               "severity": "medium"
             }
           ],
-          "actionableCount": 8,
+          "actionableCount": 13,
           "severityCounts": {
             "high": 4,
-            "medium": 3,
+            "medium": 8,
             "low": 1
           }
         },
@@ -704,7 +1369,7 @@
           "number": 321,
           "reviewDecision": "APPROVED",
           "title": "Add thorough model provider connectivity check at startup",
-          "updatedAt": "2025-11-11T19:49:58Z",
+          "updatedAt": "2025-11-12T18:11:24Z",
           "url": "https://github.com/h1-aot/aot-base/pull/321",
           "actionableComments": [
             {
@@ -737,7 +1402,7 @@
               "author": "Copilot",
               "body": "The comment explains httpcore's TCP connection retry behavior, but this might be implementation-dependent on the httpcore version. Consider adding a reference to the httpcore documentation or noting the version where this behavior was observed to help future maintainers understand if this changes.\n```suggestion\n    # Note: httpcore (as of v0.17.3) internally retries TCP connections, so the actual timeout\n    # will be approximately 2x this value (e.g., 3s → ~6s total).\n    # See: https://www.python-httpx.org/httpcore/retries/ and\n    # https://github.com/encode/httpcore/blob/0.17.3/httpcore/_synchronization.py#L36-L54\n```",
               "createdAt": "2025-11-11T01:52:03Z",
-              "path": "src/agentic/agents/model_validation.py",
+              "path": "src/agentic/utils/model_validation.py",
               "line": 87,
               "url": "https://github.com/h1-aot/aot-base/pull/321#discussion_r2512542941",
               "actionType": "improvement_needed",
@@ -792,20 +1457,44 @@
               "severity": "medium"
             },
             {
+              "id": 2519129265,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "nitpick, would it make more sense for this to go in the `utils/` directory? being inside the `agents/` directory makes it seem like an agent although I don't know how stringent we are about that 😅 ",
+              "createdAt": "2025-11-12T17:07:20Z",
+              "path": "src/agentic/utils/model_validation.py",
+              "line": 14,
+              "url": "https://github.com/h1-aot/aot-base/pull/321#discussion_r2519129265",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2519204283,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "Oh, I assume you were talking about the entire file and not just this function, right?",
+              "createdAt": "2025-11-12T17:32:50Z",
+              "path": "src/agentic/utils/model_validation.py",
+              "line": 14,
+              "url": "https://github.com/h1-aot/aot-base/pull/321#discussion_r2519204283",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
               "id": "IC_kwDOQHWW8M7RfSO4",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n487 tests  +10   487 ✅ +10   10s ⏱️ -1s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit 32a785f7. ± Comparison against base commit 336a17d0.\n\n<details>\n  <summary>This pull request <b>removes</b> 2 and <b>adds</b> 12 tests. <i>Note that renamed tests count towards both.</i></summary>\n\n```\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_bedrock_converse_does_not_pass_litellm_config\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_bedrock_converse_does_not_pass_litellm_config\n```\n\n```\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_accepts_custom_model_builder\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_bedrock_converse_config\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_accepts_custom_model_builder\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_bedrock_converse_config\ntests.agentic.agents.test_litellm_config ‑ test_model_factory_creates_bedrock_model\ntests.agentic.agents.test_litellm_config ‑ test_model_factory_creates_litellm_model\ntests.agentic.agents.test_model_connectivity ‑ test_validate_connectivity_bedrock_failure\ntests.agentic.agents.test_model_connectivity ‑ test_validate_connectivity_bedrock_success\ntests.agentic.agents.test_model_connectivity ‑ test_validate_connectivity_no_config\ntests.agentic.agents.test_model_connectivity ‑ test_validate_connectivity_openai_direct\n…\n```\n</details>\n\n[test-results]:data:application/gzip;base64,H4sIAGCWEmkC/12Myw7CIBBFf6Vh7YKWTkB/pqEMJBPbYnisjP8uVO3D5Tk39zyZo8lGdmvaS8NiprQB5qAT+aUiL1yWVLdeyR8NMRvzr+70KGp7DE7TdBI2BB++JuRlb1Y4Jz9mL658CK587Bk/z5QKMNFpqcBJDUpIAcgNqBZlxwHBCuzHq8WRa8deb7z3WmoEAQAA\n",
+              "body": "## pytest Results\n520 tests  +6   520 ✅ +6   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 156161a3. ± Comparison against base commit ba2cf7e6.\n\n[test-results]:data:application/gzip;base64,H4sIAJnLFGkC/13MSw6DIBSF4a0Yxh14UUC6mYaHJDdVaRBGpnsv2Ea0w+8/ydmIw2lcyb2BW0PWhPGATUFF9Ethm52XWDZGDz3WZMx/euIrpxqcwukSxhB8+JWQlvpZcL38lvq4+3S4+/xn/DxjzCDAOHBQnYC+h0E6aVpOtea0U1oM2jqpLRPakPcH+YAkIQQBAAA=\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-11T01:50:26Z",
               "url": "https://github.com/h1-aot/aot-base/pull/321#issuecomment-IC_kwDOQHWW8M7RfSO4",
               "actionType": "improvement_needed",
               "severity": "medium"
             }
           ],
-          "actionableCount": 8,
+          "actionableCount": 10,
           "severityCounts": {
             "high": 2,
-            "medium": 5,
+            "medium": 7,
             "low": 1
           }
         },
@@ -854,7 +1543,7 @@
           "number": 318,
           "reviewDecision": "CHANGES_REQUESTED",
           "title": "Feature/NBusby/71/sqli improve performance",
-          "updatedAt": "2025-11-11T17:21:04Z",
+          "updatedAt": "2025-11-11T22:59:48Z",
           "url": "https://github.com/h1-aot/aot-base/pull/318",
           "actionableComments": [
             {
@@ -960,7 +1649,7 @@
               "body": "We might not want to explicitly call out things like personal info and financial data here, the optics are just too bad 🙈 ",
               "createdAt": "2025-11-11T00:56:00Z",
               "path": "config/agents.toml",
-              "line": 692,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/318#discussion_r2512450083",
               "actionType": "suggestion",
               "severity": "low"
@@ -972,7 +1661,7 @@
               "body": "A lot of these tactics are helpful for benchmarks- you won't be able to find the flag if you don't completely scour the database/exfil all rows. But we may want to change up this prompting for real targets. Generally the advice I've heard from pentesters is just getting a small amount of data is good enough for reporting. Not necessarily something we need to change here, but might want to consider.",
               "createdAt": "2025-11-11T00:57:43Z",
               "path": "config/agents.toml",
-              "line": 700,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/318#discussion_r2512453020",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -984,7 +1673,7 @@
               "body": "Not that it matters too much, but generally the verify agent is responsible for calling this once exploited results are found in redis. Was there a blocker that was preventing that from working correctly?",
               "createdAt": "2025-11-11T00:59:03Z",
               "path": "config/agents.toml",
-              "line": 728,
+              "line": 726,
               "url": "https://github.com/h1-aot/aot-base/pull/318#discussion_r2512455139",
               "actionType": "question",
               "severity": "medium"
@@ -996,7 +1685,7 @@
               "body": "Might not need to commit this?",
               "createdAt": "2025-11-11T00:59:34Z",
               "path": "debug_sqli_detection.py",
-              "line": 3,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/318#discussion_r2512455986",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1116,7 +1805,7 @@
               "body": "Yeah, I had bad juju working with it, but when I removed it, it had a weird side effect of making it less aggressive towards password and account tables. That was a while back, though, so I will do some testing on this and let you know.",
               "createdAt": "2025-11-11T16:56:34Z",
               "path": "config/agents.toml",
-              "line": 692,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/318#discussion_r2514973608",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1128,7 +1817,7 @@
               "body": "I have added and removed this probably a dozen times, and this stayed in here once it got stable.  I'll test some more with it.",
               "createdAt": "2025-11-11T16:58:52Z",
               "path": "config/agents.toml",
-              "line": 728,
+              "line": 726,
               "url": "https://github.com/h1-aot/aot-base/pull/318#discussion_r2514980238",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1140,7 +1829,7 @@
               "body": "true, I got glossy at the end of the day and this was an obvious one I missed in a rage fix to get it ready.",
               "createdAt": "2025-11-11T16:59:36Z",
               "path": "debug_sqli_detection.py",
-              "line": 3,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/318#discussion_r2514982146",
               "actionType": "fix_required",
               "severity": "high"
@@ -1173,7 +1862,7 @@
               "id": "IC_kwDOQHWW8M7Rd88z",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n524 tests  +32   524 ✅ +32   12s ⏱️ +2s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit 5160bc59. ± Comparison against base commit af29bdf1.\n\n[test-results]:data:application/gzip;base64,H4sIAH5wE2kC/13MSw7CIBSF4a00jB3AVVpwM4ZeuAmxLYbCyLh3oWofDr//JOfJyA9uZtdGnBo2Z59W2BxN8mGqhOKypLpJuPx0mzPif7r7R0l8DWT8cAguxhC/JeZp+6w4Xn7K9rh4d7h4/4dhHH0qYFK0vEepO8JOGeEUaTIWBAJYaIFsrzSdibPXG9zETF0EAQAA\n\n:recycle: This comment has been updated with latest results.",
+              "body": "## pytest Results\n529 tests  +37   529 ✅ +37   10s ⏱️ ±0s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit eb4862da. ± Comparison against base commit af29bdf1.\n\n[test-results]:data:application/gzip;base64,H4sIAOK/E2kC/12MyQ7CIBRFf6Vh7aIQUPBnGob3EmJbDMOq8d+Fqh1cnnNzz0LQj5DIvaOXjqTi8wauRJ19mBv2leuS2yaY+tGQirX/6uGfVW2PAbUfTwJiDPFrYpn3ZoNz8mP24sqH4MrHng3T5HMFAobLK3NaGSMAuGLSaEQqUSNDw4Xob46CpuT1BkTlJFYEAQAA\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-10T23:13:51Z",
               "url": "https://github.com/h1-aot/aot-base/pull/318#issuecomment-IC_kwDOQHWW8M7Rd88z",
               "actionType": "improvement_needed",
@@ -1431,16 +2120,16 @@
           "createdAt": "2025-11-10T18:38:17Z",
           "isDraft": false,
           "number": 305,
-          "reviewDecision": "REVIEW_REQUIRED",
+          "reviewDecision": "APPROVED",
           "title": "Bump actions/checkout from 4 to 5",
-          "updatedAt": "2025-11-10T18:39:09Z",
+          "updatedAt": "2025-11-12T19:25:30Z",
           "url": "https://github.com/h1-aot/aot-base/pull/305",
           "actionableComments": [
             {
               "id": "IC_kwDOQHWW8M7RaWLv",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n471 tests  ±0   471 ✅ ±0   9s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 71c8dae1. ± Comparison against base commit 6909a6b7.\n\n[test-results]:data:application/gzip;base64,H4sIAEsxEmkC/13MyQ6CMBSF4VchXbvgVkpbX8Z0TG4EajqsiO9uQWVw+f0nOTPxOLhEbg1cGpIK5g22RJUxTJWysg55mToOP91TMeY/PfBZU7sFr3A4BRdjiN8Sy7R/Ljhffsr+uPpwuPr4Z8I4Yq4gHIywyoFupb2yXggDmintvOok8F5SRi0FD+T1Bke+gH0DAQAA\n",
+              "body": "## pytest Results\n520 tests  ±0   520 ✅ ±0   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit e3be901f. ± Comparison against base commit e9bc5c9d.\n\n[test-results]:data:application/gzip;base64,H4sIAP3eFGkC/13Myw7CIBCF4VdpWLsYxlaDL2MoDMnEthguK+O7C9WU1uX3n+S8hOOJorh18tSJmDltsDnoxH6phOKypLoNuOkeszH/6cHPklpwmqdDoBB8+JWQl/ZZcbz8lva4ene4ev9n/DxzKhB0HkmBdKBQawVge6SxtwiWFMrBobQXQ1cS7w/wgvNXBAEAAA==\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-10T18:39:09Z",
               "url": "https://github.com/h1-aot/aot-base/pull/305#issuecomment-IC_kwDOQHWW8M7RaWLv",
               "actionType": "improvement_needed",
@@ -1462,16 +2151,16 @@
           "createdAt": "2025-11-10T18:38:14Z",
           "isDraft": false,
           "number": 304,
-          "reviewDecision": "REVIEW_REQUIRED",
+          "reviewDecision": "APPROVED",
           "title": "Bump aws-actions/configure-aws-credentials from 4 to 5",
-          "updatedAt": "2025-11-10T18:39:00Z",
+          "updatedAt": "2025-11-12T19:27:29Z",
           "url": "https://github.com/h1-aot/aot-base/pull/304",
           "actionableComments": [
             {
               "id": "IC_kwDOQHWW8M7RaWBy",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n471 tests  ±0   471 ✅ ±0   9s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 8e4ff054. ± Comparison against base commit 6909a6b7.\n\n[test-results]:data:application/gzip;base64,H4sIAEExEmkC/13Myw7CIBCF4VdpZu2iFEzFlzEwMMnEthguK+O7S6v24vL7T3KeQDz4BNdGnBpIhfMKV6LJHKZKXVmHPE+qFz/dUkH8T3d+1NSugQwPh+BjDPFbYpm2zxnHy0/ZHhfvDhfv/zCMI+cKuHhF1J4VdtL1xqBCIaRwhNp21huHkhxpi/B6A7F3/eUDAQAA\n",
+              "body": "## pytest Results\n520 tests  ±0   520 ✅ ±0   10s ⏱️ -1s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 590270fc. ± Comparison against base commit 940fed44.\n\n[test-results]:data:application/gzip;base64,H4sIAHDfFGkC/13MSwrDIBSF4a0Exx14hWu1myk+QZrE4mNUuvdqWmLS4fcfOC/iw+wyuU1wmUiuoeywNakS4tpJm9tS+oZs1z1XY/7TIzxbGsGrMJ+CSymmX0l1HZ8d58tvGY+bD4ebj38mLksoDQQlZVfqDWjBOZUWtRcgFGi0kgNSqxHAMU/eH898Ln8EAQAA\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-10T18:39:00Z",
               "url": "https://github.com/h1-aot/aot-base/pull/304#issuecomment-IC_kwDOQHWW8M7RaWBy",
               "actionType": "improvement_needed",
@@ -1548,9 +2237,9 @@
           "createdAt": "2025-11-08T00:39:53Z",
           "isDraft": false,
           "number": 298,
-          "reviewDecision": "",
+          "reviewDecision": "APPROVED",
           "title": "Refactor base/methodical_agent to use same setup steps for model, rate limiter and metadata construction",
-          "updatedAt": "2025-11-11T19:12:42Z",
+          "updatedAt": "2025-11-12T00:53:47Z",
           "url": "https://github.com/h1-aot/aot-base/pull/298",
           "actionableComments": [
             {
@@ -1650,21 +2339,68 @@
               "severity": "medium"
             },
             {
+              "id": 2515963003,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "FYI, I believe you can have this inherit from `ModelBuilderProtocol` so that you get type errors if it doesn't implement the Protocol properly.",
+              "createdAt": "2025-11-11T22:04:52Z",
+              "path": "src/agentic/agents/model_factory.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/298#discussion_r2515963003",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": 2515966645,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "Nitpick- personally, I don't like the idea of different implementations of the Protocol inheriting from each other. I think this would make the code a bit tough to reason about. IMO, we could have stateless utility methods for shared business logic, but each concrete implementation would inherit only from the Protocol. WDYT? Too many hoops to jump through?",
+              "createdAt": "2025-11-11T22:07:10Z",
+              "path": "src/agentic/agents/model_factory.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/298#discussion_r2515966645",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2516080824,
+              "type": "review_comment",
+              "author": "bwillis",
+              "body": "Yeah, I do agree that multi-level inheritance can be confusing to follow. If we need a default, perhaps we can fully implement it or have a different construction approach. As it stands, this isn't even in use, so we can avoid all this confusion by simply deleting it. ",
+              "createdAt": "2025-11-11T22:54:57Z",
+              "path": "src/agentic/agents/model_factory.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-base/pull/298#discussion_r2516080824",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
               "id": "IC_kwDOQHWW8M7Q8YX2",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n475 tests  +4   475 ✅ +4   9s ⏱️ -1s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 19699216. ± Comparison against base commit d2e5006a.\n\n<details>\n  <summary>This pull request <b>removes</b> 2 and <b>adds</b> 6 tests. <i>Note that renamed tests count towards both.</i></summary>\n\n```\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_bedrock_converse_does_not_pass_litellm_config\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_bedrock_converse_does_not_pass_litellm_config\n```\n\n```\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_accepts_custom_model_builder\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_bedrock_converse_config\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_accepts_custom_model_builder\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_bedrock_converse_config\ntests.agentic.agents.test_litellm_config ‑ test_model_factory_creates_bedrock_model\ntests.agentic.agents.test_litellm_config ‑ test_model_factory_creates_litellm_model\n```\n</details>\n\n[test-results]:data:application/gzip;base64,H4sIAK02EmkC/13MyQ6CMBSF4VchXbug0NGXMfS2TW4EajqsjO9uQWVw+f0nOU/icXSJXBt6aUgqmDfYEoeMYa7UlXXIy8Qk/+mWCsB/uuOjpnYLfsDxFFyMIX5LLPP+ueB8+Sn74+rD4erjH4RpwlxBqBZad1RooRRvmXISDO/63kthDTDdW2MMSEteb1F9df0DAQAA\n\n:recycle: This comment has been updated with latest results.",
+              "body": "## pytest Results\n501 tests  +4   501 ✅ +4   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 1073f8ba. ± Comparison against base commit d545eb6a.\n\n<details>\n  <summary>This pull request <b>removes</b> 2 and <b>adds</b> 6 tests. <i>Note that renamed tests count towards both.</i></summary>\n\n```\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_bedrock_converse_does_not_pass_litellm_config\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_bedrock_converse_does_not_pass_litellm_config\n```\n\n```\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_accepts_custom_model_builder\ntests.agentic.agents.test_litellm_config ‑ test_base_agent_bedrock_converse_config\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_accepts_custom_model_builder\ntests.agentic.agents.test_litellm_config ‑ test_methodical_agent_bedrock_converse_config\ntests.agentic.agents.test_litellm_config ‑ test_model_factory_creates_bedrock_model\ntests.agentic.agents.test_litellm_config ‑ test_model_factory_creates_litellm_model\n```\n</details>\n\n[test-results]:data:application/gzip;base64,H4sIADPAE2kC/12Myw6DIBBFf8Ww7mKwItifMTBCMqlKg7Bq+u8F2/ro8pybe57M0WgXdqv4pWJLorjBkIKO5OeCkDkvsWwC+I/6JSH+qzs9stoevdM0noQNwYevCWnemwXOyY/Ziysfgisfe+iniWIGxkFenTIaHIBDiUJAV6OUxjQS61Y1ZuiMVS17vQH0rQzkBAEAAA==\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-08T00:40:37Z",
               "url": "https://github.com/h1-aot/aot-base/pull/298#issuecomment-IC_kwDOQHWW8M7Q8YX2",
               "actionType": "improvement_needed",
               "severity": "medium"
+            },
+            {
+              "id": 3450319681,
+              "type": "review",
+              "author": "cmoh1",
+              "body": "The only blocking one would be inheriting from the main protocol, everything else is discussion points and should be g2g.",
+              "createdAt": "2025-11-11T22:08:21Z",
+              "state": "CHANGES_REQUESTED",
+              "url": "https://github.com/h1-aot/aot-base/pull/298#pullrequestreview-3450319681",
+              "actionType": "improvement_needed",
+              "severity": "medium"
             }
           ],
-          "actionableCount": 9,
+          "actionableCount": 13,
           "severityCounts": {
             "high": 0,
-            "medium": 8,
-            "low": 1
+            "medium": 10,
+            "low": 3
           }
         },
         {
@@ -3187,7 +3923,7 @@
           "number": 249,
           "reviewDecision": "APPROVED",
           "title": "Improve Recon endpoint storing flow",
-          "updatedAt": "2025-11-11T20:43:56Z",
+          "updatedAt": "2025-11-11T22:54:19Z",
           "url": "https://github.com/h1-aot/aot-base/pull/249",
           "actionableComments": [
             {
@@ -3290,7 +4026,7 @@
               "id": "IC_kwDOQHWW8M7RVdnA",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n497 tests  +5   497 ✅ +5   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 12b46553. ± Comparison against base commit af29bdf1.\n\n[test-results]:data:application/gzip;base64,H4sIACCVE2kC/12Myw7CIBBFf6Vh7cKpFKo/03RgSCa2xVBYGf9dqNqHy3Nu7nkKxwPN4lbBqRJz4riCTaGP7KeC58x5iWWTV/2jbk7G/Ks7P7JaH53reTgICsGHrwlp2poFjsmP2YoL74IL73vGjyPHDAJqlKppLrVCRNJaggZFhLZ1RrUAxjkghVa83rq6J20EAQAA\n\n:recycle: This comment has been updated with latest results.",
+              "body": "## pytest Results\n497 tests  +5   497 ✅ +5   9s ⏱️ -1s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 8bdd0db0. ± Comparison against base commit 8cbb3632.\n\n[test-results]:data:application/gzip;base64,H4sIAFy+E2kC/12MyQrCMBRFf6Vk7SItGf0ZSV8aeNg2kmEl/ruvVTu4uXDOhfNkAcchs2vTXhqWK5YNfE2uYJwJLSEdZbmE1T+65Qrwr+74IMU3ERyOJzGkFNPXpDrvzQXOyY/ZiysfgisfexCnCQsBM7333Pe8o1WGc6E6A1Y7G6QG1RqppQThLHu9AU98AfgDAQAA\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-10T14:34:44Z",
               "url": "https://github.com/h1-aot/aot-base/pull/249#issuecomment-IC_kwDOQHWW8M7RVdnA",
               "actionType": "improvement_needed",
@@ -4250,487 +4986,6 @@
             "medium": 3,
             "low": 1
           }
-        },
-        {
-          "author": {
-            "id": "MDQ6VXNlcjUwMjQ0MTc=",
-            "is_bot": false,
-            "login": "NicholasBusby",
-            "name": "Nicholas Busby"
-          },
-          "createdAt": "2025-11-01T19:46:07Z",
-          "isDraft": false,
-          "number": 235,
-          "reviewDecision": "APPROVED",
-          "title": "Fixintg the path to postgres",
-          "updatedAt": "2025-11-03T16:07:36Z",
-          "url": "https://github.com/h1-aot/aot-base/pull/235",
-          "actionableComments": [
-            {
-              "id": 2483889568,
-              "type": "review_comment",
-              "author": "Copilot",
-              "body": "The PostgreSQL volume mount path should be `/var/lib/postgresql/data`, not `/var/lib/postgresql`. The official PostgreSQL Docker image expects the data directory to be mounted at `/var/lib/postgresql/data` (the PGDATA location). Mounting at the parent directory `/var/lib/postgresql` can cause permission issues and conflicts with PostgreSQL's internal directory structure, as the container needs to manage the `data` subdirectory and other metadata files separately.\n```suggestion\n      - langfuse_postgres_data:/var/lib/postgresql/data\n```",
-              "createdAt": "2025-11-01T19:47:25Z",
-              "path": "docker-compose.yml",
-              "line": 240,
-              "url": "https://github.com/h1-aot/aot-base/pull/235#discussion_r2483889568",
-              "actionType": "improvement_needed",
-              "severity": "medium"
-            },
-            {
-              "id": 2484981222,
-              "type": "review_comment",
-              "author": "pembroke-davis",
-              "body": "I can confirm.  The error we saw was very verbose wrt to the latest version of postgres.  We may want to consider locking versions to avoid errors like this in the future.",
-              "createdAt": "2025-11-02T20:04:40Z",
-              "path": "docker-compose.yml",
-              "line": 240,
-              "url": "https://github.com/h1-aot/aot-base/pull/235#discussion_r2484981222",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 3408949198,
-              "type": "review",
-              "author": "pembroke-davis",
-              "body": "this was due to postgres containers being \"latest\" and a breaking feature being released across a major version.  We may want to consider locking down datastores to specific versions in the future to avoid this",
-              "createdAt": "2025-11-02T20:06:34Z",
-              "state": "APPROVED",
-              "url": "https://github.com/h1-aot/aot-base/pull/235#pullrequestreview-3408949198",
-              "actionType": "suggestion",
-              "severity": "low"
-            }
-          ],
-          "actionableCount": 3,
-          "severityCounts": {
-            "high": 1,
-            "medium": 1,
-            "low": 1
-          }
-        },
-        {
-          "author": {
-            "id": "MDQ6VXNlcjMwMDQ2Mzc=",
-            "is_bot": false,
-            "login": "r6e",
-            "name": "Rob Trame"
-          },
-          "createdAt": "2025-10-31T20:35:21Z",
-          "isDraft": false,
-          "number": 224,
-          "reviewDecision": "APPROVED",
-          "title": "ci: Enhance convenience features for builds",
-          "updatedAt": "2025-11-03T20:20:06Z",
-          "url": "https://github.com/h1-aot/aot-base/pull/224",
-          "actionableComments": [
-            {
-              "id": 2487139731,
-              "type": "review_comment",
-              "author": "Copilot",
-              "body": "The `--preview` flag combined with `--output-format sarif` may fail if `ruff format` doesn't support this combination. Additionally, the script will fail if `ruff format --check` exits with a non-zero code before the redirect completes. Consider adding `|| true` or checking the exit code separately to ensure the SARIF file is created even when formatting issues are found.\n```suggestion\n          uv run ruff format --check --preview --output-format sarif \"${paths[@]}\" > ruff-format.sarif || true\n```",
-              "createdAt": "2025-11-03T16:36:52Z",
-              "path": ".github/workflows/ci.yml",
-              "line": 54,
-              "url": "https://github.com/h1-aot/aot-base/pull/224#discussion_r2487139731",
-              "actionType": "improvement_needed",
-              "severity": "medium"
-            },
-            {
-              "id": 2487139751,
-              "type": "review_comment",
-              "author": "Copilot",
-              "body": "When `steps.changed-python.outputs.files` contains multiple lines, the `mapfile` command will populate the array correctly, but if a file path contains spaces or special characters, the command expansion `${paths[@]}` may not handle them properly. Consider using a more robust approach with null-delimited strings or quoting each path individually.",
-              "createdAt": "2025-11-03T16:36:53Z",
-              "path": ".github/workflows/ci.yml",
-              "line": 54,
-              "url": "https://github.com/h1-aot/aot-base/pull/224#discussion_r2487139751",
-              "actionType": "suggestion",
-              "severity": "low"
-            },
-            {
-              "id": 2487139763,
-              "type": "review_comment",
-              "author": "Copilot",
-              "body": "Similar to the lint step, when `steps.changed-python.outputs.files` contains multiple lines with file paths that have spaces or special characters, the `mapfile` and array expansion may not handle them correctly. This could cause the type checker to fail or skip files.\n```suggestion\n          files=$(git diff -z --name-only \"$base_ref\" \"$GITHUB_SHA\" -- '*.py')\n          if [[ -z \"$files\" ]]; then\n            echo \"files=\" >> \"$GITHUB_OUTPUT\"\n          else\n            # base64 encode the NUL-delimited list for safe transfer\n            encoded=$(printf '%s' \"$files\" | base64)\n            echo \"files=$encoded\" >> \"$GITHUB_OUTPUT\"\n          fi\n\n      - name: Type check\n        if: steps.changed-python.outputs.files != ''\n        run: |\n          if [[ -n \"${{ steps.changed-python.outputs.files }}\" ]]; then\n            decoded=$(echo \"${{ steps.changed-python.outputs.files }}\" | base64 --decode)\n            readarray -d '' -t paths < <(printf '%s' \"$decoded\")\n            uv run ty check --output-format github \"${paths[@]}\"\n          fi\n```",
-              "createdAt": "2025-11-03T16:36:53Z",
-              "path": ".github/workflows/ci.yml",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/224#discussion_r2487139763",
-              "actionType": "improvement_needed",
-              "severity": "medium"
-            },
-            {
-              "id": 2487139774,
-              "type": "review_comment",
-              "author": "Copilot",
-              "body": "The glob pattern `*.sarif` may not reliably match both `ruff.sarif` and `ruff-format.sarif` files depending on the GitHub Action's working directory and glob expansion behavior. Consider explicitly listing the files as `sarif_file: ruff.sarif\\nruff-format.sarif` or combining them into a single SARIF file before upload.\n```suggestion\n          sarif_file: |\n            ruff.sarif\n            ruff-format.sarif\n```",
-              "createdAt": "2025-11-03T16:36:53Z",
-              "path": ".github/workflows/ci.yml",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/224#discussion_r2487139774",
-              "actionType": "improvement_needed",
-              "severity": "medium"
-            },
-            {
-              "id": 2487139796,
-              "type": "review_comment",
-              "author": "Copilot",
-              "body": "The script exits with code 1 when junit.xml is not found, which will mark the step as failed. However, this is executed with `if: always()`, so even if tests pass but junit.xml generation fails for some reason, the entire test job will fail. Consider using a warning instead of an error exit, or check if this behavior is intentional.\n```suggestion\n              print(\"::warning::junit.xml not found, possibly no tests were run\")\n              exit(0)\n```",
-              "createdAt": "2025-11-03T16:36:53Z",
-              "path": ".github/workflows/ci.yml",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/224#discussion_r2487139796",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": "IC_kwDOQHWW8M7PHWuz",
-              "type": "general_comment",
-              "author": "github-advanced-security",
-              "body": "This pull request sets up GitHub code scanning for this repository. Once the scans have completed and the checks have passed, the analysis results for this pull request branch will appear on [this overview](/h1-aot/aot-base/security/code-scanning?query=pr%3A224+is%3Aopen). Once you merge this pull request, the 'Security' tab will show more code scanning analysis results (for example, for the default branch). Depending on your configuration and choice of analysis tool, future pull requests will be annotated with code scanning analysis results. For more information about GitHub code scanning, check out [the documentation](https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning). ",
-              "createdAt": "2025-10-31T20:35:54Z",
-              "url": "https://github.com/h1-aot/aot-base/pull/224#issuecomment-IC_kwDOQHWW8M7PHWuz",
-              "actionType": "fix_required",
-              "severity": "high"
-            }
-          ],
-          "actionableCount": 6,
-          "severityCounts": {
-            "high": 2,
-            "medium": 3,
-            "low": 1
-          }
-        },
-        {
-          "author": {
-            "id": "U_kgDODh47-A",
-            "is_bot": false,
-            "login": "simd-h1",
-            "name": ""
-          },
-          "createdAt": "2025-10-31T16:01:07Z",
-          "isDraft": false,
-          "number": 221,
-          "reviewDecision": "",
-          "title": "Phase1/tool registry base ",
-          "updatedAt": "2025-11-11T21:08:46Z",
-          "url": "https://github.com/h1-aot/aot-base/pull/221",
-          "actionableComments": [
-            {
-              "id": 2512075248,
-              "type": "review_comment",
-              "author": "cmoh1",
-              "body": "Is this meant to be on the same PR as the tool registry branch?",
-              "createdAt": "2025-11-10T21:51:03Z",
-              "path": "src/agentic/agents/security_headers.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512075248",
-              "actionType": "question",
-              "severity": "medium"
-            },
-            {
-              "id": 2512085038,
-              "type": "review_comment",
-              "author": "simd-h1",
-              "body": "No i fixed that with the latest change it pulled in a local change with my recent fix not sure why it did that super annoying ",
-              "createdAt": "2025-11-10T21:54:42Z",
-              "path": "src/agentic/agents/security_headers.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512085038",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095901,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## File `{filename}` is part of an implicit namespace package. Add an `__init__.py`.\n\nFile `tools/sqlmap/server.py` is part of an implicit namespace package. Add an `__init__.py`.\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/185)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095901",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095904,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Missing return type annotation for public function `{name}`\n\nMissing return type annotation for public function `execute_sqlmap`\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/186)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095904",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095907,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Logging statement uses f-string\n\nLogging statement uses f-string\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/187)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095907",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095910,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Async functions should not run processes with blocking methods\n\nAsync functions should not run processes with blocking methods\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/188)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095910",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095913,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## `subprocess` call: check for execution of untrusted input\n\n`subprocess` call: check for execution of untrusted input\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/189)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095913",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095916,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Within an `except*` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling\n\nWithin an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/190)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095916",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095920,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Do not catch blind exception: `{name}`\n\nDo not catch blind exception: `Exception`\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/191)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095920",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095922,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Logging statement uses f-string\n\nLogging statement uses f-string\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/192)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095922",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095926,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Within an `except*` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling\n\nWithin an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/193)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095926",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095931,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Missing return type annotation for public function `{name}`\n\nMissing return type annotation for public function `health_check`\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/194)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095931",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095935,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Missing return type annotation for public function `{name}`\n\nMissing return type annotation for public function `get_version`\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/195)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095935",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095937,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Missing return type annotation for public function `{name}`\n\nMissing return type annotation for public function `get_sqlmap_version`\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/196)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095937",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095940,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Starting a process with a partial executable path\n\nStarting a process with a partial executable path\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/197)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095940",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095946,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Do not catch blind exception: `{name}`\n\nDo not catch blind exception: `Exception`\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/198)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095946",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2512095949,
-              "type": "review_comment",
-              "author": "github-advanced-security[bot]",
-              "body": "## Possible binding to all interfaces\n\nPossible binding to all interfaces\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/199)",
-              "createdAt": "2025-11-10T21:58:47Z",
-              "path": "tools/sqlmap/server.py",
-              "line": null,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2512095949",
-              "actionType": "fix_required",
-              "severity": "high"
-            },
-            {
-              "id": 2515743821,
-              "type": "review_comment",
-              "author": "cmoh1",
-              "body": "Do you mind adding this additional CLI param to the README? ",
-              "createdAt": "2025-11-11T20:45:25Z",
-              "path": "bin/agentic",
-              "line": 14,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2515743821",
-              "actionType": "question",
-              "severity": "medium"
-            },
-            {
-              "id": 2515785964,
-              "type": "review_comment",
-              "author": "sherman205",
-              "body": "this doesn't look like it's used, remove?",
-              "createdAt": "2025-11-11T20:56:46Z",
-              "path": "src/agentic/tools/base_tool.py",
-              "line": 8,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2515785964",
-              "actionType": "question",
-              "severity": "medium"
-            },
-            {
-              "id": 2515806959,
-              "type": "review_comment",
-              "author": "sherman205",
-              "body": "Is this pretty much all we would need to do to test out running with with the sidecar locally? Wondering if this is also a helpful piece to add to the README if you think it's important, along with any other setup.",
-              "createdAt": "2025-11-11T21:02:38Z",
-              "path": "docker-compose.yml",
-              "line": 252,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2515806959",
-              "actionType": "improvement_needed",
-              "severity": "medium"
-            },
-            {
-              "id": 2515824511,
-              "type": "review_comment",
-              "author": "sherman205",
-              "body": "Is it possible to run sqlmap without the \"sidecar\" execution if we have this specified here? If we use `--no-tools`?",
-              "createdAt": "2025-11-11T21:07:33Z",
-              "path": "tools/tool_metadata.yaml",
-              "line": 7,
-              "url": "https://github.com/h1-aot/aot-base/pull/221#discussion_r2515824511",
-              "actionType": "question",
-              "severity": "medium"
-            },
-            {
-              "id": "IC_kwDOQHWW8M7RcEX-",
-              "type": "general_comment",
-              "author": "github-actions",
-              "body": "## pytest Results\n505 tests  +13   505 ✅ +13   10s ⏱️ ±0s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit 676c12ee. ± Comparison against base commit af29bdf1.\n\n[test-results]:data:application/gzip;base64,H4sIAA6kE2kC/12MSQrDMAxFrxK87iJpPNHLBCNbIDK4eFiV3r122kwFbd776L0Y0uQiezTdrWExU9rB5mAS+aViW7gsqW6iFRsNMQP8q5GeRe0fAxqaLsKF4MPPhLwczQrX5NccxZVPwZXPPfDzTKkAk0pCd3fOSARdTimpkXMQ2iAKCdoC2r7n7P0BoGxXwwQBAAA=\n\n:recycle: This comment has been updated with latest results.",
-              "createdAt": "2025-11-10T20:33:50Z",
-              "url": "https://github.com/h1-aot/aot-base/pull/221#issuecomment-IC_kwDOQHWW8M7RcEX-",
-              "actionType": "improvement_needed",
-              "severity": "medium"
-            }
-          ],
-          "actionableCount": 22,
-          "severityCounts": {
-            "high": 16,
-            "medium": 6,
-            "low": 0
-          }
-        },
-        {
-          "author": {
-            "id": "U_kgDODh47-A",
-            "is_bot": false,
-            "login": "simd-h1",
-            "name": ""
-          },
-          "createdAt": "2025-10-30T23:24:17Z",
-          "isDraft": true,
-          "number": 219,
-          "reviewDecision": "",
-          "title": "Dynamic Tool Discovery and SQLMap Sidecar",
-          "updatedAt": "2025-10-31T18:51:54Z",
-          "url": "https://github.com/h1-aot/aot-base/pull/219",
-          "actionableComments": [
-            {
-              "id": 2481851168,
-              "type": "review_comment",
-              "author": "ppaul-h-aot",
-              "body": "The original PR comment says \n7 new files: Tool registry, executor, SQLMap sidecar, and tests, but I see 3 new files. So wanted to double check on that\n\nIt adds ",
-              "createdAt": "2025-10-31T15:40:29Z",
-              "path": "tests/agentic/tools/conftest.py",
-              "line": 3,
-              "url": "https://github.com/h1-aot/aot-base/pull/219#discussion_r2481851168",
-              "actionType": "improvement_needed",
-              "severity": "medium"
-            },
-            {
-              "id": "IC_kwDOQHWW8M7PGCvy",
-              "type": "general_comment",
-              "author": "simd-h1",
-              "body": "Closing this as I opened up once where it doenst have the source file issues PR #221 ",
-              "createdAt": "2025-10-31T18:51:53Z",
-              "url": "https://github.com/h1-aot/aot-base/pull/219#issuecomment-IC_kwDOQHWW8M7PGCvy",
-              "actionType": "question",
-              "severity": "medium"
-            }
-          ],
-          "actionableCount": 2,
-          "severityCounts": {
-            "high": 0,
-            "medium": 2,
-            "low": 0
-          }
         }
       ]
     },
@@ -4738,8 +4993,184 @@
       "owner": "h1-aot",
       "name": "aot-frontend-api",
       "url": "https://github.com/h1-aot/aot-frontend-api",
-      "lastPush": "2025-11-11T20:56:05Z",
+      "lastPush": "2025-11-12T22:34:53Z",
       "pullRequests": [
+        {
+          "author": {
+            "id": "MDQ6VXNlcjMwMDQ2Mzc=",
+            "is_bot": false,
+            "login": "r6e",
+            "name": "Rob Trame"
+          },
+          "createdAt": "2025-11-12T22:35:00Z",
+          "isDraft": false,
+          "number": 27,
+          "reviewDecision": "REVIEW_REQUIRED",
+          "title": "Create CI workflow for Python project",
+          "updatedAt": "2025-11-12T22:50:27Z",
+          "url": "https://github.com/h1-aot/aot-frontend-api/pull/27",
+          "actionableComments": [
+            {
+              "id": 2520048697,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The type checker tool \"ty\" does not exist. This appears to be referencing a non-existent Python type checking tool. Common Python type checkers include:\n- `mypy` (most widely used)\n- `pyright` (Microsoft's type checker)\n- `pytype` (Google's type checker)\n- `pyre` (Facebook's type checker)\n\nConsider replacing \"ty\" with one of these established type checkers. For example, with mypy:\n```bash\nuv run mypy --output json \"${paths[@]}\" > mypy-check.json\n```\n```suggestion\n          echo \"mypy_version=$(uv run mypy --version | cut -d ' ' -f 2)\" >> \"${GITHUB_OUTPUT}\"\n          uv run mypy --output json \"${paths[@]}\" > mypy-check.json\n\n      - name: No Python files changed\n        if: steps.changed-files.outputs.diffFiles == ''\n        run: echo \"::notice::Skipping type check - no Python files were modified in this change\"\n\n      - uses: h1-aot/actions/gitlab-json-to-sarif@v1.1.1\n        if: steps.changed-files.outputs.diffFiles != '' && hashFiles('mypy-check.json') != '' && always()\n        with:\n          toolName: mypy\n          toolVersion: ${{ steps.type-check.outputs.mypy_version }}\n          informationUri: https://mypy.readthedocs.io/en/stable/\n          inputFile: mypy-check.json\n          outputFile: mypy-check.sarif\n\n      - uses: github/codeql-action/upload-sarif@v4\n        if: steps.changed-files.outputs.diffFiles != '' && hashFiles('mypy-check.sarif') != '' && always()\n        with:\n          sarif_file: mypy-check.sarif\n          category: mypy-check\n```",
+              "createdAt": "2025-11-12T22:48:19Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 170,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/27#discussion_r2520048697",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2520048717,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The `informationUri` points to a non-existent documentation page for \"ty\". This URL should be updated to match the actual type checker being used. For example:\n- mypy: `https://mypy.readthedocs.io/`\n- pyright: `https://microsoft.github.io/pyright/`\n```suggestion\n          informationUri: https://ty.astral.sh/\n```",
+              "createdAt": "2025-11-12T22:48:19Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 162,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/27#discussion_r2520048717",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2520048727,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The tool name \"ty\" does not correspond to any known Python type checker. This should be updated to match the actual type checker being used (e.g., \"mypy\", \"pyright\", \"pytype\", or \"pyre\").\n```suggestion\n          toolName: mypy\n```",
+              "createdAt": "2025-11-12T22:48:20Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 160,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/27#discussion_r2520048727",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2520048732,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "Using `--preview` mode for production CI is risky as it enables unstable features that may change or break between releases. The comment on line 96 acknowledges this is for \"currently-unstable SARIF output formatter\". Consider:\n1. Removing `--preview` and using stable output formats, or\n2. Pinning the ruff version to avoid unexpected breakages when preview features change\n\nIf SARIF support has been stabilized in newer versions of ruff, the `--preview` flag may no longer be necessary.",
+              "createdAt": "2025-11-12T22:48:20Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 97,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/27#discussion_r2520048732",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2520052871,
+              "type": "review_comment",
+              "author": "r6e",
+              "body": "We have only found one bug related to the preview functionality being used, and have implemented a workaround.",
+              "createdAt": "2025-11-12T22:50:27Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 97,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/27#discussion_r2520052871",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": "IC_kwDOQHP3CM7SDu6Y",
+              "type": "general_comment",
+              "author": "github-actions",
+              "body": "## pytest Results\n33 tests   24 ✅  3s ⏱️\n 1 suites   9 💤\n 1 files     0 ❌\n\nResults for commit 4aeffa8d.\n\n[test-results]:data:application/gzip;base64,H4sIAAgMFWkC/1WMyw6CMBBFf4V07aKlD9GfMaXTJhOBmj5WxH93QFNwd8+5yVlZwMlndu/EpWO5YmkANdmCcSGUhHSU7ZINHrk6R6ZXh3nii8ytiWBxIsGb8CnF9DOpLq247b/gVxy9nU+5nc81F+cZCwFT1odgB+i59ArAjCoASGGsMBq40oO/anB+ZO8P7KT4vf8AAAA=\n",
+              "createdAt": "2025-11-12T22:36:59Z",
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/27#issuecomment-IC_kwDOQHP3CM7SDu6Y",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 6,
+          "severityCounts": {
+            "high": 1,
+            "medium": 4,
+            "low": 1
+          }
+        },
+        {
+          "author": {
+            "id": "U_kgDODdEf2A",
+            "is_bot": false,
+            "login": "bsong-123",
+            "name": "bsong"
+          },
+          "createdAt": "2025-11-11T21:02:45Z",
+          "isDraft": false,
+          "number": 26,
+          "reviewDecision": "APPROVED",
+          "title": "gh action to build and push to ecr in aot-dev",
+          "updatedAt": "2025-11-12T18:05:58Z",
+          "url": "https://github.com/h1-aot/aot-frontend-api/pull/26",
+          "actionableComments": [
+            {
+              "id": 2516301141,
+              "type": "review_comment",
+              "author": "mesamhaider",
+              "body": "I'd add these as repo secrets to avoid having this info in plaintext ",
+              "createdAt": "2025-11-12T00:57:54Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 15,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/26#discussion_r2516301141",
+              "actionType": "request",
+              "severity": "medium"
+            },
+            {
+              "id": 2516302020,
+              "type": "review_comment",
+              "author": "mesamhaider",
+              "body": "Can we name this something a bit more descriptive?",
+              "createdAt": "2025-11-12T00:58:33Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/26#discussion_r2516302020",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2516306107,
+              "type": "review_comment",
+              "author": "mesamhaider",
+              "body": "nit and doesn't need to be done but what I usually like to do is send a slack message which notifies the team that the image was been pushed and is ready to be used. ",
+              "createdAt": "2025-11-12T01:01:49Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 34,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/26#discussion_r2516306107",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2516645304,
+              "type": "review_comment",
+              "author": "khaleksa",
+              "body": "Great suggestion! I agreed that it might be better suited for a separate task since it could require some extra setup for Slack integrations. For now, I’d like to keep the focus on deploying the FrontendAPI image to AWS ECR, which is more time-sensitive for the AOT Platform team.",
+              "createdAt": "2025-11-12T03:57:20Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 34,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/26#discussion_r2516645304",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2516770549,
+              "type": "review_comment",
+              "author": "bsong-123",
+              "body": "changed to build-and-push-frontend-api!",
+              "createdAt": "2025-11-12T04:54:47Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/26#discussion_r2516770549",
+              "actionType": "request",
+              "severity": "medium"
+            }
+          ],
+          "actionableCount": 5,
+          "severityCounts": {
+            "high": 0,
+            "medium": 4,
+            "low": 1
+          }
+        },
         {
           "author": {
             "id": "U_kgDOCjx3QA",
@@ -4798,8 +5229,8 @@
           "isDraft": false,
           "number": 24,
           "reviewDecision": "REVIEW_REQUIRED",
-          "title": "fix: make Redis port configurable and remove duplicate config sections",
-          "updatedAt": "2025-11-11T18:37:40Z",
+          "title": "Remove Redis and switch to DynamoDB-only storage",
+          "updatedAt": "2025-11-12T20:29:54Z",
           "url": "https://github.com/h1-aot/aot-frontend-api/pull/24",
           "actionableComments": [
             {
@@ -4809,7 +5240,7 @@
               "body": "Environment variable substitution in docker-compose healthcheck commands may not work as expected. Docker Compose does not expand environment variables within the `test` array after the initial command. The `${REDIS_PORT:-6379}` will be passed as a literal string to the shell rather than being substituted. Consider using a more explicit approach with HEALTHCHECK_CMD environment variable or accept that the health check will always use the default port 6379 inside the container (which is correct since Redis always listens on its configured port inside the container network).\n```suggestion\n      test: [\"CMD\", \"sh\", \"-c\", \"redis-cli -p 6379 ping\"]\n```",
               "createdAt": "2025-11-10T23:33:25Z",
               "path": "docker-compose.yml",
-              "line": 71,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/24#discussion_r2512320688",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -4833,7 +5264,7 @@
               "body": "LIES!!! Heh, I tested it and it works fine. With the container running, I ran `docker inspect aot-frontend-api-redis-1 --format='{{json .State.Health.Log}}' | jq '.[-5:]'` in another terminal (print the last 5 health check outcomes). Got :\r\n```  \r\n{\r\n    \"Start\": \"2025-11-10T16:06:44.025646959-08:00\",\r\n    \"End\": \"2025-11-10T16:06:44.068847852-08:00\",\r\n    \"ExitCode\": 0,\r\n    \"Output\": \"PONG\\n\"\r\n  }\r\n```\r\nvs the failure (by hardcoding the wrong port in there):\r\n```\r\n  {\r\n    \"Start\": \"2025-11-10T16:06:01.676180897-08:00\",\r\n    \"End\": \"2025-11-10T16:06:01.754624144-08:00\",\r\n    \"ExitCode\": 1,\r\n    \"Output\": \"Could not connect to Redis at 127.0.0.1:6333: Connection refused\\n\"\r\n  }\r\n```",
               "createdAt": "2025-11-11T00:13:40Z",
               "path": "docker-compose.yml",
-              "line": 71,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/24#discussion_r2512386158",
               "actionType": "fix_required",
               "severity": "high"
@@ -4857,7 +5288,7 @@
               "body": "Question - why do we need to pass the new port via CLI - shouldn't the Redis containers env variable work the same way?",
               "createdAt": "2025-11-11T02:51:03Z",
               "path": "docker-compose.yml",
-              "line": 71,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/24#discussion_r2512645832",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -4869,7 +5300,7 @@
               "body": "+1 to this question",
               "createdAt": "2025-11-11T13:59:51Z",
               "path": "docker-compose.yml",
-              "line": 71,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/24#discussion_r2514338642",
               "actionType": "suggestion",
               "severity": "low"
@@ -4909,13 +5340,35 @@
               "url": "https://github.com/h1-aot/aot-frontend-api/pull/24#discussion_r2515262512",
               "actionType": "suggestion",
               "severity": "low"
+            },
+            {
+              "id": 2519554450,
+              "type": "review_comment",
+              "author": "mesamhaider",
+              "body": "we can get rid of this variable if our storage is always going to be dynamo",
+              "createdAt": "2025-11-12T19:37:24Z",
+              "path": "app/config.py",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/24#discussion_r2519554450",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": "IC_kwDOQHP3CM7RwG7J",
+              "type": "general_comment",
+              "author": "brycehacker1",
+              "body": "@amedury-eng, I removed redis and forced dynamodb. Was able to start a run successfully, haven't tested anything else (is there anything else to test?)",
+              "createdAt": "2025-11-11T22:58:25Z",
+              "url": "https://github.com/h1-aot/aot-frontend-api/pull/24#issuecomment-IC_kwDOQHP3CM7RwG7J",
+              "actionType": "improvement_needed",
+              "severity": "medium"
             }
           ],
-          "actionableCount": 9,
+          "actionableCount": 11,
           "severityCounts": {
             "high": 1,
-            "medium": 4,
-            "low": 4
+            "medium": 5,
+            "low": 5
           }
         },
         {
