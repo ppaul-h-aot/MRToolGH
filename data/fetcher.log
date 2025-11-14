@@ -2,3 +2,173 @@
 📅 Office hours: 9:00 - 18:00, Mon-Fri
 🌙 Currently outside office hours, waiting for next office hour...
 ✅ Scheduler started. Data will be fetched every 3 hours during office hours.
+⏰ Time for scheduled data fetch...
+🔄 Starting data fetch...
+📁 Found 8 active repositories to monitor
+📊 Processing h1-aot/agent_manager...
+  📝 Processing PR #37: Add basic GitHub actions for Rails app
+  📝 Processing PR #36: Enhanced log analysis and S3 reporting tools with automated workflows
+  📝 Processing PR #13: Bump propshaft from 1.2.1 to 1.3.1
+  📝 Processing PR #12: Bump aws-sdk-cloudwatchlogs from 1.127.0 to 1.129.0
+  📝 Processing PR #11: Bump solid_queue from 1.2.1 to 1.2.4
+  📝 Processing PR #10: Bump aws-sdk-ecs from 1.205.0 to 1.210.0
+  📝 Processing PR #9: Bump rubocop from 1.80.2 to 1.81.7
+  ✅ Found 2 PRs with actionable comments
+📊 Processing h1-aot/aot-base...
+  📝 Processing PR #328: Add security headers agent with testssl tooling and artifact exports
+  📝 Processing PR #327: Add indicator + user flow context to exploit prompting
+  📝 Processing PR #318: Feature/NBusby/71/sqli improve performance
+  📝 Processing PR #315: Remove thread ID compounding for child processes
+  📝 Processing PR #306: [do not merge] Add Proper Exit Code Handling for Runtime Workflow Failures
+  📝 Processing PR #295: Use AWS credentials in environment variables
+  📝 Processing PR #278: Add exit code handling to CLI entry point with distinct codes for error types
+  📝 Processing PR #257: Add token-based truncation logic for messages in state
+  📝 Processing PR #247: Add S3-backed checkpoint storage with file-based uploads
+  📝 Processing PR #201: DRAFT: Add summary and status updates to indicators from exploit agents
+  ✅ Found 10 PRs with actionable comments
+📊 Processing h1-aot/aot-frontend-api...
+  📝 Processing PR #27: Create CI workflow for Python project
+  📝 Processing PR #23: feat(docker): allow interactive debugging
+  📝 Processing PR #21: feat(docker): enable hot reloading
+  📝 Processing PR #20: feat: add ability to initiate `bin/run` detached
+  📝 Processing PR #19: Bump typer from 0.19.2 to 0.20.0
+  📝 Processing PR #18: Bump sentry-sdk from 2.41.0 to 2.43.0
+  📝 Processing PR #17: Bump boto3 from 1.40.59 to 1.40.69
+  📝 Processing PR #16: Bump fastapi from 0.121.0 to 0.121.1
+  ✅ Found 2 PRs with actionable comments
+📊 Processing h1-aot/aot-user-ui...
+  📝 Processing PR #6: Bump vuetify from 3.10.5 to 3.10.8
+  📝 Processing PR #5: Bump eventsource-parser from 0.1.0 to 3.0.6
+  📝 Processing PR #4: Bump tailwindcss from 3.2.6 to 4.1.16
+  📝 Processing PR #3: Bump glob from 9.3.5 to 11.0.3
+  📝 Processing PR #2: Bump @types/node from 20.19.21 to 24.10.0
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/masp...
+  📝 Processing PR #5: Bump jest from 29.7.0 to 30.2.0 in /agent-solver
+  📝 Processing PR #4: Bump uuid from 9.0.1 to 13.0.0 in /agent-solver
+  📝 Processing PR #3: Bump supertest from 6.3.4 to 7.1.4 in /agent-solver
+  📝 Processing PR #2: Bump express from 4.21.2 to 5.1.0 in /agent-solver
+  📝 Processing PR #1: Bump @types/node from 20.19.24 to 24.10.0 in /agent-solver
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/offsec-benchmarks...
+  📝 Processing PR #2: Vulnerable Nethserver App
+  ✅ Found 1 PRs with actionable comments
+📊 Processing h1-aot/aot-terraform...
+  ℹ️  No actionable comments found
+📊 Processing ppaul-h-aot/MRToolGH...
+  ℹ️  No actionable comments found
+✅ Data fetch complete! Found actionable comments in 4 repositories
+⏰ Time for scheduled data fetch...
+🔄 Starting data fetch...
+📁 Found 8 active repositories to monitor
+📊 Processing h1-aot/agent_manager...
+  📝 Processing PR #37: Add basic GitHub actions for Rails app
+  📝 Processing PR #36: Enhanced log analysis and S3 reporting tools with automated workflows
+  📝 Processing PR #13: Bump propshaft from 1.2.1 to 1.3.1
+  📝 Processing PR #12: Bump aws-sdk-cloudwatchlogs from 1.127.0 to 1.129.0
+  📝 Processing PR #11: Bump solid_queue from 1.2.1 to 1.2.4
+  📝 Processing PR #10: Bump aws-sdk-ecs from 1.205.0 to 1.210.0
+  📝 Processing PR #9: Bump rubocop from 1.80.2 to 1.81.7
+  ✅ Found 2 PRs with actionable comments
+📊 Processing h1-aot/aot-base...
+  📝 Processing PR #342: refactor: move bind_tools_safe logic into ModelBuilder
+  📝 Processing PR #328: Add security headers agent with testssl tooling and artifact exports
+  📝 Processing PR #327: Add indicator + user flow context to exploit prompting
+  📝 Processing PR #318: Feature/NBusby/71/sqli improve performance
+  📝 Processing PR #315: Remove thread ID compounding for child processes
+  📝 Processing PR #306: [do not merge] Add Proper Exit Code Handling for Runtime Workflow Failures
+  📝 Processing PR #295: Use AWS credentials in environment variables
+  📝 Processing PR #278: Add exit code handling to CLI entry point with distinct codes for error types
+  📝 Processing PR #257: Add token-based truncation logic for messages in state
+  📝 Processing PR #247: Add S3-backed checkpoint storage with file-based uploads
+  📝 Processing PR #201: Add summary and status updates to indicators from exploit agents
+  ✅ Found 11 PRs with actionable comments
+📊 Processing h1-aot/aot-frontend-api...
+  📝 Processing PR #23: feat(docker): allow interactive debugging
+  📝 Processing PR #21: feat(docker): enable hot reloading
+  📝 Processing PR #20: feat: add ability to initiate `bin/run` detached
+  📝 Processing PR #19: Bump typer from 0.19.2 to 0.20.0
+  📝 Processing PR #18: Bump sentry-sdk from 2.41.0 to 2.43.0
+  📝 Processing PR #17: Bump boto3 from 1.40.59 to 1.40.69
+  📝 Processing PR #16: Bump fastapi from 0.121.0 to 0.121.1
+  ✅ Found 1 PRs with actionable comments
+📊 Processing h1-aot/aot-user-ui...
+  📝 Processing PR #6: Bump vuetify from 3.10.5 to 3.10.8
+  📝 Processing PR #5: Bump eventsource-parser from 0.1.0 to 3.0.6
+  📝 Processing PR #4: Bump tailwindcss from 3.2.6 to 4.1.16
+  📝 Processing PR #3: Bump glob from 9.3.5 to 11.0.3
+  📝 Processing PR #2: Bump @types/node from 20.19.21 to 24.10.0
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/masp...
+  📝 Processing PR #5: Bump jest from 29.7.0 to 30.2.0 in /agent-solver
+  📝 Processing PR #4: Bump uuid from 9.0.1 to 13.0.0 in /agent-solver
+  📝 Processing PR #3: Bump supertest from 6.3.4 to 7.1.4 in /agent-solver
+  📝 Processing PR #2: Bump express from 4.21.2 to 5.1.0 in /agent-solver
+  📝 Processing PR #1: Bump @types/node from 20.19.24 to 24.10.0 in /agent-solver
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/offsec-benchmarks...
+  📝 Processing PR #2: Vulnerable Nethserver App
+  ✅ Found 1 PRs with actionable comments
+📊 Processing h1-aot/aot-terraform...
+  ℹ️  No actionable comments found
+📊 Processing ppaul-h-aot/MRToolGH...
+  ℹ️  No actionable comments found
+✅ Data fetch complete! Found actionable comments in 4 repositories
+⏰ Time for scheduled data fetch...
+🔄 Starting data fetch...
+📁 Found 8 active repositories to monitor
+📊 Processing h1-aot/agent_manager...
+  📝 Processing PR #37: Add basic GitHub actions for Rails app
+  📝 Processing PR #36: Enhanced log analysis and S3 reporting tools with automated workflows
+  📝 Processing PR #13: Bump propshaft from 1.2.1 to 1.3.1
+  📝 Processing PR #12: Bump aws-sdk-cloudwatchlogs from 1.127.0 to 1.129.0
+  📝 Processing PR #11: Bump solid_queue from 1.2.1 to 1.2.4
+  📝 Processing PR #10: Bump aws-sdk-ecs from 1.205.0 to 1.210.0
+  📝 Processing PR #9: Bump rubocop from 1.80.2 to 1.81.7
+  ✅ Found 2 PRs with actionable comments
+📊 Processing h1-aot/aot-base...
+  📝 Processing PR #348: Bugfix: Only setup opentelemetry if langfuse is enabled
+  📝 Processing PR #347: Deduplicate dynamic routes and endpoints with query params
+  📝 Processing PR #328: Add security headers agent with testssl tooling and artifact exports
+  📝 Processing PR #327: Add indicator + user flow context to exploit prompting
+  📝 Processing PR #318: Feature/NBusby/71/sqli improve performance
+  📝 Processing PR #315: Remove thread ID compounding for child processes
+  📝 Processing PR #306: [do not merge] Add Proper Exit Code Handling for Runtime Workflow Failures
+  📝 Processing PR #295: Use AWS credentials in environment variables
+  📝 Processing PR #278: Add exit code handling to CLI entry point with distinct codes for error types
+  📝 Processing PR #257: Add token-based truncation logic for messages in state
+  📝 Processing PR #247: Add S3-backed checkpoint storage with file-based uploads
+  📝 Processing PR #201: Add summary and status updates to indicators from exploit agents
+  ✅ Found 12 PRs with actionable comments
+📊 Processing h1-aot/aot-frontend-api...
+  📝 Processing PR #23: feat(docker): allow interactive debugging
+  📝 Processing PR #21: feat(docker): enable hot reloading
+  📝 Processing PR #20: feat: add ability to initiate `bin/run` detached
+  📝 Processing PR #19: Bump typer from 0.19.2 to 0.20.0
+  📝 Processing PR #18: Bump sentry-sdk from 2.41.0 to 2.43.0
+  📝 Processing PR #17: Bump boto3 from 1.40.59 to 1.40.69
+  📝 Processing PR #16: Bump fastapi from 0.121.0 to 0.121.1
+  ✅ Found 1 PRs with actionable comments
+📊 Processing h1-aot/aot-user-ui...
+  📝 Processing PR #6: Bump vuetify from 3.10.5 to 3.10.8
+  📝 Processing PR #5: Bump eventsource-parser from 0.1.0 to 3.0.6
+  📝 Processing PR #4: Bump tailwindcss from 3.2.6 to 4.1.16
+  📝 Processing PR #3: Bump glob from 9.3.5 to 11.0.3
+  📝 Processing PR #2: Bump @types/node from 20.19.21 to 24.10.0
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/masp...
+  📝 Processing PR #5: Bump jest from 29.7.0 to 30.2.0 in /agent-solver
+  📝 Processing PR #4: Bump uuid from 9.0.1 to 13.0.0 in /agent-solver
+  📝 Processing PR #3: Bump supertest from 6.3.4 to 7.1.4 in /agent-solver
+  📝 Processing PR #2: Bump express from 4.21.2 to 5.1.0 in /agent-solver
+  📝 Processing PR #1: Bump @types/node from 20.19.24 to 24.10.0 in /agent-solver
+  ℹ️  No actionable comments found
+📊 Processing h1-aot/offsec-benchmarks...
+  📝 Processing PR #3: Mschoenfeld/2fauth
+  📝 Processing PR #2: Vulnerable Nethserver App
+  ✅ Found 2 PRs with actionable comments
+📊 Processing h1-aot/aot-terraform...
+  ℹ️  No actionable comments found
+📊 Processing ppaul-h-aot/MRToolGH...
+  ℹ️  No actionable comments found
+✅ Data fetch complete! Found actionable comments in 4 repositories
