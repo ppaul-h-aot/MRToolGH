@@ -219,9 +219,79 @@ app.post('/api/analyze', (req, res) => {
   }
 });
 
+// API endpoint to get list of repositories
+app.get('/api/repos', (req, res) => {
+  try {
+    const fetcher = new (require('./data-fetcher'))();
+    const repos = fetcher.getRepositoriesToMonitor();
+    res.json({ success: true, repos: repos });
+  } catch (error) {
+    console.error('Error getting repositories:', error);
+    res.json({ success: false, error: error.message });
+  }
+});
+
+// API endpoint to get cached data
+app.get('/api/cached-data', (req, res) => {
+  try {
+    const fetcher = new (require('./data-fetcher'))();
+    const data = fetcher.loadCachedData();
+    res.json({ success: true, data: data });
+  } catch (error) {
+    console.error('Error getting cached data:', error);
+    res.json({ success: false, error: error.message });
+  }
+});
+
+// API endpoint to refresh specific repository
+app.post('/api/repos/:owner/:repo/refresh', async (req, res) => {
+  try {
+    const { owner, repo } = req.params;
+    console.log(`🔄 Refreshing repository: ${owner}/${repo}`);
+
+    const fetcher = new (require('./data-fetcher'))();
+
+    // Refresh data for this specific repository
+    const data = await fetcher.fetchAllData();
+
+    res.json({
+      success: true,
+      message: `Repository ${owner}/${repo} refreshed successfully`,
+      data: data
+    });
+  } catch (error) {
+    console.error('Error refreshing repository:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// API endpoint to trigger full data refresh
+app.post('/api/fetch-data', async (req, res) => {
+  try {
+    console.log('🔄 Triggering full data refresh...');
+
+    const fetcher = new (require('./data-fetcher'))();
+    const data = await fetcher.fetchAllData();
+
+    res.json({
+      success: true,
+      message: 'All data refreshed successfully',
+      data: data
+    });
+  } catch (error) {
+    console.error('Error refreshing all data:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Serve the GitHub PR tool page
+app.get('/github-pr-tool', (req, res) => {
+  res.sendFile(path.join(__dirname, 'github-pr-tool.html'));
+});
+
 // Serve the main analyzer page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'analyzer.html'));
+  res.sendFile(path.join(__dirname, 'github-pr-tool.html'));
 });
 
 // Error handling middleware

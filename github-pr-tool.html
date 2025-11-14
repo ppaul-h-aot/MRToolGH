@@ -68,6 +68,50 @@
             cursor: not-allowed;
         }
 
+        .repo-refresh-btn {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 8px;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .repo-refresh-btn:hover {
+            opacity: 1;
+            background: #2ea043;
+        }
+
+        .repo-refresh-btn:disabled {
+            background: #8c959f;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .streaming-indicator {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: #0969da;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: none;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
         .navbar {
             background: #24292f;
             padding: 8px 15px;
@@ -779,6 +823,10 @@
         </div>
     </nav>
 
+    <div id="streamingIndicator" class="streaming-indicator">
+        📡 Live data streaming...
+    </div>
+
     <div class="container">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -800,9 +848,17 @@
                         Select a repository to view pull requests
                     </div>
                 </div>
-                <button id="refreshBtn" class="refresh-btn" onclick="refreshCurrentPR()">
-                    🔄 Refresh
-                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button id="refreshBtn" class="refresh-btn" onclick="refreshCurrentPR()">
+                        🔄 Refresh Current
+                    </button>
+                    <button id="refreshAllBtn" class="refresh-btn" onclick="refreshAllData()">
+                        🔄 Refresh All
+                    </button>
+                    <button id="streamToggle" class="refresh-btn" onclick="toggleStreaming()" style="background: #6f42c1;">
+                        📡 Start Streaming
+                    </button>
+                </div>
             </header>
 
             <div class="content">
@@ -819,6 +875,9 @@
         let currentPR = null;
         let repos = [];
         let prs = [];
+        let isStreaming = false;
+        let streamingTimer = null;
+        let streamingEventSource = null;
 
         // Load repositories on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -970,6 +1029,9 @@
                             <span class="tree-icon" id="icon-${repoId}">📁</span>
                             <div class="repo-name">${repo.owner.login}/${repo.name}</div>
                             ${repo.pullRequests.length > 0 ? `<div class="repo-badge">${repo.pullRequests.length}</div>` : ''}
+                            <button class="repo-refresh-btn" onclick="refreshRepository('${repo.owner.login}', '${repo.name}', event)" title="Refresh this repository">
+                                🔄
+                            </button>
                         </div>
                     </div>
 
@@ -1771,6 +1833,153 @@
             document.getElementById('commentLine').value = '';
         }
 
+        async function refreshRepository(owner, repoName, event) {
+            event.stopPropagation();
+            const btn = event.target;
+            const originalText = btn.textContent;
+
+            btn.disabled = true;
+            btn.textContent = '⟳';
+            btn.style.animation = 'spin 1s linear infinite';
+
+            try {
+                // Trigger refresh for specific repository
+                const response = await fetch(`/api/repos/${owner}/${repoName}/refresh`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Reload repositories to show updated data
+                    await loadRepositories(true);
+
+                    // Show success message
+                    showTemporaryMessage('✅ Repository refreshed successfully!');
+                } else {
+                    showError('Failed to refresh repository: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error refreshing repository:', error);
+                showError('Error refreshing repository: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                btn.style.animation = '';
+            }
+        }
+
+        async function refreshAllData() {
+            const refreshBtn = document.getElementById('refreshAllBtn');
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 Refreshing All...';
+
+            try {
+                // Trigger full data refresh
+                const response = await fetch('/api/fetch-data', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success || response.ok) {
+                    // Reload repositories with fresh data
+                    await loadRepositories(true);
+
+                    document.getElementById('mainContent').innerHTML = `
+                        <div class="empty-state">
+                            <h2>🔄 All Data Refreshed!</h2>
+                            <p>Select a repository from the sidebar to view updated pull requests.</p>
+                        </div>
+                    `;
+
+                    showTemporaryMessage('✅ All data refreshed successfully!');
+                } else {
+                    showError('Failed to refresh all data: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error refreshing all data:', error);
+                showError('Error refreshing all data: ' + error.message);
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 Refresh All';
+            }
+        }
+
+        function toggleStreaming() {
+            const btn = document.getElementById('streamToggle');
+            const indicator = document.getElementById('streamingIndicator');
+
+            if (isStreaming) {
+                // Stop streaming
+                isStreaming = false;
+                if (streamingTimer) {
+                    clearInterval(streamingTimer);
+                    streamingTimer = null;
+                }
+                if (streamingEventSource) {
+                    streamingEventSource.close();
+                    streamingEventSource = null;
+                }
+
+                btn.textContent = '📡 Start Streaming';
+                btn.style.background = '#6f42c1';
+                indicator.style.display = 'none';
+
+                console.log('📡 Streaming stopped');
+                showTemporaryMessage('📡 Data streaming stopped');
+            } else {
+                // Start streaming
+                isStreaming = true;
+                btn.textContent = '⏹️ Stop Streaming';
+                btn.style.background = '#dc3545';
+                indicator.style.display = 'block';
+
+                console.log('📡 Starting data streaming...');
+                startStreamingData();
+                showTemporaryMessage('📡 Data streaming started - updates every 30s');
+            }
+        }
+
+        function startStreamingData() {
+            // Initial load
+            loadRepositories(true);
+
+            // Set up periodic refresh
+            streamingTimer = setInterval(async () => {
+                if (!isStreaming) return;
+
+                console.log('📡 Streaming update...');
+                try {
+                    // Refresh data in background
+                    await fetch('/api/fetch-data', { method: 'POST' });
+
+                    // Update repositories
+                    await loadRepositories(true);
+
+                    // If we're viewing a specific PR, refresh it too
+                    if (currentPR && currentRepo) {
+                        await loadPRComments();
+                    }
+
+                    console.log('📡 Streaming update completed');
+                } catch (error) {
+                    console.error('📡 Streaming update failed:', error);
+                }
+            }, 30000); // Update every 30 seconds
+        }
+
+        function showTemporaryMessage(message, duration = 3000) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'copy-success';
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageDiv.remove();
+            }, duration);
+        }
+
         function showError(message) {
             const mainContent = document.getElementById('mainContent');
             mainContent.innerHTML = `
@@ -1781,6 +1990,26 @@
                 </div>
             `;
         }
+
+        // Add CSS for spinning animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (streamingTimer) {
+                clearInterval(streamingTimer);
+            }
+            if (streamingEventSource) {
+                streamingEventSource.close();
+            }
+        });
     </script>
 </body>
 </html>
