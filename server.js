@@ -220,10 +220,10 @@ app.post('/api/analyze', (req, res) => {
 });
 
 // API endpoint to get list of repositories
-app.get('/api/repos', (req, res) => {
+app.get('/api/repos', async (req, res) => {
   try {
     const fetcher = new (require('./data-fetcher'))();
-    const repos = fetcher.getRepositoriesToMonitor();
+    const repos = await fetcher.getRepositoriesToMonitor();
     res.json({ success: true, repos: repos });
   } catch (error) {
     console.error('Error getting repositories:', error);
