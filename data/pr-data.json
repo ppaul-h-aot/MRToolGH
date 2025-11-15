@@ -1,11 +1,11 @@
 {
-  "lastUpdate": "2025-11-14T20:00:04.755Z",
+  "lastUpdate": "2025-11-14T23:00:05.152Z",
   "repositories": [
     {
       "owner": "h1-aot",
       "name": "aot-base",
       "url": "https://github.com/h1-aot/aot-base",
-      "lastPush": "2025-11-14T19:36:31Z",
+      "lastPush": "2025-11-14T21:54:09Z",
       "pullRequests": [
         {
           "author": {
@@ -76,7 +76,7 @@
           "number": 352,
           "reviewDecision": "CHANGES_REQUESTED",
           "title": "Add status and summary details to indicators",
-          "updatedAt": "2025-11-14T18:36:19Z",
+          "updatedAt": "2025-11-14T21:15:40Z",
           "url": "https://github.com/h1-aot/aot-base/pull/352",
           "actionableComments": [
             {
@@ -86,7 +86,7 @@
               "body": "I'll remove all these...  whoopsie daisy",
               "createdAt": "2025-11-14T02:17:51Z",
               "path": "config/agentic.toml",
-              "line": 14,
+              "line": null,
               "url": "https://github.com/h1-aot/aot-base/pull/352#discussion_r2525535247",
               "actionType": "request",
               "severity": "medium"
@@ -143,7 +143,7 @@
               "id": "IC_kwDOQHWW8M7Sb5eO",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n541 tests  +8   538 ✅ +5   11s ⏱️ -1s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     3 ❌ +3 \n\nFor more details on these failures, see [this check](https://github.com/h1-aot/aot-base/runs/55437231175).\n\nResults for commit f8b6c154. ± Comparison against base commit f0d4af11.\n\n<details>\n  <summary>This pull request <b>removes</b> 8 and <b>adds</b> 16 tests. <i>Note that renamed tests count towards both.</i></summary>\n\n```\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_complete_data\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_empty_test_plans_list\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_missing_overview_fields\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_multiple_test_plans\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_none_values_in_test_plans\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_stored_xss_enum_values\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_test_plan_overview_only\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_test_plans_only\n```\n\n```\ntests.agentic.tools.test_endpoints.TestEndpoints ‑ test_store_endpoint_parametrizes_numeric_ids\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_exploit_results\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_format_exploit_status\ntests.agentic.utils.test_url_normalizer.TestNormalizePathSegments ‑ test_no_dynamic_segments\ntests.agentic.utils.test_url_normalizer.TestNormalizePathSegments ‑ test_numeric_ids\ntests.agentic.utils.test_url_normalizer.TestNormalizePathSegments ‑ test_root_path\ntests.agentic.utils.test_url_normalizer.TestNormalizePathSegments ‑ test_uuid_ids\ntests.agentic.utils.test_url_normalizer.TestNormalizeSpaFragment ‑ test_empty_spa_fragments\ntests.agentic.utils.test_url_normalizer.TestNormalizeSpaFragment ‑ test_spa_route_with_numeric_id\ntests.agentic.utils.test_url_normalizer.TestNormalizeSpaFragment ‑ test_spa_static_routes\n…\n```\n</details>\n\n[test-results]:data:application/gzip;base64,H4sIAKF2F2kC/1WMQQ7CIBQFr9KwdsEXEOplDFBIfmyLobBqvLtQDdTlzHuZnXic3UbuA1wGsmVMDaYcdcKwVqxcllQ3wRs9tmxtVUx19cRXUbQJr3EugjXhYgzxd4l57c0K/8mv6cWDT8GDzz0blgVTAeKVuVkQnMppBC+t9kwIT5VWYDS/Agdg0pmRvD/8NCpbBAEAAA==\n\n:recycle: This comment has been updated with latest results.",
+              "body": "## pytest Results\n553 tests  +6   553 ✅ +6   10s ⏱️ ±0s\n  1 suites ±0     0 💤 ±0 \n  1 files   ±0     0 ❌ ±0 \n\nResults for commit 368c414e. ± Comparison against base commit 7586b441.\n\n<details>\n  <summary>This pull request <b>removes</b> 8 and <b>adds</b> 14 tests. <i>Note that renamed tests count towards both.</i></summary>\n\n```\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_complete_data\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_empty_test_plans_list\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_missing_overview_fields\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_multiple_test_plans\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_none_values_in_test_plans\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_stored_xss_enum_values\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_test_plan_overview_only\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_test_plans_only\n```\n\n```\ntests.agentic.agents.test_summarization.TestSummarizationAgent ‑ test_summarization_prompt_includes_exploit_results\ntests.agentic.agents.test_summarization.TestSummarizationAgent ‑ test_summarization_prompt_includes_indicators\ntests.agentic.agents.test_summarization.TestSummarizationAgent ‑ test_summarization_prompt_includes_read_test_plan\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_convert_state_with_exploit_results\ntests.agentic.utils.test_indicator.TestConvertIndicatorsToMarkdown ‑ test_format_exploit_status\ntests.agentic.workflows.test_orchestrator.TestOrchestratorWorkflowS3Upload ‑ test_call_sqli_workflow_handles_none_updated_indicator\ntests.agentic.workflows.test_orchestrator.TestOrchestratorWorkflowS3Upload ‑ test_call_stored_xss_workflow_handles_none_updated_indicator\ntests.agentic.workflows.test_orchestrator.TestOrchestratorWorkflowS3Upload ‑ test_call_xss_workflow_handles_none_updated_indicator\ntests.agentic.workflows.test_sqli.TestSqliWorkflow ‑ test_call_async_falls_back_to_input_indicator\ntests.agentic.workflows.test_sqli.TestSqliWorkflow ‑ test_call_async_raises_on_empty_input_indicators\n…\n```\n</details>\n\n[test-results]:data:application/gzip;base64,H4sIAPqbF2kC/12Myw7CIBBFf6Vh7UJKoerPNNMZSCa2xVBYGf9dqNqHy3Nu7nkKx4Odxa2Sp0rMieMKlAJE9lPBc+a8xLJprX7UzQnxX935kdX66BzwcBA2BB++JqRpaxY4Jj9mKy68Cy6876EfR44ZhDIXbGRjSV0JQLWqltQ7QJRkqNYtkIPeGCVebxBlPzEEAQAA\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-14T02:18:22Z",
               "url": "https://github.com/h1-aot/aot-base/pull/352#issuecomment-IC_kwDOQHWW8M7Sb5eO",
               "actionType": "improvement_needed",
@@ -180,7 +180,7 @@
           "number": 328,
           "reviewDecision": "CHANGES_REQUESTED",
           "title": "Add security headers agent with testssl tooling and artifact exports",
-          "updatedAt": "2025-11-14T19:29:56Z",
+          "updatedAt": "2025-11-14T21:55:02Z",
           "url": "https://github.com/h1-aot/aot-base/pull/328",
           "actionableComments": [
             {
@@ -526,16 +526,28 @@
               "body": "## parameter-already-assigned: Multiple values provided for parameter `config` of bound method `__init__`\n\nparameter-already-assigned: Multiple values provided for parameter `config` of bound method `__init__`\n\n[Show more details](https://github.com/h1-aot/aot-base/security/code-scanning/456)",
               "createdAt": "2025-11-14T18:49:58Z",
               "path": "src/agentic/agents/security_headers.py",
-              "line": 36,
+              "line": 37,
               "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2528573295",
               "actionType": "fix_required",
               "severity": "high"
             },
             {
+              "id": 2528890110,
+              "type": "review_comment",
+              "author": "cmoh1",
+              "body": "@r6e could you take a look at this file diff and give feedback on the approach?",
+              "createdAt": "2025-11-14T20:44:39Z",
+              "path": ".github/workflows/ci.yml",
+              "line": 154,
+              "url": "https://github.com/h1-aot/aot-base/pull/328#discussion_r2528890110",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
               "id": "IC_kwDOQHWW8M7Ru8B-",
               "type": "general_comment",
               "author": "github-actions",
-              "body": "## pytest Results\n560 tests  +13   560 ✅ +13   11s ⏱️ -1s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit ab088405. ± Comparison against base commit 7586b441.\n\n[test-results]:data:application/gzip;base64,H4sIADKDF2kC/13MSw7CIBSF4a00jB1wCRRwMwYpJDe2xfAYGfcu1Aetw+8/yXkQj7NL5DzAaSCpYP5hKtFkDGtjc11y28RIv7qkYu1/uuG9ph68wfkQXIwhfkosa/9sOF6+S3/cvDvcvP+zYVkwVxBzpUpxKphUo4TJcauk1mAZcMsZCC1AeaqBPF9LdgsFBAEAAA==\n\n:recycle: This comment has been updated with latest results.",
+              "body": "## pytest Results\n562 tests  +15   562 ✅ +15   10s ⏱️ ±0s\n  1 suites ± 0     0 💤 ± 0 \n  1 files   ± 0     0 ❌ ± 0 \n\nResults for commit 17afc476. ± Comparison against base commit 7586b441.\n\n[test-results]:data:application/gzip;base64,H4sIADWlF2kC/12MyQ6DIBRFf8Ww7kJABvszhjF5qUqDsDL994JtHbo85+aeFXkY3YLuDb41aMmQdrA5qgRhrtgWLkuqG+PkR8OSjflXD3gWtT8Gr2C8CBdjiF8T83w0K1yTH3MUNz4FNz73TJgmSAUQFsqbTnAqnKZEMK56zC3WLXVOEi0t7XpJDUOvN+de7qEEAQAA\n\n:recycle: This comment has been updated with latest results.",
               "createdAt": "2025-11-11T21:12:28Z",
               "url": "https://github.com/h1-aot/aot-base/pull/328#issuecomment-IC_kwDOQHWW8M7Ru8B-",
               "actionType": "improvement_needed",
@@ -552,6 +564,16 @@
               "severity": "medium"
             },
             {
+              "id": "IC_kwDOQHWW8M7Sr6aO",
+              "type": "general_comment",
+              "author": "simd-h1",
+              "body": "Summary\r\n- Fix `testssl.sh` runs timing out by widening the subprocess window (default 300 s, env/arg override).\r\n- Introduce timestamped artifact snapshots so each run saves a copy of `./artifacts` plus `latest.json` metadata.\r\n- Restore the `--skip-model-validation` CLI flag so CI smoke jobs can bypass Bedrock checks.\r\n\r\n Testing\r\n- `./bin/run pytest tests/agentic/tools/test_testssl.py tests/agentic/utils/test_artifacts.py tests/agentic/agents/test_security_headers_agent.py`\r\n- `./bin/run agentic -a security_headers_agent ...` against `eduquiz.netizens.it`",
+              "createdAt": "2025-11-14T21:46:31Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/328#issuecomment-IC_kwDOQHWW8M7Sr6aO",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
               "id": 3466084946,
               "type": "review",
               "author": "bwillis",
@@ -563,11 +585,11 @@
               "severity": "low"
             }
           ],
-          "actionableCount": 32,
+          "actionableCount": 34,
           "severityCounts": {
-            "high": 19,
+            "high": 20,
             "medium": 11,
-            "low": 2
+            "low": 3
           }
         },
         {
@@ -582,7 +604,7 @@
           "number": 318,
           "reviewDecision": "CHANGES_REQUESTED",
           "title": "Feature/NBusby/71/sqli improve performance",
-          "updatedAt": "2025-11-13T23:18:20Z",
+          "updatedAt": "2025-11-14T20:18:03Z",
           "url": "https://github.com/h1-aot/aot-base/pull/318",
           "actionableComments": [
             {
@@ -1087,7 +1109,7 @@
           "number": 295,
           "reviewDecision": "CHANGES_REQUESTED",
           "title": "Use AWS credentials in environment variables",
-          "updatedAt": "2025-11-14T19:39:23Z",
+          "updatedAt": "2025-11-14T20:48:10Z",
           "url": "https://github.com/h1-aot/aot-base/pull/295",
           "actionableComments": [
             {
@@ -1177,6 +1199,16 @@
               "severity": "low"
             },
             {
+              "id": "IC_kwDOQHWW8M7SrE2a",
+              "type": "general_comment",
+              "author": "cmoh1",
+              "body": "@rquinlivan \r\n\r\nWhen I test with `AWS_PROFILE=aot-developer` in my .env I get the following:\r\n```\r\nbotocore.exceptions.ProfileNotFound: The config profile (aot-developer) could not be found\r\n```\r\n\r\nWhen I remove that line, I get the following error:\r\n\r\n```\r\n✗ Model connectivity validation failed: AWS credentials not found - run 'bin/setup-aws' to configure credentials\r\n```\r\n\r\nI'm running `bin/agentic -a orchestrator_workflow` from a terminal, not from in the devcontainer 🤔 ",
+              "createdAt": "2025-11-14T20:48:10Z",
+              "url": "https://github.com/h1-aot/aot-base/pull/295#issuecomment-IC_kwDOQHWW8M7SrE2a",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
               "id": 3444677926,
               "type": "review",
               "author": "cmoh1",
@@ -1188,9 +1220,9 @@
               "severity": "medium"
             }
           ],
-          "actionableCount": 9,
+          "actionableCount": 10,
           "severityCounts": {
-            "high": 2,
+            "high": 3,
             "medium": 5,
             "low": 2
           }
@@ -1377,7 +1409,7 @@
           "number": 247,
           "reviewDecision": "",
           "title": "Add S3-backed checkpoint storage with file-based uploads",
-          "updatedAt": "2025-11-14T19:36:32Z",
+          "updatedAt": "2025-11-14T21:21:45Z",
           "url": "https://github.com/h1-aot/aot-base/pull/247",
           "actionableComments": [
             {
@@ -1567,7 +1599,7 @@
               "body": "Suggestion - I see we are making this async, but calling sync operations - we should discuss how we can avoid that if possible.",
               "createdAt": "2025-11-11T06:05:37Z",
               "path": "src/agentic/stores/checkpointer/async_s3_postgres.py",
-              "line": 709,
+              "line": 700,
               "url": "https://github.com/h1-aot/aot-base/pull/247#discussion_r2512960861",
               "actionType": "improvement_needed",
               "severity": "medium"
@@ -1663,7 +1695,7 @@
       "owner": "h1-aot",
       "name": "aot-user-ui",
       "url": "https://github.com/h1-aot/aot-user-ui",
-      "lastPush": "2025-11-14T19:15:55Z",
+      "lastPush": "2025-11-14T21:17:57Z",
       "pullRequests": [
         {
           "author": {
@@ -1672,56 +1704,212 @@
             "login": "rquinlivan",
             "name": "Robert Quinlivan"
           },
-          "createdAt": "2025-11-14T19:22:31Z",
+          "createdAt": "2025-11-14T20:35:31Z",
           "isDraft": false,
-          "number": 7,
+          "number": 8,
           "reviewDecision": "",
-          "title": "Dockerize, choose yarn as dependency management tool, and update readme",
-          "updatedAt": "2025-11-14T19:52:21Z",
-          "url": "https://github.com/h1-aot/aot-user-ui/pull/7",
+          "title": "Publish ECR image on main",
+          "updatedAt": "2025-11-14T22:33:20Z",
+          "url": "https://github.com/h1-aot/aot-user-ui/pull/8",
           "actionableComments": [
             {
-              "id": 2528693938,
+              "id": 2528876619,
               "type": "review_comment",
-              "author": "amedury-eng",
-              "body": "Question - Curious if this entrypoint works? I have been using `npm run dev` to run it locally - so just wanted to understand how this works :D!",
-              "createdAt": "2025-11-14T19:28:20Z",
-              "path": "Dockerfile",
-              "line": 13,
-              "url": "https://github.com/h1-aot/aot-user-ui/pull/7#discussion_r2528693938",
+              "author": "Copilot",
+              "body": "The workflow only tags images with the short commit SHA, but doesn't include a `latest` tag. This makes it difficult to identify the most recent image and forces consumers to know specific commit SHAs. Consider adding a `latest` tag for the main branch:\n```bash\ndocker build -t ${ECR_URI}:${IMAGE_TAG} -t ${ECR_URI}:latest .\ndocker push ${ECR_URI}:${IMAGE_TAG}\ndocker push ${ECR_URI}:latest\n```\n```suggestion\n          docker build -t ${ECR_URI}:${IMAGE_TAG} -t ${ECR_URI}:latest .\n          docker push ${ECR_URI}:${IMAGE_TAG}\n          docker push ${ECR_URI}:latest\n```",
+              "createdAt": "2025-11-14T20:37:41Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528876619",
               "actionType": "suggestion",
               "severity": "low"
             },
             {
-              "id": 2528760603,
+              "id": 2528876633,
               "type": "review_comment",
-              "author": "rquinlivan",
-              "body": "[From the docs](https://nuxt.com/docs/4.x/getting-started/deployment#entry-point) I learned that nuxt writes its dist files to `./.output`. This is written during the builder layer. Then we copy the dist files from the builder on line 9., so the final layer here doesn't even have npm or yarn installed, it just makes the call to the `node` process, which is what `npm run` does under the hood. \r\n\r\nWe can still run `yarn run dev` locally. ",
-              "createdAt": "2025-11-14T19:51:22Z",
-              "path": "Dockerfile",
-              "line": 13,
-              "url": "https://github.com/h1-aot/aot-user-ui/pull/7#discussion_r2528760603",
+              "author": "Copilot",
+              "body": "The workflow lacks error handling. If the Docker build or push fails, there's no cleanup or notification. Consider adding error handling or at minimum ensuring the workflow fails fast. Additionally, consider adding a step to verify the image was successfully pushed to ECR.\n```suggestion\n        run: |\n          set -euo pipefail\n          IMAGE_TAG=${GITHUB_SHA::7}\n          ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_ECR_REPOSITORY}\n          docker build -t ${ECR_URI}:${IMAGE_TAG} .\n          docker push ${ECR_URI}:${IMAGE_TAG}\n          # Verify image was pushed to ECR\n          aws ecr describe-images --repository-name ${AWS_ECR_REPOSITORY} --image-ids imageTag=${IMAGE_TAG}\n```",
+              "createdAt": "2025-11-14T20:37:41Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528876633",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2528876645,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "AWS account ID and IAM role ARN are hardcoded in the workflow. These sensitive values should be stored as GitHub secrets or repository/organization variables for better security and flexibility across environments. Consider using:\n```yaml\nAWS_IAM_ROLE: ${{ secrets.AWS_IAM_ROLE }}\nAWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}\n```\n```suggestion\n  AWS_IAM_ROLE: ${{ secrets.AWS_IAM_ROLE }}\n  AWS_ECR_REPOSITORY: aot/aot-user-ui\n  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}\n```",
+              "createdAt": "2025-11-14T20:37:41Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528876645",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2528876654,
+              "type": "review_comment",
+              "author": "Copilot",
+              "body": "The Docker build doesn't utilize layer caching, which will result in slower builds as every step will be rebuilt from scratch on each run. Consider using Docker buildx with GitHub Actions cache to improve build performance:\n```yaml\n- name: Set up Docker Buildx\n  uses: docker/setup-buildx-action@v3\n- name: Build, tag, and push\n  uses: docker/build-push-action@v5\n  with:\n    context: .\n    push: true\n    tags: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPOSITORY }}:${GITHUB_SHA::7}\n    cache-from: type=gha\n    cache-to: type=gha,mode=max\n```\n```suggestion\n      - name: Set up Docker Buildx\n        uses: docker/setup-buildx-action@v3\n      - name: Build, tag, and push\n        uses: docker/build-push-action@v5\n        with:\n          context: .\n          push: true\n          tags: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_REPOSITORY }}:${{ github.sha }}\n          cache-from: type=gha\n          cache-to: type=gha,mode=max\n```",
+              "createdAt": "2025-11-14T20:37:42Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528876654",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2528896305,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "We should probably have an env based matrix strategy to this. Doesn't have to be here, but if we capture an issue for it it'd be swell! ",
+              "createdAt": "2025-11-14T20:47:46Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528896305",
+              "actionType": "fix_required",
+              "severity": "high"
+            },
+            {
+              "id": 2528920005,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "A precheck step like this might be useful:\r\n```\r\n# Optional: ensure the ECR repo exists (no-op if it already does)\r\n      - name: Ensure ECR repository exists\r\n        run: |\r\n          set -euo pipefail\r\n          aws ecr describe-repositories --repository-names \"${AWS_ECR_REPOSITORY}\" >/dev/null 2>&1 || \\\r\n            aws ecr create-repository --repository-name \"${AWS_ECR_REPOSITORY}\" >/dev/null\r\n\r\n```",
+              "createdAt": "2025-11-14T21:00:17Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528920005",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2528927496,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "You only push :${GITHUB_SHA::7}. If your deploy expects :latest (or any fixed tag), pulls will 404 (manifest unknown).\r\n\r\nSomething like this might be better (imho)\r\n```\r\n- name: Build, tag, and push\r\n  run: |\r\n    set -euo pipefail\r\n    IMAGE_TAG=${GITHUB_SHA::7}\r\n    ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_ECR_REPOSITORY}\r\n    docker build -t ${ECR_URI}:${IMAGE_TAG} -t ${ECR_URI}:latest .\r\n    docker push ${ECR_URI}:${IMAGE_TAG}\r\n    docker push ${ECR_URI}:latest\r\n\r\n```",
+              "createdAt": "2025-11-14T21:03:59Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 26,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528927496",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2528935378,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "Also no platform is pinned here, which may cause issues in the future. Setting something like `platforms: linux/amd64,linux/arm64` will be useful.",
+              "createdAt": "2025-11-14T21:06:41Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528935378",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2528950900,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "options\r\n\r\n1) we can use GitHub Environments (dev, staging, prod) and store AWS_ACCOUNT_ID / AWS_IAM_ROLE as environment variables. This keeps credentials tied to each environment and avoids duplication in YAML.\r\n\r\n2), use repository/org secrets (AWS_ACCOUNT_ID_DEV, AWS_ACCOUNT_ID_PROD, etc.) and pull them into the matrix. This is also safer for multi-account setups managed by Infra.\r\n\r\nif we have to coordinate with Infra to confirm which approach fits our org standards and update the workflow accordingly lets create a follow-up task: “_Align AWS account & IAM role injection strategy for multi-env GitHub Actions builds._”",
+              "createdAt": "2025-11-14T21:14:35Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528950900",
               "actionType": "improvement_needed",
               "severity": "medium"
             },
             {
-              "id": 2528763619,
+              "id": 2528956208,
               "type": "review_comment",
               "author": "rquinlivan",
-              "body": "And yes, it works. You can checkout and run:\r\n\r\n```\r\ndocker build . -t aot-user-ui:latest\r\ndocker run -p 3000:3000 aot-user-ui:latest\r\n```\r\n\r\nThen open up localhost:3000.",
-              "createdAt": "2025-11-14T19:52:21Z",
-              "path": "Dockerfile",
-              "line": 13,
-              "url": "https://github.com/h1-aot/aot-user-ui/pull/7#discussion_r2528763619",
-              "actionType": "request",
+              "body": "I don't see any option to set a `platforms` key here. Isn't `runs-on: ubuntu-latest` specific enough?",
+              "createdAt": "2025-11-14T21:16:36Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528956208",
+              "actionType": "question",
+              "severity": "medium"
+            },
+            {
+              "id": 2528961170,
+              "type": "review_comment",
+              "author": "ppaul-h-aot",
+              "body": "U see that the copilot suggested caching layers. If you image is nt super big lik that at of the agent with playwright consuming .5 gb and then python tools taking 600 MB. You should not enable caching. \n",
+              "createdAt": "2025-11-14T21:18:38Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 3,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528961170",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2528969503,
+              "type": "review_comment",
+              "author": "rquinlivan",
+              "body": "I consider `latest` to be an anti-pattern in a non-public repository like this because it loses the explicit tagging of which commit we expect to be running.",
+              "createdAt": "2025-11-14T21:22:44Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 26,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528969503",
+              "actionType": "suggestion",
+              "severity": "low"
+            },
+            {
+              "id": 2528979180,
+              "type": "review_comment",
+              "author": "rquinlivan",
+              "body": "@skhasnis-cmd I just updated the pipeline to use secrets + a non-secret var for the region, and removed them from this file. If that works, we should go and do this in the other repositories.",
+              "createdAt": "2025-11-14T21:25:49Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": null,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2528979180",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2529008040,
+              "type": "review_comment",
+              "author": "ppaul-h-aot",
+              "body": "I had some typos in the prev comment. Sorry , I meant, caching has its own challenges. If you have a good seprate of base images the it would be advisable\r\n",
+              "createdAt": "2025-11-14T21:33:55Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 3,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2529008040",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2529148590,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "Yeah i think `runs-on: ubuntu-latest` on github runner should be stable ( i was thinking about multi env builds but for this use case its fine!)",
+              "createdAt": "2025-11-14T22:32:36Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2529148590",
+              "actionType": "improvement_needed",
+              "severity": "medium"
+            },
+            {
+              "id": 2529149696,
+              "type": "review_comment",
+              "author": "skhasnis-cmd",
+              "body": "Let's do the precheck step though?",
+              "createdAt": "2025-11-14T22:33:20Z",
+              "path": ".github/workflows/build_and_push_ecr.yml",
+              "line": 29,
+              "url": "https://github.com/h1-aot/aot-user-ui/pull/8#discussion_r2529149696",
+              "actionType": "question",
               "severity": "medium"
             }
           ],
-          "actionableCount": 3,
+          "actionableCount": 16,
           "severityCounts": {
-            "high": 0,
-            "medium": 2,
-            "low": 1
+            "high": 4,
+            "medium": 8,
+            "low": 4
           }
         }
       ]
