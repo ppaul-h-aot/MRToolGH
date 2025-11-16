@@ -7,7 +7,7 @@ const fs = require('fs');
 const basicAuth = require('express-basic-auth');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Security configuration
 const ALLOWED_IPS = process.env.ALLOWED_IPS ? process.env.ALLOWED_IPS.split(',') : [];
@@ -222,9 +222,19 @@ app.post('/api/analyze', (req, res) => {
 // API endpoint to get list of repositories
 app.get('/api/repos', async (req, res) => {
   try {
-    const fetcher = new (require('./data-fetcher'))();
-    const repos = await fetcher.getRepositoriesToMonitor();
-    res.json({ success: true, repos: repos });
+    // Return static list of repositories to monitor
+    const reposToMonitor = [
+      { name: 'agent_manager', owner: { login: 'h1-aot' }, url: 'https://github.com/h1-aot/agent_manager' },
+      { name: 'aot-base', owner: { login: 'h1-aot' }, url: 'https://github.com/h1-aot/aot-base' },
+      { name: 'aot-frontend-api', owner: { login: 'h1-aot' }, url: 'https://github.com/h1-aot/aot-frontend-api' },
+      { name: 'aot-user-ui', owner: { login: 'h1-aot' }, url: 'https://github.com/h1-aot/aot-user-ui' },
+      { name: 'masp', owner: { login: 'h1-aot' }, url: 'https://github.com/h1-aot/masp' },
+      { name: 'offsec-benchmarks', owner: { login: 'h1-aot' }, url: 'https://github.com/h1-aot/offsec-benchmarks' },
+      { name: 'aot-terraform', owner: { login: 'h1-aot' }, url: 'https://github.com/h1-aot/aot-terraform' },
+      { name: 'MRToolGH', owner: { login: 'ppaul-h-aot' }, url: 'https://github.com/ppaul-h-aot/MRToolGH' }
+    ];
+
+    res.json({ success: true, repos: reposToMonitor });
   } catch (error) {
     console.error('Error getting repositories:', error);
     res.json({ success: false, error: error.message });
